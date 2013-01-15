@@ -50,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     _ui->setupUi( this);
 
-    _appSettings = new QSettings("MicTech", "ArnBrowser");
+    _appSettings = new QSettings("MicTron", "ArnBrowser");
 
     //// Error log from Arn system
     Arn::setConsoleError( false);
