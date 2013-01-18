@@ -106,15 +106,15 @@
     </layout>
    </item>
    <item>
-    <widget class="QsciScintilla" name="textEdit"/>
+    <widget class="MTextEdit" name="textEdit"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QsciScintilla</class>
+   <class>MTextEdit</class>
    <extends>QTextEdit</extends>
-   <header>Qsci/qsciscintilla.h</header>
+   <header>MTextEdit.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

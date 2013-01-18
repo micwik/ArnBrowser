@@ -2,6 +2,9 @@
 # Project created by QtCreator 2010-08-12T21:08:40
 # -------------------------------------------------
 
+# Usage of js aware code editor
+# CONFIG += qscintilla
+
 QT += core gui
 QT += network
 
@@ -25,7 +28,8 @@ HEADERS += MainWindow.hpp \
     ItemDataRole.hpp \
     Math.hpp \
     CodeWindow.hpp \
-    ArnModel.hpp
+    ArnModel.hpp \
+    MTextEdit.hpp
 
 FORMS += MainWindow.ui \
     TermWindow.ui \
@@ -35,13 +39,15 @@ win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../ArnLib/release/ -lA
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ArnLib/debug/ -lArn
 else:unix: LIBS += -L$$OUT_PWD/../ArnLib/ -lArn
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../QScintilla/Qt4/release/ -lqscintilla2
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../QScintilla/Qt4/debug/ -lqscintilla2
-else:unix: LIBS += -L$$OUT_PWD/../QScintilla/Qt4/ -lqscintilla2
-
 INCLUDEPATH += $$PWD/..
-INCLUDEPATH += $$PWD/../QScintilla/Qt4
 
 
+qscintilla {
+  DEFINES += QSCINTILLA
 
+  win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../QScintilla/Qt4/release/ -lqscintilla2
+  else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../QScintilla/Qt4/debug/ -lqscintilla2
+  else:unix: LIBS += -L$$OUT_PWD/../QScintilla/Qt4/ -lqscintilla2
 
+  INCLUDEPATH += $$PWD/../QScintilla/Qt4
+}

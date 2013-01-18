@@ -32,9 +32,9 @@
 
 #include "CodeWindow.hpp"
 #include "ui_CodeWindow.h"
-#include <Qsci/qsciscintilla.h>
-#include <Qsci/qscilexerjavascript.h>
+#include "MTextEdit.hpp"
 #include <QFont>
+#include <QFontMetrics>
 #include <QString>
 #include <QFile>
 #include <QTextStream>
@@ -45,6 +45,9 @@
 #include <QCloseEvent>
 #include <QDebug>
 
+#ifdef QSCINTILLA
+#  include <Qsci/qscilexerjavascript.h>
+#endif
 
 CodeWindow::CodeWindow( QSettings* appSettings, const QString& path, QWidget* parent) :
     QDialog( parent),
@@ -57,12 +60,13 @@ CodeWindow::CodeWindow( QSettings* appSettings, const QString& path, QWidget* pa
     _appSettings = appSettings;
     readSettings();
 
-    QsciScintilla*  textEdit = _ui->textEdit;
+    QFont  font("MonoSpace", 12);
+    MTextEdit*  textEdit = _ui->textEdit;
+
+#ifdef QSCINTILLA
     QsciLexerJavaScript*  lexer = 0;
     if (path.endsWith(".js"))
         lexer = new QsciLexerJavaScript;
-
-    QFont  font("MonoSpace", 12);
 
     if (lexer) {
         lexer->setFont( font);
@@ -79,6 +83,12 @@ CodeWindow::CodeWindow( QSettings* appSettings, const QString& path, QWidget* pa
     textEdit->setAutoIndent(true);
     textEdit->setBraceMatching( QsciScintilla::StrictBraceMatch);
     textEdit->setMatchedBraceForegroundColor( Qt::red);
+#else
+    QFontMetrics fm( font);
+    int  tabWidthInPixels = fm.width("    ");
+    textEdit->setTabStopWidth( tabWidthInPixels);
+    textEdit->setCurrentFont( font);
+#endif
 
     _arnItem.open( path);
     setText( _arnItem.toString());
@@ -126,7 +136,7 @@ void  CodeWindow::on_findButton_clicked()
                                           tr("Text:"), QLineEdit::Normal,
                                           QString(), &isOk);
     if (isOk && !text.isEmpty()) {
-        _ui->textEdit->findFirst( text, false, false, false, true);
+        _ui->textEdit->findFirst( text);
     }
 }
 
