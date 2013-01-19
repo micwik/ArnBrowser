@@ -53,9 +53,10 @@ public:
     ~TermWindow();
 
 private slots:
-    void  doPipeInput( QString text);
-    void  doPipe2Input( QString text);
-    void  doLineInput();
+    void  doPipeInputRq( QString text);
+    void  doPipeInputPv( QString text);
+    void  doLineInputRq();
+    void  doLineInputPv();
     void  readSettings();
     void  writeSettings();
 
@@ -64,8 +65,8 @@ protected:
 
 private:
     Ui::TermWindow *_ui;
-    ArnItem  _pipe;
-    ArnItem  _pipe2;
+    ArnItem  _pipeRq;
+    ArnItem  _pipePv;
     QSettings*  _appSettings;
 };
 

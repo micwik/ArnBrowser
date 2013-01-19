@@ -47,16 +47,25 @@ TermWindow::TermWindow( QSettings* appSettings, const QString& path, QWidget* pa
     _appSettings = appSettings;
     readSettings();
 
-    _ui->pipePath->setText( path);
+    QString  twinPath = Arn::twinPath( path);
+    if (Arn::isProviderPath( path)) {
+        _pipePv.open( path);
+        _pipeRq.open( twinPath);
+    }
+    else {  // path is requester side (normal)
+        _pipeRq.open( path);
+        _pipePv.open( twinPath);
+    }
+
+    _ui->pipePath->setText( _pipeRq.path());
     _ui->pipePath->setReadOnly( true);
     _ui->textEdit->setReadOnly( true);
-    _ui->lineEdit->setFocus();
+    _ui->lineEditRq->setFocus();
 
-    _pipe.open( path);
-    _pipe2.open( Arn::twinPath( path));
-    connect( &_pipe, SIGNAL(changed(QString)), this, SLOT(doPipeInput(QString)));
-    connect( &_pipe2, SIGNAL(changed(QString)), this, SLOT(doPipe2Input(QString)));
-    connect( _ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(doLineInput()));
+    connect( &_pipeRq, SIGNAL(changed(QString)), this, SLOT(doPipeInputRq(QString)));
+    connect( &_pipePv, SIGNAL(changed(QString)), this, SLOT(doPipeInputPv(QString)));
+    connect( _ui->lineEditRq, SIGNAL(returnPressed()), this, SLOT(doLineInputRq()));
+    connect( _ui->lineEditPv, SIGNAL(returnPressed()), this, SLOT(doLineInputPv()));
 }
 
 
@@ -66,28 +75,33 @@ TermWindow::~TermWindow()
 }
 
 
-void  TermWindow::doPipeInput( QString text)
+void  TermWindow::doPipeInputRq( QString text)
 {
     _ui->textEdit->setTextColor( Qt::blue);
     _ui->textEdit->append( text);
 }
 
 
-void  TermWindow::doPipe2Input( QString text)
+void  TermWindow::doPipeInputPv( QString text)
 {
     _ui->textEdit->setTextColor( Qt::black);
     _ui->textEdit->append( text);
 }
 
 
-void  TermWindow::doLineInput()
+void  TermWindow::doLineInputRq()
 {
-    QString  text = _ui->lineEdit->text();
-    _ui->lineEdit->clear();
+    QString  text = _ui->lineEditRq->text();
+    _ui->lineEditRq->clear();
+    _pipeRq = text;
+}
 
-    //_ui->textEdit->setTextColor( Qt::black);
-    //_ui->textEdit->append( text);
-    _pipe = text;
+
+void  TermWindow::doLineInputPv()
+{
+    QString  text = _ui->lineEditPv->text();
+    _ui->lineEditPv->clear();
+    _pipePv = text;
 }
 
 
