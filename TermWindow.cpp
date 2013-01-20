@@ -62,6 +62,7 @@ TermWindow::TermWindow( QSettings* appSettings, const QString& path, QWidget* pa
     _ui->textEdit->setReadOnly( true);
     _ui->lineEditRq->setFocus();
 
+    connect( &_pipeRq, SIGNAL(arnLinkDestroyed()), this, SLOT(deleteLater()));
     connect( &_pipeRq, SIGNAL(changed(QString)), this, SLOT(doPipeInputRq(QString)));
     connect( &_pipePv, SIGNAL(changed(QString)), this, SLOT(doPipeInputPv(QString)));
     connect( _ui->lineEditRq, SIGNAL(returnPressed()), this, SLOT(doLineInputRq()));
