@@ -14,32 +14,32 @@ OBJECTS_DIR = tmp
 MOC_DIR = tmp
 UI_DIR = tmp
 
-SOURCES += main.cpp \
-    MainWindow.cpp \
-    TermWindow.cpp \
-    MultiDelegate.cpp \
-    Math.cpp \
-    CodeWindow.cpp \
-    ArnModel.cpp
+SOURCES += src/main.cpp \
+    src/MainWindow.cpp \
+    src/TermWindow.cpp \
+    src/MultiDelegate.cpp \
+    src/Math.cpp \
+    src/CodeWindow.cpp \
+    src/ArnModel.cpp
 
-HEADERS += MainWindow.hpp \
-    TermWindow.hpp \
-    MultiDelegate.hpp \
-    ItemDataRole.hpp \
-    Math.hpp \
-    CodeWindow.hpp \
-    ArnModel.hpp \
-    MTextEdit.hpp
+HEADERS += src/MainWindow.hpp \
+    src/TermWindow.hpp \
+    src/MultiDelegate.hpp \
+    src/ItemDataRole.hpp \
+    src/Math.hpp \
+    src/CodeWindow.hpp \
+    src/ArnModel.hpp \
+    src/MTextEdit.hpp
 
-FORMS += MainWindow.ui \
-    TermWindow.ui \
-    CodeWindow.ui
+FORMS += src/MainWindow.ui \
+    src/TermWindow.ui \
+    src/CodeWindow.ui
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../ArnLib/release/ -lArn
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ArnLib/debug/ -lArn
 else:unix: LIBS += -L$$OUT_PWD/../ArnLib/ -lArn
 
-INCLUDEPATH += $$PWD/..
+INCLUDEPATH += src $$PWD/..
 
 
 qscintilla {
