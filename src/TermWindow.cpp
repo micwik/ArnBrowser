@@ -47,8 +47,8 @@ TermWindow::TermWindow( QSettings* appSettings, const QString& path, QWidget* pa
     _appSettings = appSettings;
     readSettings();
 
-    QString  twinPath = Arn::twinPath( path);
-    if (Arn::isProviderPath( path)) {
+    QString  twinPath = ArnM::twinPath( path);
+    if (ArnM::isProviderPath( path)) {
         _pipePv.open( path);
         _pipeRq.open( twinPath);
     }
