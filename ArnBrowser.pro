@@ -3,7 +3,7 @@
 # -------------------------------------------------
 
 # Usage of js aware code editor
-CONFIG += qscintilla
+# CONFIG += qscintilla
 
 QT += core gui
 QT += network
@@ -39,7 +39,7 @@ win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../ArnLib/release/ -lA
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ArnLib/debug/ -lArn
 else:unix: LIBS += -L$$OUT_PWD/../ArnLib/ -lArn
 
-INCLUDEPATH += src $$PWD/..
+INCLUDEPATH += src $$PWD/.. $$PWD/../include
 
 
 qscintilla {
