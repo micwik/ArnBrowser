@@ -3,7 +3,7 @@
 # -------------------------------------------------
 
 # Usage of js aware code editor
-# CONFIG += qscintilla
+CONFIG += qscintilla
 
 QT += core gui
 QT += network
