@@ -6,6 +6,8 @@
 
 This Qt and ArnLib based program lets you browse data objects in an Arn server. 
 All data objects are real time presented in a tree view.
+<Br><Br>
+
 
 ## Installation and usage
 
@@ -13,7 +15,7 @@ Read [Install.md](Install.md) how to build, install and use.
 <Br><Br>
 
 
-### Main features
+## Main features
 
 * Based on QT, multiple plattform and OS support.
 
