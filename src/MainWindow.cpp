@@ -34,6 +34,8 @@
 #include "ui_MainWindow.h"
 #include "TermWindow.hpp"
 #include "CodeWindow.hpp"
+#include "ManageWindow.hpp"
+#include "VcsWindow.hpp"
 #include "MultiDelegate.hpp"
 #include <ArnLib/ArnClient.hpp>
 #include <ArnLib/ArnLink.hpp>
@@ -114,6 +116,20 @@ void  MainWindow::on_editButton_clicked()
 }
 
 
+void  MainWindow::on_manageButton_clicked()
+{
+    ManageWindow*  manageWindow = new ManageWindow( _appSettings, _curItemPath, 0);
+    manageWindow->show();
+}
+
+
+void  MainWindow::on_vcsButton_clicked()
+{
+    VcsWindow*  vcsWindow = new VcsWindow( _appSettings, 0);
+    vcsWindow->show();
+}
+
+
 void  MainWindow::on_viewHidden_clicked()
 {
     updateHiddenTree( _ui->arnView->rootIndex());
@@ -175,19 +191,6 @@ void  MainWindow::clientConnected()
 
     _appSettings->setValue("connect/host", _ui->hostEdit->text());
     _appSettings->setValue("connect/port", _ui->portEdit->value());
-
-/*
-    // Test
-    ArnItem arnTestValue("/test/value");
-    arnTestValue = "Testing ...";
-    QImage  img;
-    img.load("hus.png");
-    //img.load("vattenmat.ppm");
-    ArnItem arnImg("/test/husImg");
-    QVariant valImg = QVariant( img);
-    arnImg = valImg;
-    qDebug() << "Set Test Image: type=" << arnImg.toVariant().typeName();
-*/
 }
 
 

@@ -59,6 +59,8 @@ private slots:
     void  on_connectButton_clicked();
     void  on_terminalButton_clicked();
     void  on_editButton_clicked();
+    void  on_manageButton_clicked();
+    void  on_vcsButton_clicked();
     void  on_viewHidden_clicked();
     void  on_hideBidir_clicked();
     void  errorLog( QString errText);

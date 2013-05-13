@@ -20,7 +20,9 @@ SOURCES += src/main.cpp \
     src/MultiDelegate.cpp \
     src/Math.cpp \
     src/CodeWindow.cpp \
-    src/ArnModel.cpp
+    src/ArnModel.cpp \
+    src/ManageWindow.cpp \
+    src/VcsWindow.cpp
 
 HEADERS += src/MainWindow.hpp \
     src/TermWindow.hpp \
@@ -29,11 +31,15 @@ HEADERS += src/MainWindow.hpp \
     src/Math.hpp \
     src/CodeWindow.hpp \
     src/ArnModel.hpp \
-    src/MTextEdit.hpp
+    src/MTextEdit.hpp \
+    src/ManageWindow.hpp \
+    src/VcsWindow.hpp
 
 FORMS += src/MainWindow.ui \
     src/TermWindow.ui \
-    src/CodeWindow.ui
+    src/CodeWindow.ui \
+    src/ManageWindow.ui \
+    src/VcsWindow.ui
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../ArnLib/release/ -lArn
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ArnLib/debug/ -lArn
