@@ -31,5 +31,9 @@ Read [Install.md](Install.md) how to build, install and use.
 
 * Terminal for monitoring and inserting data streams for double direction pipes.
 
+* Managing Arn Data Object properties.
+
+* Managing Version Control (VCS) for objects stored in files.
+
 * ...
   To be Continued
