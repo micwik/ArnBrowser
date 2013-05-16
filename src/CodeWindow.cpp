@@ -209,6 +209,7 @@ void  CodeWindow::closeEvent( QCloseEvent* event)
     qDebug() << "Close event";
     writeSettings();
     event->accept();
+    deleteLater();
 }
 
 

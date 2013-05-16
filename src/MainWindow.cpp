@@ -85,6 +85,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     _ui->terminalButton->setEnabled( false);
     _ui->editButton->setEnabled( false);
+    _ui->manageButton->setEnabled( false);
+    _ui->vcsButton->setEnabled( false);
 }
 
 
@@ -169,6 +171,8 @@ void  MainWindow::itemClicked( const QModelIndex& index)
                                       ||  (type.e == type.ByteArray)
                                       ||  (type.e == type.String));
     _ui->editButton->setEnabled( editEn);
+
+    _ui->manageButton->setEnabled( true);
 }
 
 
@@ -183,6 +187,8 @@ void  MainWindow::clientConnected()
     _arnModel->setHideBidir( _ui->hideBidir->isChecked());
     connect( _arnModel, SIGNAL(hiddenRow(int,QModelIndex,bool)),
              this, SLOT(updateHidden(int,QModelIndex,bool)));
+    _ui->vcsButton->setEnabled( true);
+
     _delegate = new MultiDelegate;
     _ui->arnView->setItemDelegate( _delegate);
     _ui->arnView->setEnabled( true);
@@ -236,6 +242,7 @@ void  MainWindow::closeEvent( QCloseEvent* event)
     qDebug() << "Close event";
     writeSettings();
     event->accept();
+    deleteLater();
 }
 
 
