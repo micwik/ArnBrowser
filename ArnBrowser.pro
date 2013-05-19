@@ -3,10 +3,11 @@
 # -------------------------------------------------
 
 # Usage of js aware code editor
-CONFIG += qscintilla
+# CONFIG += qscintilla
 
 QT += core gui
 QT += network
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = ArnBrowser
 TEMPLATE = app
@@ -41,9 +42,14 @@ FORMS += src/MainWindow.ui \
     src/ManageWindow.ui \
     src/VcsWindow.ui
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../ArnLib/release/ -lArn
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ArnLib/debug/ -lArn
-else:unix: LIBS += -L$$OUT_PWD/../ArnLib/ -lArn
+greaterThan(QT_MAJOR_VERSION, 4) {
+    ARNLIB = Arn5
+} else {
+    ARNLIB = Arn
+}
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../ArnLib/release/ -l$${ARNLIB}
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ArnLib/debug/ -l$${ARNLIB}
+else:unix: LIBS += -L$$OUT_PWD/../ArnLib/ -l$${ARNLIB}
 
 INCLUDEPATH += src $$PWD/.. $$PWD/../include
 
