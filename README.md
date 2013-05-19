@@ -17,7 +17,7 @@ Read [Install.md](Install.md) how to build, install and use.
 
 ## Main features
 
-* Based on QT, multiple plattform and OS support.
+* Based on Qt (4 & 5), multiple plattform and OS support.
 
 * Tree view presentation of "hot" changing data objects.
 
