@@ -158,42 +158,45 @@ QWidget*  MultiDelegate::createEditor( QWidget* parent,
 {
     QVariant  value = index.model()->data( index, Qt::EditRole);
     switch (value.type()) {
-        case QMetaType::QDate:
-        {
-            QDateEdit*  editor = new QDateEdit( parent);
-            setupCalenderWidget( editor);
-            editor->setMaximumWidth( editor->sizeHint().width());
-            return editor;
-        }
-        case QMetaType::QDateTime:
-        {
-            QDateTimeEdit*  editor = new QDateTimeEdit( parent);
-            setupCalenderWidget( editor);
-            editor->setMaximumWidth( editor->sizeHint().width());
-            return editor;
-        }
-        case QMetaType::QImage:
-            // Fall throu
-        case QMetaType::QPixmap:
-            // Fall throu
-        case QMetaType::QIcon:
-        {
-            PixmapViewer*  editor = new PixmapViewer( parent);
-            return editor;
-        }
-        case QMetaType::QString:
-        {
-            QVariant  varList = index.model()->data( index, ItemDataRole::EnumList);
-            if (varList.isNull())  break;  // Not a enum-list, fall to std
-
-            QComboBox*  editor = new QComboBox( parent);
-            editor->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-            editor->addItems( varList.toStringList());
-            editor->setMaximumWidth( editor->minimumSizeHint().width());
-            return editor;
-        }
-        default:;
+    case QMetaType::QTime: {
+        QTimeEdit*  editor = new QTimeEdit( parent);
+        editor->setMaximumWidth( editor->sizeHint().width());
+        return editor;
     }
+    case QMetaType::QDate: {
+        QDateEdit*  editor = new QDateEdit( parent);
+        setupCalenderWidget( editor);
+        editor->setMaximumWidth( editor->sizeHint().width());
+        return editor;
+    }
+    case QMetaType::QDateTime: {
+        QDateTimeEdit*  editor = new QDateTimeEdit( parent);
+        setupCalenderWidget( editor);
+        editor->setMaximumWidth( editor->sizeHint().width());
+        return editor;
+    }
+    case QMetaType::QImage:
+        // Fall throu
+    case QMetaType::QPixmap:
+        // Fall throu
+    case QMetaType::QIcon:
+    {
+        PixmapViewer*  editor = new PixmapViewer( parent);
+        return editor;
+    }
+    case QMetaType::QString: {
+        QVariant  varList = index.model()->data( index, ItemDataRole::EnumList);
+        if (varList.isNull())  break;  // Not a enum-list, fall to std
+
+        QComboBox*  editor = new QComboBox( parent);
+        editor->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+        editor->addItems( varList.toStringList());
+        editor->setMaximumWidth( editor->minimumSizeHint().width());
+        return editor;
+    }
+    default:;
+    }
+
     return QItemDelegate::createEditor( parent, option, index);
 }
 
@@ -216,7 +219,12 @@ void  MultiDelegate::setEditorData( QWidget* editor,
     QVariant value = index.model()->data( index, Qt::EditRole);
 
     QString  className = editor->metaObject()->className();
-    if (className == "QDateEdit") {
+    if (className == "QTimeEdit") {
+        QTimeEdit*  ed = qobject_cast<QTimeEdit*>(editor);
+        Q_ASSERT( ed);
+        ed->setTime( value.toTime());
+    }
+    else if (className == "QDateEdit") {
         QDateEdit*  ed = qobject_cast<QDateEdit*>(editor);
         Q_ASSERT( ed);
         ed->setDate( value.toDate());
@@ -265,7 +273,12 @@ void MultiDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
     QVariant value;
 
     QString  className = editor->metaObject()->className();
-    if (className == "QDateEdit") {
+    if (className == "QTimeEdit") {
+        QTimeEdit*  ed = qobject_cast<QTimeEdit*>(editor);
+        Q_ASSERT( ed);
+        value = QVariant( ed->time());
+    }
+    else if (className == "QDateEdit") {
         QDateEdit*  ed = qobject_cast<QDateEdit*>(editor);
         Q_ASSERT( ed);
         value = QVariant( ed->date());

@@ -221,8 +221,8 @@ QVariant  ArnModel::adjustedNodeData( const ArnNode *node, int role) const
     if (prec >= 0) { // The value should be a floating-point
         return QString::number( valueNode->toDouble(), 'f', prec) + unit;
     }
-    else if ((type.e == type.ByteArray)
-         ||  (type.e == type.String)) {
+    else if ((type == type.ByteArray)
+         ||  (type == type.String)) {
         QString  value = valueNode->toString();
         int  i = value.indexOf('\n');
         if (i < 0) {
@@ -459,7 +459,7 @@ void  ArnModel::doInsertItem( const QModelIndex& index, ArnNode* node, QString p
     }
 
     this->beginInsertRows( index, insRow, insRow);
-    qDebug() << "arnModel netChildFound: create item=" << itemName;
+    // qDebug() << "arnModel netChildFound: create item=" << itemName;
     ArnNode*  child = new ArnNode( node, itemName, insRow);
     connect( child, SIGNAL(changed()), this, SLOT(nodeDataChanged()));
     connect( child, SIGNAL(arnLinkDestroyed()), this, SLOT(destroyNode()));
