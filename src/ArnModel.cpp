@@ -350,7 +350,7 @@ bool  ArnModel::setData( const QModelIndex& index, const QVariant& value, int ro
         if (node->isFolder()) {
             if (node->_valueChild) {
                 if (node->_setMap) {
-                    node->_valueChild->setValue( node->_setMap->key( value.toString()));
+                    node->_valueChild->setValue( node->_setMap->keyString( value.toString()));
                 }
                 else {
                     setAdjustedNodeData( node->_valueChild, value);
@@ -373,14 +373,14 @@ bool  ArnModel::setData( const QModelIndex& index, const QVariant& value, int ro
 bool  ArnModel::setAdjustedNodeData( ArnNode* node, const QVariant& data)
 {
     switch (data.type()) {
-    case QVariant::ByteArray:
+    case QMetaType::QByteArray:
         node->setValue( data.toByteArray());
         break;
-    case QVariant::String:
-    case QVariant::Bool:
-    case QVariant::Int:
-    case QVariant::Double:
-    case QVariant::UInt:
+    case QMetaType::QString:
+    case QMetaType::Bool:
+    case QMetaType::Int:
+    case QMetaType::Double:
+    case QMetaType::UInt:
         node->setValue( data.toString());
         break;
     default:
