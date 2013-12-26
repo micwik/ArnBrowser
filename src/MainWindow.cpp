@@ -195,6 +195,9 @@ void  MainWindow::clientConnected()
     _ui->arnView->setColumnWidth(0, _pathWidth);
     _ui->arnView->setColumnWidth(1, 10);
 
+    _curItemPath = "/";
+    _ui->manageButton->setEnabled( true);
+
     _appSettings->setValue("connect/host", _ui->hostEdit->text());
     _appSettings->setValue("connect/port", _ui->portEdit->value());
 }
