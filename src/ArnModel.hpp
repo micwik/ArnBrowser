@@ -35,8 +35,8 @@
 
 #include "ItemDataRole.hpp"
 #include <QAbstractItemModel>
-#include <ArnLib/ArnItem.hpp>
-#include <ArnLib/ArnClient.hpp>
+#include <ArnInc/ArnItem.hpp>
+#include <ArnInc/ArnClient.hpp>
 
 class ArnMonitor;
 class XStringMap;

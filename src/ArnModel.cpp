@@ -31,8 +31,8 @@
 //
 
 #include "ArnModel.hpp"
-#include <ArnLib/ArnLink.hpp>
-#include <ArnLib/ArnMonitor.hpp>
+#include <ArnInc/ArnDefs.hpp>
+#include <ArnInc/ArnMonitor.hpp>
 #include <QRegExp>
 #include <QStringList>
 
@@ -154,7 +154,7 @@ QVariant  ArnModel::data(const QModelIndex &index, int role) const
     case Qt::EditRole:
         switch (index.column()) {
         case 0:
-            return node->name( ArnLink::NameF::NoFolderMark);
+            return node->name( Arn::NameF::NoFolderMark);
         case 1:
             return adjustedNodeData( node, role);
         }
@@ -174,7 +174,7 @@ QVariant  ArnModel::data(const QModelIndex &index, int role) const
         return node->path();
 
     case Role::Hidden: {
-        QString  name = node->name( ArnLink::NameF::NoFolderMark);
+        QString  name = node->name( Arn::NameF::NoFolderMark);
         return submitRowHidden( index.row(), parent( index), name);
     }
     case ItemDataRole::EnumList:
@@ -217,7 +217,7 @@ QVariant  ArnModel::adjustedNodeData( const ArnNode *node, int role) const
         }
     }
 
-    ArnLink::Type  type = valueNode->type();
+    Arn::DataType  type = valueNode->type();
     if (prec >= 0) { // The value should be a floating-point
         return QString::number( valueNode->toDouble(), 'f', prec) + unit;
     }
@@ -452,7 +452,7 @@ void  ArnModel::doInsertItem( const QModelIndex& index, ArnNode* node, QString p
     int  insRow;
     for (insRow = 0; insRow < node->_children.size(); ++insRow) {
         ArnNode*  child = node->_children.at( insRow);
-        QString  childName = child->name( ArnLink::NameF());
+        QString  childName = child->name( Arn::NameF());
         // qDebug() << "arnModel doInsertItem: item=" << itemName << " child=" << childName;
         if (itemName == childName)  return;  // Item already exist
         if (itemName < childName)  break;  // Sorting place found

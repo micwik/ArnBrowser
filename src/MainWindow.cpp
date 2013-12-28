@@ -37,8 +37,7 @@
 #include "ManageWindow.hpp"
 #include "VcsWindow.hpp"
 #include "MultiDelegate.hpp"
-#include <ArnLib/ArnClient.hpp>
-#include <ArnLib/ArnLink.hpp>
+#include <ArnInc/ArnClient.hpp>
 #include <QMessageBox>
 #include <QImage>
 #include <QSettings>
@@ -161,15 +160,15 @@ void  MainWindow::itemClicked( const QModelIndex& index)
     _curItemPath = _arnModel->data( index, ArnModel::Role::Path).toString();
     //qDebug() << "ItemClicked: path=" << _curItemPath;
     ArnItem  arnItem( _curItemPath);
-    ArnLink::Type  type = arnItem.type();
+    Arn::DataType  type = arnItem.type();
 
     // Set state for Terminal button
     _ui->terminalButton->setEnabled( arnItem.isPipeMode());
 
     // Set state for Edit button
-    bool editEn = !arnItem.isFolder() && ((type.e == type.Null)
-                                      ||  (type.e == type.ByteArray)
-                                      ||  (type.e == type.String));
+    bool editEn = !arnItem.isFolder() && ((type == type.Null)
+                                      ||  (type == type.ByteArray)
+                                      ||  (type == type.String));
     _ui->editButton->setEnabled( editEn);
 
     _ui->manageButton->setEnabled( true);

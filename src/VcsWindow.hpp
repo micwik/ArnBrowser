@@ -33,9 +33,9 @@
 #ifndef VCSWINDOW_HPP
 #define VCSWINDOW_HPP
 
-#include <ArnLib/MQFlags.hpp>
-#include "ArnLib/Arn.hpp"
-#include <ArnLib/ArnPersistSapi.hpp>
+#include <ArnInc/MQFlags.hpp>
+#include <ArnInc/Arn.hpp>
+#include <ArnInc/ArnPersistSapi.hpp>
 #include <QStringList>
 #include <QDialog>
 

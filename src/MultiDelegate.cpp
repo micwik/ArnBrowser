@@ -47,10 +47,7 @@
 #include <QImage>
 #include <QPainter>
 #include <QRect>
-//#include <QVBoxLayout>
-//#include <QHBoxLayout>
 #include <QGridLayout>
-//#include <QSizePolicy>
 #include <QDebug>
 
 

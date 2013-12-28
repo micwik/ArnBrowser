@@ -2,6 +2,8 @@
 # Project created by QtCreator 2010-08-12T21:08:40
 # -------------------------------------------------
 
+CONFIG += ArnLibCompile
+
 # Usage of js aware code editor
 # CONFIG += qscintilla
 
@@ -47,11 +49,20 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 } else {
     ARNLIB = Arn
 }
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../ArnLib/release/ -l$${ARNLIB}
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ArnLib/debug/ -l$${ARNLIB}
-else:unix: LIBS += -L$$OUT_PWD/../ArnLib/ -l$${ARNLIB}
 
 INCLUDEPATH += src $$PWD/.. $$PWD/../include
+
+ArnLibCompile {
+    ARN += server
+    ARN += zeroconf
+    CONFIG += mDnsIntern
+    include(../ArnLib/src/ArnLib.pri)
+    INCLUDEPATH += $$PWD/../ArnLib/src
+} else {
+    win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../ArnLib/release/ -l$${ARNLIB}
+    else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ArnLib/debug/ -l$${ARNLIB}
+    else:unix: LIBS += -L$$OUT_PWD/../ArnLib/ -l$${ARNLIB}
+}
 
 
 qscintilla {

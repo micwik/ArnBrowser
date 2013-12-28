@@ -105,7 +105,7 @@ void  ManageWindow::doUpdate()
         _ui->armDelButton->setDisabled(true);
     }
     else if (!_arnPath.isFolder()) {  // Edit non folder item
-        _ui->itemEdit->setText( _arnPath.name( ArnLink::NameF()));
+        _ui->itemEdit->setText( _arnPath.name( Arn::NameF()));
         _ui->itemEdit->setDisabled(true);
         _ui->folderButton->setChecked(false);
         _ui->folderButton->setDisabled(true);

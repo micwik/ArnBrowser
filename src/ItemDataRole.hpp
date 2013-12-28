@@ -33,7 +33,7 @@
 #ifndef ITEMDATAROLE_HPP
 #define ITEMDATAROLE_HPP
 
-#include <ArnLib/MQFlags.hpp>
+#include <ArnInc/MQFlags.hpp>
 #include <Qt>
 
 
