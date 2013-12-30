@@ -34,20 +34,24 @@
 #include <ArnInc/ArnDefs.hpp>
 #include <ArnInc/ArnMonitor.hpp>
 #include <QRegExp>
+#include <QPixmap>
 #include <QStringList>
+
 
 
 void  ArnNode::init()
 {
-    _parent     = 0;
-    _valueChild = 0;
-    _setChild   = 0;
-    _propChild  = 0;
-    _infoChild  = 0;
-    _arnMon     = 0;
-    _setMap     = 0;
-    _propMap    = 0;
-    _isExpanded = false;
+    _parent       = 0;
+    _valueChild   = 0;
+    _setChild     = 0;
+    _propChild    = 0;
+    _infoChild    = 0;
+    _arnMon       = 0;
+    _setMap       = 0;
+    _propMap      = 0;
+    _folderChildN = 0;
+    _leafChildN   = 0;
+    _isExpanded   = false;
 }
 
 
@@ -166,6 +170,27 @@ QVariant  ArnModel::data(const QModelIndex &index, int role) const
             QRegExp rx("<tt>(.*)</tt>");
             if (rx.indexIn( info) >= 0) {
                 return rx.cap(1);
+            }
+        }
+        break;
+
+    case Qt::DecorationRole:
+        if (index.column() == 0) {
+            if (node->isFolder()) {
+                //qDebug() << "Data DecorationRole: path=" << node->path( Arn::NameF())
+                //         << " leafChildN=" << node->_leafChildN << " folderChildN=" << node->_folderChildN;
+                if (node->_leafChildN == 0)  // No additional leaves as children, only folders
+                    return QPixmap("://pic/folder.png");
+                else if (node->_folderChildN == 0)  // No additional folders as children, only leaves
+                    return QPixmap("://pic/documents.png");
+                else  // Mixed folders and leaves
+                    return QPixmap("://pic/folder_document.png");
+            }
+            else {
+                if (node->isPipeMode())
+                    return QPixmap("://pic/pipe.png");
+                else
+                    return QPixmap("://pic/document.png");
             }
         }
         break;
@@ -441,6 +466,30 @@ void  ArnModel::netChildFound( QString path)
         QModelIndex  valueIndex = createIndex( index.row(), 1, node);
         emit dataChanged( valueIndex, valueIndex);
     }
+
+    if (ArnM::isFolderPath( path)) {
+        if (node->_isExpanded) {
+            if (node->_folderChildN >= 0)
+                node->_folderChildN++;
+            else
+                node->_folderChildN = 1;
+        }
+        else
+            node->_folderChildN = -1;  // Mark at least one folder child found (not exact for unexpanded nodes)
+        emit dataChanged( index, index);
+    }
+    else {
+        if (node->_isExpanded) {
+            if (node->_leafChildN >= 0)
+                node->_leafChildN++;
+            else
+                node->_leafChildN = 1;
+        }
+        else {
+            node->_leafChildN = -1;  // Mark at least one leaf child found (not exact for unexpanded nodes)
+        }
+        emit dataChanged( index, index);
+    }
 }
 
 
@@ -462,6 +511,7 @@ void  ArnModel::doInsertItem( const QModelIndex& index, ArnNode* node, QString p
     // qDebug() << "arnModel netChildFound: create item=" << itemName;
     ArnNode*  child = new ArnNode( node, itemName, insRow);
     connect( child, SIGNAL(changed()), this, SLOT(nodeDataChanged()));
+    connect( child, SIGNAL(modeChanged(ArnItem::Mode)), this, SLOT(nodeModeChanged()));
     connect( child, SIGNAL(arnLinkDestroyed()), this, SLOT(destroyNode()));
     this->endInsertRows();
 
@@ -492,6 +542,14 @@ void  ArnModel::nodeDataChanged()
 {
     ArnNode*  node = qobject_cast<ArnNode*>( sender());
     QModelIndex  index = indexFromNode( node, 1);
+    emit dataChanged( index, index);
+}
+
+
+void ArnModel::nodeModeChanged()
+{
+    ArnNode*  node = qobject_cast<ArnNode*>( sender());
+    QModelIndex  index = indexFromNode( node, 0);
     emit dataChanged( index, index);
 }
 
@@ -548,7 +606,7 @@ void  ArnModel::destroyNode()
         parent->_valueChild = 0;
         QModelIndex  valueIndex = indexFromNode( parent, 1);
         emit dataChanged( valueIndex, valueIndex);
-        delete node;
+        node->deleteLater();
         return;
     }
     if (node == parent->_setChild) { // Remove Set-child
@@ -557,7 +615,7 @@ void  ArnModel::destroyNode()
         parent->_setChild = 0;
         QModelIndex  valueIndex = indexFromNode( parent, 1);
         emit dataChanged( valueIndex, valueIndex);
-        delete node;
+        node->deleteLater();
         return;
     }
     if (node == parent->_propChild) { // Remove Property-child
@@ -566,14 +624,14 @@ void  ArnModel::destroyNode()
         parent->_propChild = 0;
         QModelIndex  valueIndex = indexFromNode( parent, 1);
         emit dataChanged( valueIndex, valueIndex);
-        delete node;
+        node->deleteLater();
         return;
     }
     if (node == parent->_infoChild) { // Remove Info-child
         parent->_infoChild = 0;
         QModelIndex  valueIndex = indexFromNode( parent, 1);
         emit dataChanged( valueIndex, valueIndex);
-        delete node;
+        node->deleteLater();
         return;
     }
 
@@ -582,9 +640,18 @@ void  ArnModel::destroyNode()
     if (row >= 0) {  // Remove normal child node
         QModelIndex  index = indexFromNode( parent, 0);
         beginRemoveRows( index, row, row);
-        delete parent->_children.at( row);  // Delete node
+        if (node->isFolder()) {
+            if (parent->_folderChildN > 0)
+                parent->_folderChildN--;
+        }
+        else {
+            if (parent->_leafChildN > 0)
+                parent->_leafChildN--;
+        }
+        parent->_children.at( row)->deleteLater();  // Delete node
         parent->_children.removeAt( row);
         endRemoveRows();
+        emit dataChanged( index, index);
         return;
     }
 }

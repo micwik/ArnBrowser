@@ -61,6 +61,8 @@ public:
     typedef XStringMap  PropMap;
     SetMap*  _setMap;
     SetMap*  _propMap;
+    int  _folderChildN;  // -1 = Has been at least one,  >= 0 Actual number so far
+    int  _leafChildN;    // -1 = Has been at least one,  >= 0 Actual number so far
     bool  _isExpanded;
     QList<ArnNode*>  _children;
 };
@@ -104,6 +106,7 @@ public slots:
 private slots:
     void  netChildFound( QString path);
     void  nodeDataChanged();
+    void  nodeModeChanged();
     void  updateSetMap( ArnNode* node = 0);
     void  updatePropMap( ArnNode* node = 0);
     void  destroyNode();

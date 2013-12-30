@@ -117,6 +117,16 @@
         <property name="text">
          <string>Connect</string>
         </property>
+        <property name="icon">
+         <iconset resource="files.qrc">
+          <normaloff>:/pic/connect.png</normaloff>:/pic/connect.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>16</width>
+          <height>16</height>
+         </size>
+        </property>
        </widget>
       </item>
       <item>
@@ -163,7 +173,7 @@
           <enum>Qt::LeftToRight</enum>
          </property>
          <property name="autoFillBackground">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
@@ -276,6 +286,21 @@ Bidir.</string>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="styleSheet">
+         <string notr="true">QTreeView::branch:has-children:!has-siblings:closed,
+QTreeView::branch:closed:has-children:has-siblings {
+    border-image: none;
+    image: url(://pic/rightarrow.png);
+}
+
+QTreeView::branch:open:has-children:!has-siblings,
+QTreeView::branch:open:has-children:has-siblings  {
+    border-image: none;
+    image: url(://pic/downarrow.png);
+}
+
+</string>
+        </property>
         <property name="alternatingRowColors">
          <bool>true</bool>
         </property>
@@ -294,7 +319,7 @@ Bidir.</string>
      <x>0</x>
      <y>0</y>
      <width>557</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
@@ -309,6 +334,8 @@ Bidir.</string>
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="files.qrc"/>
+ </resources>
  <connections/>
 </ui>
