@@ -30,61 +30,59 @@
 // GNU Lesser General Public License for more details.
 //
 
-#ifndef MAINWINDOW_HPP
-#define MAINWINDOW_HPP
+#ifndef DISCOVERWINDOW_HPP
+#define DISCOVERWINDOW_HPP
 
-#include <QMainWindow>
-#include <QTreeView>
-#include "ArnModel.hpp"
+#include <ArnInc/MQFlags.hpp>
+#include <ArnInc/Arn.hpp>
+#include <ArnInc/ArnPersistSapi.hpp>
+#include <QStringList>
+#include <QDialog>
 
-class MultiDelegate;
 class QSettings;
 class QCloseEvent;
 
 namespace Ui {
-    class MainWindow;
+class DiscoverWindow;
 }
 
 
-class MainWindow : public QMainWindow {
+class DiscoverWindow : public QDialog
+{
     Q_OBJECT
+    
 public:
-    MainWindow( QWidget* parent = 0);
-    ~MainWindow();
-
+    explicit DiscoverWindow( QSettings* appSettings, QWidget* parent = 0);
+    ~DiscoverWindow();
+    
 private slots:
-    void  itemClicked( const QModelIndex &index);
-    void  clientConnected();
-    void  clientError( QString errorText);
-    void  on_connectButton_clicked();
-    void  on_discoverButton_clicked();
-    void  on_terminalButton_clicked();
-    void  on_editButton_clicked();
-    void  on_manageButton_clicked();
-    void  on_vcsButton_clicked();
-    void  on_viewHidden_clicked();
-    void  on_hideBidir_clicked();
-    void  errorLog( QString errText);
+    void  on_reLoadButton_clicked();
+    void  onTreeChanged();
+
     void  readSettings();
     void  writeSettings();
-    //void  dataChanged( const QModelIndex& topLeft, const QModelIndex& bottomRight);
-    void  updateHidden( int row, QModelIndex parent, bool isHidden);
 
 protected:
-    void changeEvent( QEvent *e);
     void closeEvent( QCloseEvent *event);
 
-private:    
-    void  updateHiddenTree( const QModelIndex& index);
+private:
 
-    Ui::MainWindow*  _ui;
-    MultiDelegate*  _delegate;
-    ArnModel*  _arnModel;
-    ArnClient*  _arnClient;
+    void  doUpdate();
+    //QStringList  getSelFiles();
+/*
+    QString  getRef();
 
+    ArnPersistSapi  _sapiVcs;
+    QStringList  _refIdList;
+    QStringList  _refIdMsgList;
+    QStringList  _refTagList;
+    QStringList  _fileList;
+    bool  _filesUpdated;
+    bool  _refUpdated;
+*/
+
+    Ui::DiscoverWindow* _ui;
     QSettings*  _appSettings;
-    QString  _curItemPath;
-    int  _pathWidth;
 };
 
-#endif // MAINWINDOW_HPP
+#endif // DISCOVERWINDOW_HPP

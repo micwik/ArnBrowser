@@ -36,6 +36,7 @@
 #include "CodeWindow.hpp"
 #include "ManageWindow.hpp"
 #include "VcsWindow.hpp"
+#include "DiscoverWindow.hpp"
 #include "MultiDelegate.hpp"
 #include <ArnInc/ArnClient.hpp>
 #include <QMessageBox>
@@ -100,6 +101,13 @@ void  MainWindow::on_connectButton_clicked()
     _arnClient->connectToArn( _ui->hostEdit->text(), _ui->portEdit->value());
     _ui->hostEdit->setEnabled( false);
     _ui->portEdit->setEnabled( false);
+}
+
+
+void  MainWindow::on_discoverButton_clicked()
+{
+    DiscoverWindow*  discoverWindow = new DiscoverWindow( _appSettings, 0);
+    discoverWindow->show();
 }
 
 

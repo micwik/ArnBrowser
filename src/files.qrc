@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>pic/open_folder.png</file>
         <file>pic/folder.png</file>
         <file>pic/folder_document.png</file>
         <file>pic/document.png</file>
@@ -9,5 +8,6 @@
         <file>pic/rightarrow.png</file>
         <file>pic/pipe.png</file>
         <file>pic/connect.png</file>
+        <file>pic/search_arn.png</file>
     </qresource>
 </RCC>
