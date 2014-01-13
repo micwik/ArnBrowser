@@ -9,5 +9,7 @@
         <file>pic/pipe.png</file>
         <file>pic/connect.png</file>
         <file>pic/search_arn.png</file>
+        <file>pic/disconnect.png</file>
+        <file>pic/close.png</file>
     </qresource>
 </RCC>

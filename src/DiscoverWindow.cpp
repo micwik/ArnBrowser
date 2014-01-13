@@ -32,6 +32,8 @@
 
 #include "DiscoverWindow.hpp"
 #include "ui_DiscoverWindow.h"
+#include <ArnInc/ArnDiscover.hpp>
+#include <ArnInc/ArnZeroConf.hpp>
 #include <QInputDialog>
 #include <QCloseEvent>
 #include <QSettings>
@@ -43,21 +45,31 @@ DiscoverWindow::DiscoverWindow( QSettings* appSettings, QWidget* parent) :
     _ui( new Ui::DiscoverWindow)
 {
     _ui->setupUi( this);
+    _ui->connectButton->setEnabled( false);
 
     this->setWindowTitle( QString("Discover ARN"));
 
     _appSettings = appSettings;
     readSettings();
 
-    //_filesUpdated = false;
-    //_refUpdated   = false;
+    qDebug() << "Start listen !!!";
+    _serviceBrowser = new ArnZeroConfBrowser( this);
+    connect(_serviceBrowser, SIGNAL(browseError(int)),
+            this, SLOT(onBrowseError(int)));
+    connect(_serviceBrowser, SIGNAL(serviceAdded(int,QString,QString)),
+            this, SLOT(onServiceAdded(int,QString,QString)));
+    connect(_serviceBrowser, SIGNAL(serviceRemoved(int,QString,QString)),
+            this, SLOT(onServiceRemoved(int,QString,QString)));
 
     //// Logics
 
-    connect( _ui->arnTypeSelBox, SIGNAL(clicked()), this, SLOT(onTreeChanged()));
-    //connect( _ui->treeRepoButton, SIGNAL(clicked()), this, SLOT(onTreeChanged()));
+    connect( _ui->typeServerButton, SIGNAL(clicked()), this, SLOT(onDiscoverTypeChanged()));
+    connect( _ui->typeClientButton, SIGNAL(clicked()), this, SLOT(onDiscoverTypeChanged()));
+    connect( _ui->typeAllButton, SIGNAL(clicked()), this, SLOT(onDiscoverTypeChanged()));
+    connect( _ui->serviceTabView, SIGNAL(itemSelectionChanged()), this, SLOT(onServiceSelectChanged()));
+    connect( _ui->cancelButton, SIGNAL(clicked()), this, SLOT(close()));
 
-    doUpdate();
+    updateBrowse();
 }
 
 
@@ -67,48 +79,214 @@ DiscoverWindow::~DiscoverWindow()
 }
 
 
-void  DiscoverWindow::doUpdate()
+void  DiscoverWindow::getResult( QString& hostAdr, quint16& hostPort)
 {
-    //_ui->commitButton->setDisabled( !_ui->treeWorkButton->isChecked());
-/*
-    if (_refUpdated) {
-        _refUpdated  = false;
-        _ui->refSel->clear();
-        if (_ui->refIdButton->isChecked()) {
-            foreach (QString msg, _refIdMsgList) {
-                _ui->refSel->addItem( msg);
-            }
-        }
-        else if (_ui->refTagButton->isChecked()) {
-            foreach (QString tag, _refTagList) {
-                _ui->refSel->addItem( tag);
-            }
-        }
+    hostAdr  = _ui->hostAdrValue->text();
+    hostPort = _ui->hostPortValue->text().toUInt();
+}
+
+
+void  DiscoverWindow::updateBrowse()
+{
+    if (_serviceBrowser->isBrowsing()) {
+        _serviceBrowser->stopBrowse();
+        _ui->serviceTabView->clear();
+
+        _activeServNames.clear();
+        _activeServIds.clear();
+        _activeServInfos.clear();
+        _ipLookupIds.clear();
+
+        updateInfoView(-1);
     }
-*/
+
+    QString  subType;  // Default no subtype
+    if (_ui->typeServerButton->isChecked())
+        subType = "server";
+    else if (_ui->typeClientButton->isChecked())
+        subType = "client";
+    _serviceBrowser->setSubType( subType);
+
+    _serviceBrowser->browse();
+    qDebug() << "Browse in progress ...";
 }
 
-/*
-QStringList  DiscoverWindow::getSelFiles()
+
+void DiscoverWindow::onBrowseError(int code)
 {
-    QList<QListWidgetItem*>  selItems = _ui->filesView->selectedItems();
-    QStringList  selFiles;
-    foreach (QListWidgetItem* item, selItems) {
-        selFiles += item->text();
+    qDebug() << "Browse Error code=" << code;
+}
+
+
+void  DiscoverWindow::onServiceAdded( int id, QString name, QString domain)
+{
+    qDebug() << "Browse Service added: name=" << name << " domain=" << domain
+             << " escFullDomain=" << _serviceBrowser->escapedFullDomain();
+
+    XStringMap  xsm;
+    xsm.add("sbDomain", domain);
+    QByteArray  info = xsm.toXString();
+    int  index;
+    for (index = 0; index < _activeServNames.size(); ++index) {
+        QString  indexName = _activeServNames.at( index);
+        Q_ASSERT(name != indexName);
+        if (name < indexName)  break;  // Sorting place found
     }
-    return selFiles;
+    _activeServNames.insert( index, name);
+    _activeServIds.insert( index, id);
+    _activeServInfos.insert( index, info);
+
+    ArnZeroConfResolv*  ds = new ArnZeroConfResolv( name, this);
+    ds->setId( id);
+    connect( ds, SIGNAL(resolveError(int)), this, SLOT(onResolveError(int)));
+    connect( ds, SIGNAL(resolved(int,QByteArray)), this, SLOT(onResolved(int,QByteArray)));
+    ds->resolve();
+
+    _ui->serviceTabView->insertItem( index, name);
 }
-*/
 
-void  DiscoverWindow::on_reLoadButton_clicked()
+
+void  DiscoverWindow::onServiceRemoved( int id, QString name, QString domain)
 {
+    qDebug() << "Browse Service removed: name=" << name << " domain=" << domain;
+    int  index = _activeServNames.indexOf( name);
+    _activeServNames.removeAt( index);
+    _activeServIds.removeAt( index);
+    _activeServInfos.removeAt( index);
+
+    QListWidgetItem*  item =_ui->serviceTabView->takeItem( index);
+    if (item)
+        delete item;
+    updateInfoView(-1);
 }
 
 
-void  DiscoverWindow::onTreeChanged()
+void  DiscoverWindow::onResolveError( int code)
 {
-    //_ui->filesView->clear();
-    doUpdate();
+    ArnZeroConfResolv*  ds = qobject_cast<ArnZeroConfResolv*>( sender());
+    Q_ASSERT(ds);
+
+    qDebug() << "Resolve Error code=" << code;
+
+    ds->releaseService();
+    ds->deleteLater();
+}
+
+
+void  DiscoverWindow::onResolved( int id, QByteArray escFullDomain)
+{
+    ArnZeroConfResolv*  ds = qobject_cast<ArnZeroConfResolv*>( sender());
+    Q_ASSERT(ds);
+
+    QString  name = ds->serviceName();
+    qDebug() << "Resolved Service: name=" << name << " escFullDomainR=" << escFullDomain
+             << " escFullDomain=" << ds->escapedFullDomain();
+    int  index = _activeServNames.indexOf( name);
+    if (index >= 0) {  // Service still exist
+        XStringMap  xsm( _activeServInfos.at( index));
+        XStringMap  xsmTxt;
+        ds->getTxtRecordMap( xsmTxt);
+        xsm.add("rFullDomain", escFullDomain.constData());
+        xsm.add("rServ",       ds->serviceType());
+        xsm.add("rDomain",     ds->domain());
+        xsm.add("rHost",       ds->host());
+        xsm.add("rPort",       QString::number( ds->port()));
+        xsm.add("rTxt",        xsmTxt.toXString());
+        QByteArray  info = xsm.toXString();
+        _activeServInfos[ index] = info;
+
+        int  ipLookupId = QHostInfo::lookupHost( ds->host(), this, SLOT(onIpLookup(QHostInfo)));
+        _ipLookupIds.insert( ipLookupId, id);
+        qDebug() << "LookingUp host=" << ds->host() << " lookupId=" << ipLookupId;
+
+        updateInfoView( index);
+    }
+
+    ds->releaseService();
+    ds->deleteLater();
+}
+
+
+void  DiscoverWindow::onIpLookup( const QHostInfo& host)
+{
+    int  ipLookupId = host.lookupId();
+    int  id = _ipLookupIds.value( ipLookupId, -1);
+    qDebug() << "onIpLookup: lookupId=" << ipLookupId;
+    if (id < 0)  return;  // Service not valid anymore
+
+    _ipLookupIds.remove( ipLookupId);
+
+    if (host.error() != QHostInfo::NoError) {
+         qDebug() << "Lookup failed:" << host.errorString();
+         return;
+    }
+
+    foreach (const QHostAddress &address, host.addresses())
+        qDebug() << "Found address:" << address.toString();
+
+    int  index = _activeServIds.indexOf( id);
+    XStringMap  xsm( _activeServInfos.at( index));
+    xsm.add("lIp", host.addresses().first().toString());
+    _activeServInfos[ index] = xsm.toXString();
+
+    updateInfoView( index);
+}
+
+
+void DiscoverWindow::updateServiceView()
+{
+    QString info;
+    _ui->serviceTabView->clear();
+
+    for (int i = 0; i < _activeServNames.size(); ++i) {
+        _ui->serviceTabView->addItem( _activeServNames.at(i));
+    }
+}
+
+
+void  DiscoverWindow::updateInfoView( int index)
+{
+    int  curIndex = _ui->serviceTabView->currentRow();
+    qDebug() << "updateInfoView: curRow=" << curIndex << " index=" << index;
+    if (index != curIndex)  return;
+
+    bool  isOk = (curIndex >= 0);
+    XStringMap  xsm( isOk ? _activeServInfos.at( curIndex) : QByteArray());
+    XStringMap  xsmTxt( xsm.value("rTxt"));
+
+    _ui->connectButton->setEnabled( isOk);
+
+    int  arnType = xsmTxt.value("server", "-1").toInt();
+    _ui->discoverTypeValue->setText( arnType < 0 ? "" : (arnType ? "Server" : "Client"));
+    _ui->hostAdrValue->setText( xsm.valueString("rHost"));
+    _ui->hostPortValue->setText( xsm.valueString("rPort"));
+    _ui->hostIpValue->setText( xsm.valueString("lIp"));
+
+    _ui->propertyTabView->clear();
+    for (int i = 0; i < xsmTxt.size(); ++i) {
+        QString  propLine = xsmTxt.keyString(i) + " = " + xsmTxt.valueString(i);
+        _ui->propertyTabView->addItem( propLine);
+    }
+}
+
+
+void DiscoverWindow::on_connectButton_clicked()
+{
+    setResult( QDialog::Accepted);
+    close();
+}
+
+
+void  DiscoverWindow::onDiscoverTypeChanged()
+{
+    updateBrowse();
+}
+
+
+void  DiscoverWindow::onServiceSelectChanged()
+{
+    qDebug() << "onServiceSelectChanged";
+    updateInfoView( _ui->serviceTabView->currentRow());
 }
 
 

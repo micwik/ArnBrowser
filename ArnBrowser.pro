@@ -2,7 +2,7 @@
 # Project created by QtCreator 2010-08-12T21:08:40
 # -------------------------------------------------
 
-# CONFIG += ArnLibCompile
+CONFIG += ArnLibCompile
 
 # Usage of js aware code editor
 # CONFIG += qscintilla
@@ -25,7 +25,8 @@ SOURCES += src/main.cpp \
     src/CodeWindow.cpp \
     src/ArnModel.cpp \
     src/ManageWindow.cpp \
-    src/VcsWindow.cpp
+    src/VcsWindow.cpp \
+    src/DiscoverWindow.cpp
 
 HEADERS += src/MainWindow.hpp \
     src/TermWindow.hpp \
@@ -36,13 +37,15 @@ HEADERS += src/MainWindow.hpp \
     src/ArnModel.hpp \
     src/MTextEdit.hpp \
     src/ManageWindow.hpp \
-    src/VcsWindow.hpp
+    src/VcsWindow.hpp \
+    src/DiscoverWindow.hpp
 
 FORMS += src/MainWindow.ui \
     src/TermWindow.ui \
     src/CodeWindow.ui \
     src/ManageWindow.ui \
-    src/VcsWindow.ui
+    src/VcsWindow.ui \
+    src/DiscoverWindow.ui
 
 greaterThan(QT_MAJOR_VERSION, 4) {
     ARNLIB = Arn5

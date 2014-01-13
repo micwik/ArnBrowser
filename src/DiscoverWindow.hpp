@@ -36,9 +36,11 @@
 #include <ArnInc/MQFlags.hpp>
 #include <ArnInc/Arn.hpp>
 #include <ArnInc/ArnPersistSapi.hpp>
+#include <QHostInfo>
 #include <QStringList>
 #include <QDialog>
 
+class ArnZeroConfBrowser;
 class QSettings;
 class QCloseEvent;
 
@@ -54,10 +56,30 @@ class DiscoverWindow : public QDialog
 public:
     explicit DiscoverWindow( QSettings* appSettings, QWidget* parent = 0);
     ~DiscoverWindow();
+    void  getResult( QString& hostAdr, quint16& hostPort);
     
 private slots:
-    void  on_reLoadButton_clicked();
-    void  onTreeChanged();
+    void onBrowseError( int code);
+    void onServiceAdded( int id, QString name, QString domain);
+    void onServiceRemoved( int id, QString name, QString domain);
+
+    void onResolveError( int code);
+    void onResolved( int id, QByteArray escFullDomain);
+
+    void onIpLookup( const QHostInfo& host);
+
+private:
+    ArnZeroConfBrowser*  _serviceBrowser;
+    QStringList  _activeServNames;
+    QList<int>  _activeServIds;
+    QList<QByteArray>  _activeServInfos;
+    QMap<int,int>  _ipLookupIds;
+
+private slots:
+    void on_connectButton_clicked();
+
+    void  onDiscoverTypeChanged();
+    void  onServiceSelectChanged();
 
     void  readSettings();
     void  writeSettings();
@@ -66,20 +88,9 @@ protected:
     void closeEvent( QCloseEvent *event);
 
 private:
-
-    void  doUpdate();
-    //QStringList  getSelFiles();
-/*
-    QString  getRef();
-
-    ArnPersistSapi  _sapiVcs;
-    QStringList  _refIdList;
-    QStringList  _refIdMsgList;
-    QStringList  _refTagList;
-    QStringList  _fileList;
-    bool  _filesUpdated;
-    bool  _refUpdated;
-*/
+    void  updateBrowse();
+    void  updateServiceView();
+    void  updateInfoView( int index);
 
     Ui::DiscoverWindow* _ui;
     QSettings*  _appSettings;

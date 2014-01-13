@@ -107,7 +107,16 @@ void  MainWindow::on_connectButton_clicked()
 void  MainWindow::on_discoverButton_clicked()
 {
     DiscoverWindow*  discoverWindow = new DiscoverWindow( _appSettings, 0);
-    discoverWindow->show();
+    discoverWindow->exec();
+    if (discoverWindow->result() != QDialog::Accepted)  return;
+
+    QString  hostAdr;
+    quint16  hostPort;
+    discoverWindow->getResult( hostAdr, hostPort);
+    _ui->hostEdit->setText( hostAdr);
+    _ui->portEdit->setValue( hostPort);
+
+    on_connectButton_clicked();
 }
 
 
