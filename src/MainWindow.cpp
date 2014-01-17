@@ -110,10 +110,10 @@ void  MainWindow::on_discoverButton_clicked()
     discoverWindow->exec();
     if (discoverWindow->result() != QDialog::Accepted)  return;
 
-    QString  hostAdr;
+    QString  hostName;
     quint16  hostPort;
-    discoverWindow->getResult( hostAdr, hostPort);
-    _ui->hostEdit->setText( hostAdr);
+    discoverWindow->getResult( hostName, hostPort);
+    _ui->hostEdit->setText( hostName);
     _ui->portEdit->setValue( hostPort);
 
     on_connectButton_clicked();
@@ -199,6 +199,7 @@ void  MainWindow::clientConnected()
              this, SLOT(clientError(QString)));
 
     _ui->connectButton->setEnabled( false);
+    _ui->discoverButton->setEnabled( false);
     _ui->arnView->setModel( _arnModel);
     _arnModel->setHideBidir( _ui->hideBidir->isChecked());
     connect( _arnModel, SIGNAL(hiddenRow(int,QModelIndex,bool)),

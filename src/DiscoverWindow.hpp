@@ -35,12 +35,11 @@
 
 #include <ArnInc/MQFlags.hpp>
 #include <ArnInc/Arn.hpp>
-#include <ArnInc/ArnPersistSapi.hpp>
+#include <ArnInc/ArnDiscover.hpp>
 #include <QHostInfo>
 #include <QStringList>
 #include <QDialog>
 
-class ArnZeroConfBrowser;
 class QSettings;
 class QCloseEvent;
 
@@ -51,49 +50,36 @@ class DiscoverWindow;
 
 class DiscoverWindow : public QDialog
 {
-    Q_OBJECT
-    
+    Q_OBJECT    
 public:
     explicit DiscoverWindow( QSettings* appSettings, QWidget* parent = 0);
     ~DiscoverWindow();
-    void  getResult( QString& hostAdr, quint16& hostPort);
+
+    void  getResult( QString& hostName, quint16& hostPort);
     
-private slots:
-    void onBrowseError( int code);
-    void onServiceAdded( int id, QString name, QString domain);
-    void onServiceRemoved( int id, QString name, QString domain);
-
-    void onResolveError( int code);
-    void onResolved( int id, QByteArray escFullDomain);
-
-    void onIpLookup( const QHostInfo& host);
-
-private:
-    ArnZeroConfBrowser*  _serviceBrowser;
-    QStringList  _activeServNames;
-    QList<int>  _activeServIds;
-    QList<QByteArray>  _activeServInfos;
-    QMap<int,int>  _ipLookupIds;
+protected:
+    void  closeEvent( QCloseEvent *event);
 
 private slots:
-    void on_connectButton_clicked();
-
+    void  on_connectButton_clicked();
     void  onDiscoverTypeChanged();
     void  onServiceSelectChanged();
+
+    void  onBrowseError( int code);
+    void  onServiceAdded( int index, QString name);
+    void  onServiceRemoved( int index);
+    void  onInfoUpdated( int index, ArnDiscoverInfo::State state);
 
     void  readSettings();
     void  writeSettings();
 
-protected:
-    void closeEvent( QCloseEvent *event);
-
 private:
     void  updateBrowse();
-    void  updateServiceView();
     void  updateInfoView( int index);
 
-    Ui::DiscoverWindow* _ui;
+    Ui::DiscoverWindow*  _ui;
     QSettings*  _appSettings;
+    ArnDiscoverBrowser*  _serviceBrowser;
 };
 
 #endif // DISCOVERWINDOW_HPP
