@@ -62,7 +62,8 @@ protected:
 
 private slots:
     void  on_connectButton_clicked();
-    void  onDiscoverTypeChanged();
+    void  onFilterTypeChanged();
+    void  onFilterGroupChanged();
     void  onServiceSelectChanged();
 
     void  onBrowseError( int code);

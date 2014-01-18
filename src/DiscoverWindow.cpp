@@ -52,6 +52,7 @@ DiscoverWindow::DiscoverWindow( QSettings* appSettings, QWidget* parent) :
 
     qDebug() << "Start listen !!!";
     _serviceBrowser = new ArnDiscoverBrowser( this);
+    _serviceBrowser->setDefaultStopState( ArnDiscoverInfo::State::HostInfo);
     //connect(_serviceBrowser, SIGNAL(browseError(int)),
     //        this, SLOT(onBrowseError(int)));
     connect(_serviceBrowser, SIGNAL(serviceAdded(int,QString)),
@@ -62,9 +63,11 @@ DiscoverWindow::DiscoverWindow( QSettings* appSettings, QWidget* parent) :
 
     //// Logics
 
-    connect( _ui->typeServerButton, SIGNAL(clicked()), this, SLOT(onDiscoverTypeChanged()));
-    connect( _ui->typeClientButton, SIGNAL(clicked()), this, SLOT(onDiscoverTypeChanged()));
-    connect( _ui->typeAllButton, SIGNAL(clicked()), this, SLOT(onDiscoverTypeChanged()));
+    connect( _ui->groupEdit, SIGNAL(editingFinished()), this, SLOT(onFilterGroupChanged()));
+    connect( _ui->filterGroupButton, SIGNAL(clicked()), this, SLOT(onFilterGroupChanged()));
+    connect( _ui->filterServerButton, SIGNAL(clicked()), this, SLOT(onFilterTypeChanged()));
+    connect( _ui->filterClientButton, SIGNAL(clicked()), this, SLOT(onFilterTypeChanged()));
+    connect( _ui->filterAllButton, SIGNAL(clicked()), this, SLOT(onFilterTypeChanged()));
     connect( _ui->serviceTabView, SIGNAL(itemSelectionChanged()), this, SLOT(onServiceSelectChanged()));
     connect( _ui->cancelButton, SIGNAL(clicked()), this, SLOT(close()));
 
@@ -93,12 +96,21 @@ void  DiscoverWindow::updateBrowse()
         updateInfoView(-1);
     }
 
-    ArnDiscover::Type  typeFilter;  // Default no filter
-    if (_ui->typeServerButton->isChecked())
-        typeFilter = typeFilter.Server;
-    else if (_ui->typeClientButton->isChecked())
-        typeFilter = typeFilter.Client;
-    _serviceBrowser->setFilter( typeFilter);
+    bool  isFilterGroup = _ui->filterGroupButton->isChecked();
+    _ui->groupEdit->setEnabled( isFilterGroup);
+    _ui->groupText->setEnabled( isFilterGroup);
+
+    if (isFilterGroup) {
+        _serviceBrowser->setFilter( _ui->groupEdit->text());
+    }
+    else {
+        ArnDiscover::Type  typeFilter;  // Default no filter
+        if (_ui->filterServerButton->isChecked())
+            typeFilter = typeFilter.Server;
+        else if (_ui->filterClientButton->isChecked())
+            typeFilter = typeFilter.Client;
+        _serviceBrowser->setFilter( typeFilter);
+    }
 
     _serviceBrowser->browse();
     qDebug() << "Browse in progress ...";
@@ -166,7 +178,13 @@ void DiscoverWindow::on_connectButton_clicked()
 }
 
 
-void  DiscoverWindow::onDiscoverTypeChanged()
+void  DiscoverWindow::onFilterTypeChanged()
+{
+    updateBrowse();
+}
+
+
+void  DiscoverWindow::onFilterGroupChanged()
 {
     updateBrowse();
 }
@@ -175,7 +193,9 @@ void  DiscoverWindow::onDiscoverTypeChanged()
 void  DiscoverWindow::onServiceSelectChanged()
 {
     qDebug() << "onServiceSelectChanged";
-    updateInfoView( _ui->serviceTabView->currentRow());
+    int  index = _ui->serviceTabView->currentRow();
+    _serviceBrowser->goTowardState( index, ArnDiscoverInfo::State::HostIp);
+    updateInfoView( index);
 }
 
 
@@ -190,12 +210,12 @@ void  DiscoverWindow::closeEvent( QCloseEvent* event)
 
 void  DiscoverWindow::readSettings()
 {
-    QPoint      pos   = _appSettings->value("discover/pos", QPoint(200, 200)).toPoint();
-    QSize       size  = _appSettings->value("discover/size", QSize(500, 400)).toSize();
-    // QByteArray  split = _appSettings->value("discover/split", _ui->splitter->saveState()).toByteArray();
+    QPoint   pos   = _appSettings->value("discover/pos", QPoint(200, 200)).toPoint();
+    QSize    size  = _appSettings->value("discover/size", QSize(500, 400)).toSize();
+    QString  group = _appSettings->value("discover/group", QString()).toString();
     resize( size);
     move( pos);
-    //_ui->splitter->restoreState( split);
+    _ui->groupEdit->setText( group);
 }
 
 
@@ -204,5 +224,5 @@ void  DiscoverWindow::writeSettings()
     qDebug() << "Write code settings";
     _appSettings->setValue("discover/pos", pos());
     _appSettings->setValue("discover/size", size());
-    //_appSettings->setValue("vcs/split", _ui->splitter->saveState());
+    _appSettings->setValue("discover/group", _ui->groupEdit->text());
 }
