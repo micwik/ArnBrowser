@@ -49,6 +49,7 @@ DiscoverWindow::DiscoverWindow( QSettings* appSettings, QWidget* parent) :
 
     _appSettings = appSettings;
     readSettings();
+    _filterGroup = _ui->groupEdit->text();
 
     qDebug() << "Start listen !!!";
     _serviceBrowser = new ArnDiscoverBrowser( this);
@@ -63,12 +64,14 @@ DiscoverWindow::DiscoverWindow( QSettings* appSettings, QWidget* parent) :
 
     //// Logics
 
-    connect( _ui->groupEdit, SIGNAL(editingFinished()), this, SLOT(onFilterGroupChanged()));
-    connect( _ui->filterGroupButton, SIGNAL(clicked()), this, SLOT(onFilterGroupChanged()));
-    connect( _ui->filterServerButton, SIGNAL(clicked()), this, SLOT(onFilterTypeChanged()));
-    connect( _ui->filterClientButton, SIGNAL(clicked()), this, SLOT(onFilterTypeChanged()));
-    connect( _ui->filterAllButton, SIGNAL(clicked()), this, SLOT(onFilterTypeChanged()));
+    connect( _ui->groupEdit, SIGNAL(returnPressed()), this, SLOT(onFilterGroupChanged()));
+    connect( _ui->groupEdit, SIGNAL(editingFinished()), this, SLOT(onFilterGroupLeave()));
+    connect( _ui->filterGroupButton, SIGNAL(clicked()), this, SLOT(onFilterChanged()));
+    connect( _ui->filterServerButton, SIGNAL(clicked()), this, SLOT(onFilterChanged()));
+    connect( _ui->filterClientButton, SIGNAL(clicked()), this, SLOT(onFilterChanged()));
+    connect( _ui->filterAllButton, SIGNAL(clicked()), this, SLOT(onFilterChanged()));
     connect( _ui->serviceTabView, SIGNAL(itemSelectionChanged()), this, SLOT(onServiceSelectChanged()));
+    connect( _ui->serviceTabView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(on_connectButton_clicked()));
     connect( _ui->cancelButton, SIGNAL(clicked()), this, SLOT(close()));
 
     updateBrowse();
@@ -101,6 +104,8 @@ void  DiscoverWindow::updateBrowse()
     _ui->groupText->setEnabled( isFilterGroup);
 
     if (isFilterGroup) {
+        if (_ui->groupEdit->text().isEmpty())
+            return;  // Don't browse using empty group filter
         _serviceBrowser->setFilter( _ui->groupEdit->text());
     }
     else {
@@ -173,18 +178,27 @@ void  DiscoverWindow::updateInfoView( int index)
 
 void DiscoverWindow::on_connectButton_clicked()
 {
+    if (!_ui->connectButton->isEnabled())  return;  // Button must be enabled to connect
+
     setResult( QDialog::Accepted);
     close();
 }
 
 
-void  DiscoverWindow::onFilterTypeChanged()
+void  DiscoverWindow::onFilterGroupChanged()
 {
+    _filterGroup = _ui->groupEdit->text();
     updateBrowse();
 }
 
 
-void  DiscoverWindow::onFilterGroupChanged()
+void  DiscoverWindow::onFilterGroupLeave()
+{
+    _ui->groupEdit->setText( _filterGroup);  // Restore and skip any unfinnished editing
+}
+
+
+void  DiscoverWindow::onFilterChanged()
 {
     updateBrowse();
 }

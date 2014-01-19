@@ -62,8 +62,9 @@ protected:
 
 private slots:
     void  on_connectButton_clicked();
-    void  onFilterTypeChanged();
+    void  onFilterChanged();
     void  onFilterGroupChanged();
+    void  onFilterGroupLeave();
     void  onServiceSelectChanged();
 
     void  onBrowseError( int code);
@@ -81,6 +82,7 @@ private:
     Ui::DiscoverWindow*  _ui;
     QSettings*  _appSettings;
     ArnDiscoverBrowser*  _serviceBrowser;
+    QString  _filterGroup;
 };
 
 #endif // DISCOVERWINDOW_HPP
