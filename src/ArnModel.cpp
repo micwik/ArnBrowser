@@ -229,7 +229,12 @@ QVariant  ArnModel::adjustedNodeData( const ArnNode *node, int role) const
         valueNode = node->_valueChild;
 
         if (node->_setMap) {
-            return node->_setMap->valueString( valueNode->toByteArray());
+            QByteArray  itemVal = valueNode->toByteArray();
+            int  index = node->_setMap->indexOf( itemVal);
+            if (index >= 0)
+                return node->_setMap->valueString( index);
+            else
+                return "[" + itemVal + "]";
         }
 
         if (node->_propMap) {
