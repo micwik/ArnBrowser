@@ -438,7 +438,7 @@ void  ArnModel::netChildFound( QString path)
         doInsertItem( index, node, path);
     }
 
-    QString itemName = ArnM::itemName( path);
+    QString itemName = Arn::itemName( path);
     if (!node->_valueChild && (itemName == "value")) {
         //// Peek at child item "value"
         node->_valueChild = new ArnNode( path, node);
@@ -472,7 +472,7 @@ void  ArnModel::netChildFound( QString path)
         emit dataChanged( valueIndex, valueIndex);
     }
 
-    if (ArnM::isFolderPath( path)) {
+    if (Arn::isFolderPath( path)) {
         if (node->_isExpanded) {
             if (node->_folderChildN >= 0)
                 node->_folderChildN++;
@@ -502,7 +502,7 @@ void  ArnModel::doInsertItem( const QModelIndex& index, ArnNode* node, QString p
 {
     if (!node)  return;
 
-    QString  itemName = ArnM::itemName( path);
+    QString  itemName = Arn::itemName( path);
     int  insRow;
     for (insRow = 0; insRow < node->_children.size(); ++insRow) {
         ArnNode*  child = node->_children.at( insRow);

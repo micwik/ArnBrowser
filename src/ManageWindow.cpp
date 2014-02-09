@@ -271,7 +271,7 @@ void  ManageWindow::on_saveButton_clicked()
         QString  item = _ui->itemEdit->text();
         if (item.isEmpty())  return;  // Item may not be empty
 
-        QString  itemPath = ArnM::addPath( _arnPath.path(), item);
+        QString  itemPath = Arn::addPath( _arnPath.path(), item);
         arnItemNew.open( itemPath);
         arnItem = &arnItemNew;
     }
