@@ -33,7 +33,7 @@
 #ifndef CODEWINDOW_HPP
 #define CODEWINDOW_HPP
 
-#include <ArnInc/Arn.hpp>
+#include <ArnInc/ArnItem.hpp>
 #include <QDialog>
 
 class QSettings;

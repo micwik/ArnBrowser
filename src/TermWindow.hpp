@@ -33,7 +33,7 @@
 #ifndef TERMWINDOW_HPP
 #define TERMWINDOW_HPP
 
-#include <ArnInc/Arn.hpp>
+#include <ArnInc/ArnItem.hpp>
 #include <QDialog>
 
 class QSettings;
