@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //// Error log from Arn system
     ArnM::setConsoleError( false);
-    connect( &ArnM::getInstance(), SIGNAL(errorLogSig(QString,uint,void*)),
+    connect( &ArnM::instance(), SIGNAL(errorLogSig(QString,uint,void*)),
              this, SLOT(errorLog(QString)));
 
     //// Prepare connect to Arn server
