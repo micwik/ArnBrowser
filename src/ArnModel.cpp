@@ -37,6 +37,7 @@
 #include <QPixmap>
 #include <QStringList>
 
+using Arn::XStringMap;
 
 
 void  ArnNode::init()

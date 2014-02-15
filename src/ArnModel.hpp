@@ -39,7 +39,10 @@
 #include <ArnInc/ArnClient.hpp>
 
 class ArnMonitor;
+
+namespace Arn {
 class XStringMap;
+}
 
 
 class ArnNode : public ArnItem
@@ -57,8 +60,8 @@ public:
     ArnNode*  _propChild;
     ArnNode*  _infoChild;
     ArnMonitor*  _arnMon;
-    typedef XStringMap  SetMap;
-    typedef XStringMap  PropMap;
+    typedef Arn::XStringMap  SetMap;
+    typedef Arn::XStringMap  PropMap;
     SetMap*  _setMap;
     SetMap*  _propMap;
     int  _folderChildN;  // -1 = Has been at least one,  >= 0 Actual number so far

@@ -37,6 +37,8 @@
 #include <QSettings>
 #include <QDebug>
 
+using Arn::XStringMap;
+
 
 DiscoverWindow::DiscoverWindow( QSettings* appSettings, QWidget* parent) :
     QDialog( parent),
