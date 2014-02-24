@@ -86,10 +86,11 @@ DiscoverWindow::~DiscoverWindow()
 }
 
 
-void  DiscoverWindow::getResult( QString& hostName, quint16& hostPort)
+void  DiscoverWindow::getResult( QString& hostName, quint16& hostPort, QString &hostAddr)
 {
     hostName = _ui->hostNameValue->text();
     hostPort = _ui->hostPortValue->text().toUInt();
+    hostAddr = _ui->hostIpValue->text();
 }
 
 

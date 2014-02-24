@@ -55,7 +55,7 @@ public:
     explicit DiscoverWindow( QSettings* appSettings, QWidget* parent = 0);
     ~DiscoverWindow();
 
-    void  getResult( QString& hostName, quint16& hostPort);
+    void  getResult( QString& hostName, quint16& hostPort, QString& hostAddr);
     
 protected:
     void  closeEvent( QCloseEvent *event);

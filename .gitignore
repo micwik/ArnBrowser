@@ -25,7 +25,8 @@ Makefile
 Makefile.*
 *-build-*
 
-# Debug and Release directories (created under Windows, not Linux)
+# Debug and Release (created under Windows, not Linux)
+object_script.*
 Debug/
 Release/
 

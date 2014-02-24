@@ -98,7 +98,11 @@ MainWindow::~MainWindow()
 
 void  MainWindow::on_connectButton_clicked()
 {
-    _arnClient->connectToArn( _ui->hostEdit->text(), _ui->portEdit->value());
+    QString  host = _ui->hostEdit->text();
+    int  pos = host.indexOf( QRegExp("\\s*\\[.+\\]"));
+    if (pos >= 0)
+        host.resize( pos);
+    _arnClient->connectToArn( host, _ui->portEdit->value());
     _ui->hostEdit->setEnabled( false);
     _ui->portEdit->setEnabled( false);
 }
@@ -112,7 +116,10 @@ void  MainWindow::on_discoverButton_clicked()
 
     QString  hostName;
     quint16  hostPort;
-    discoverWindow->getResult( hostName, hostPort);
+    QString  hostAddr;
+    discoverWindow->getResult( hostName, hostPort, hostAddr);
+    if (!hostAddr.isEmpty())
+        hostName = hostAddr + "  [" + hostName + "]";
     _ui->hostEdit->setText( hostName);
     _ui->portEdit->setValue( hostPort);
 
