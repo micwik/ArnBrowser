@@ -109,9 +109,21 @@
       </item>
       <item>
        <widget class="QPushButton" name="connectButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>102</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="font">
          <font>
-          <pointsize>10</pointsize>
+          <pointsize>9</pointsize>
          </font>
         </property>
         <property name="text">
@@ -147,6 +159,23 @@
       </item>
       <item>
        <widget class="QPushButton" name="discoverButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>140</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>Discover ARN</string>
         </property>
