@@ -77,6 +77,7 @@ private slots:
 
 private:
     void  updateBrowse();
+    void  updateCurService();
     void  updateInfoView( int index);
 
     Ui::DiscoverWindow*  _ui;

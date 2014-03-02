@@ -123,6 +123,15 @@ void  DiscoverWindow::updateBrowse()
 }
 
 
+void  DiscoverWindow::updateCurService()
+{
+    int  index = _ui->serviceTabView->currentRow();
+    if (index >= 0)
+        _serviceBrowser->goTowardState( index, ArnDiscoverInfo::State::HostIp);
+    updateInfoView( index);
+}
+
+
 void  DiscoverWindow::onBrowseError( int code)
 {
     qWarning() << "Browse Error code=" << code;
@@ -140,7 +149,7 @@ void  DiscoverWindow::onServiceRemoved( int index)
     QListWidgetItem*  item =_ui->serviceTabView->takeItem( index);
     if (item)
         delete item;
-    updateInfoView(-1);
+    updateCurService();
 }
 
 
@@ -208,9 +217,7 @@ void  DiscoverWindow::onFilterChanged()
 void  DiscoverWindow::onServiceSelectChanged()
 {
     // qDebug() << "onServiceSelectChanged";
-    int  index = _ui->serviceTabView->currentRow();
-    _serviceBrowser->goTowardState( index, ArnDiscoverInfo::State::HostIp);
-    updateInfoView( index);
+    updateCurService();
 }
 
 
@@ -236,7 +243,7 @@ void  DiscoverWindow::readSettings()
 
 void  DiscoverWindow::writeSettings()
 {
-    qDebug() << "Write code settings";
+    qDebug() << "Write discover settings";
     _appSettings->setValue("discover/pos", pos());
     _appSettings->setValue("discover/size", size());
     _appSettings->setValue("discover/group", _ui->groupEdit->text());

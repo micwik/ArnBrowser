@@ -92,6 +92,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    // qDebug() << "MainWindow: Destructor";
     delete _ui;
 }
 
@@ -262,10 +263,9 @@ void  MainWindow::changeEvent(QEvent *e)
 
 void  MainWindow::closeEvent( QCloseEvent* event)
 {
-    qDebug() << "Close event";
+    qDebug() << "MainWindow: Close event";
     writeSettings();
     event->accept();
-    deleteLater();
 }
 
 

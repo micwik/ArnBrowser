@@ -47,13 +47,13 @@ FORMS += src/MainWindow.ui \
     src/VcsWindow.ui \
     src/DiscoverWindow.ui
 
+INCLUDEPATH += src $$PWD/.. $$PWD/../include
+
 greaterThan(QT_MAJOR_VERSION, 4) {
     ARNLIB = Arn5
 } else {
     ARNLIB = Arn
 }
-
-INCLUDEPATH += src $$PWD/.. $$PWD/../include
 
 ArnLibCompile {
     ARN += server
