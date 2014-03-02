@@ -366,6 +366,12 @@ QTreeView::branch:open:has-children:has-siblings  {
         <property name="alternatingRowColors">
          <bool>true</bool>
         </property>
+        <property name="indentation">
+         <number>28</number>
+        </property>
+        <property name="animated">
+         <bool>true</bool>
+        </property>
         <attribute name="headerDefaultSectionSize">
          <number>150</number>
         </attribute>

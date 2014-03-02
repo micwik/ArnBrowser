@@ -53,7 +53,6 @@ DiscoverWindow::DiscoverWindow( QSettings* appSettings, QWidget* parent) :
     readSettings();
     _filterGroup = _ui->groupEdit->text();
 
-    qDebug() << "Start listen !!!";
     _serviceBrowser = new ArnDiscoverBrowser( this);
     _serviceBrowser->setDefaultStopState( ArnDiscoverInfo::State::HostInfo);
     //connect(_serviceBrowser, SIGNAL(browseError(int)),
@@ -121,13 +120,12 @@ void  DiscoverWindow::updateBrowse()
     }
 
     _serviceBrowser->browse();
-    qDebug() << "Browse in progress ...";
 }
 
 
 void  DiscoverWindow::onBrowseError( int code)
 {
-    qDebug() << "Browse Error code=" << code;
+    qWarning() << "Browse Error code=" << code;
 }
 
 
@@ -157,7 +155,7 @@ void  DiscoverWindow::onInfoUpdated( int index, ArnDiscoverInfo::State state)
 void  DiscoverWindow::updateInfoView( int index)
 {
     int  curIndex = _ui->serviceTabView->currentRow();
-    qDebug() << "updateInfoView: curRow=" << curIndex << " index=" << index;
+    // qDebug() << "updateInfoView: curRow=" << curIndex << " index=" << index;
     if (index != curIndex)  return;
 
     bool  isOk = (curIndex >= 0);
@@ -209,7 +207,7 @@ void  DiscoverWindow::onFilterChanged()
 
 void  DiscoverWindow::onServiceSelectChanged()
 {
-    qDebug() << "onServiceSelectChanged";
+    // qDebug() << "onServiceSelectChanged";
     int  index = _ui->serviceTabView->currentRow();
     _serviceBrowser->goTowardState( index, ArnDiscoverInfo::State::HostIp);
     updateInfoView( index);
