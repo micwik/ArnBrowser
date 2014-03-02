@@ -1,4 +1,4 @@
-// Copyright (C) 2010-2013 Michael Wiklund.
+// Copyright (C) 2010-2014 Michael Wiklund.
 // All rights reserved.
 // Contact: arnlib@wiklunden.se
 //
@@ -143,6 +143,8 @@ int  ArnModel::rowCount(const QModelIndex &parent) const
 
 int  ArnModel::columnCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent)
+    
     return 2;
 }
 

@@ -1,4 +1,4 @@
-// Copyright (C) 2010-2013 Michael Wiklund.
+// Copyright (C) 2010-2014 Michael Wiklund.
 // All rights reserved.
 // Contact: arnlib@wiklunden.se
 //
@@ -45,6 +45,8 @@
 #include <QCloseEvent>
 #include <QDebug>
 
+extern const QString ver;
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -69,6 +71,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _arnModel = new ArnModel( this);
     _arnModel->setClient( _arnClient);
 
+    setWindowTitle(tr("Arn Browser  ") + ver);
     _ui->arnView->setEnabled( false);
 
     readSettings();
