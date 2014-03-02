@@ -56,7 +56,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 }
 
 ArnLibCompile {
-    ARN += server
+    ARN += client
     ARN += discover
     CONFIG += mDnsIntern
     include(../ArnLib/src/ArnLib.pri)
