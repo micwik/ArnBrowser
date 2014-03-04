@@ -68,6 +68,12 @@ ArnLibCompile {
 }
 
 
+!mDnsIntern {
+    win32:CONFIG(release, debug|release): LIBS +=  -ldns_sd
+    else:win32:CONFIG(debug, debug|release): LIBS +=  -ldns_sd
+    else:unix: LIBS += -ldns_sd
+}
+
 qscintilla {
   DEFINES += QSCINTILLA
 
