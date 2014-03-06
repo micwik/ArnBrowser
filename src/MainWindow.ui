@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>557</width>
-    <height>431</height>
+    <width>770</width>
+    <height>537</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,6 +25,12 @@
       </property>
       <item>
        <widget class="QLabel" name="hostLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string>&amp;Host</string>
         </property>
@@ -36,10 +42,22 @@
       <item>
        <widget class="QLineEdit" name="hostEdit">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="baseSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
         </property>
         <property name="font">
          <font>
@@ -53,6 +71,12 @@
       </item>
       <item>
        <widget class="QLabel" name="portLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string>&amp;Port</string>
         </property>
@@ -64,7 +88,7 @@
       <item>
        <widget class="QSpinBox" name="portEdit">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -87,7 +111,7 @@
          <number>65535</number>
         </property>
         <property name="value">
-         <number>2002</number>
+         <number>65535</number>
         </property>
        </widget>
       </item>
@@ -195,6 +219,9 @@
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Expanding</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>

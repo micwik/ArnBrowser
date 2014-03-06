@@ -2,10 +2,13 @@
 # Project created by QtCreator 2010-08-12T21:08:40
 # -------------------------------------------------
 
-CONFIG += ArnLibCompile
+# CONFIG += ArnLibCompile
 
 # Usage of js aware code editor
 # CONFIG += qscintilla
+
+# Usage of internal mDNS code (no external dependency)
+CONFIG += mDnsIntern
 
 QT += core gui
 QT += network
@@ -52,13 +55,13 @@ INCLUDEPATH += src $$PWD/.. $$PWD/../include
 greaterThan(QT_MAJOR_VERSION, 4) {
     ARNLIB = Arn5
 } else {
-    ARNLIB = Arn
+    ARNLIB = Arn4
 }
 
 ArnLibCompile {
     ARN += client
     ARN += discover
-    CONFIG += mDnsIntern
+    #CONFIG += mDnsIntern
     include(../ArnLib/src/ArnLib.pri)
     INCLUDEPATH += $$PWD/../ArnLib/src
 } else {

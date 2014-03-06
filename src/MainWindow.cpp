@@ -40,6 +40,7 @@
 #include "MultiDelegate.hpp"
 #include <ArnInc/ArnClient.hpp>
 #include <QMessageBox>
+#include <QSpinBox>
 #include <QImage>
 #include <QSettings>
 #include <QCloseEvent>
@@ -80,9 +81,13 @@ MainWindow::MainWindow(QWidget *parent) :
     if (host.isNull())
         host = "localhost";  // Default host
     if (port == 0)
-        port = 2022;
+        port = Arn::defaultTcpPort;
     _ui->hostEdit->setText( host);    // Default host
     _ui->portEdit->setValue( port);
+
+#if QT_VERSION >= 0x050000
+    _ui->portEdit->setRange( 1, 1065535);  // Fix Qt5 layout bug giving to little space
+#endif
 
     connect( _ui->arnView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemClicked(QModelIndex)));
 
