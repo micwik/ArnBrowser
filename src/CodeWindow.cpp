@@ -33,7 +33,6 @@
 #include "CodeWindow.hpp"
 #include "ui_CodeWindow.h"
 #include "MTextEdit.hpp"
-#include <QFont>
 #include <QFontMetrics>
 #include <QString>
 #include <QFile>
@@ -60,7 +59,8 @@ CodeWindow::CodeWindow( QSettings* appSettings, const QString& path, QWidget* pa
     _appSettings = appSettings;
     readSettings();
 
-    QFont  font("MonoSpace", 12);
+    _font = QFont("MonoSpace", 10);
+    _font.setStyleHint( QFont::TypeWriter);
     MTextEdit*  textEdit = _ui->textEdit;
 
 #ifdef QSCINTILLA
@@ -69,11 +69,11 @@ CodeWindow::CodeWindow( QSettings* appSettings, const QString& path, QWidget* pa
         lexer = new QsciLexerJavaScript;
 
     if (lexer) {
-        lexer->setFont( font);
+        lexer->setFont( _font);
         textEdit->setLexer( lexer);
     }
     else {
-        textEdit->setFont( font);
+        textEdit->setFont( _font);
     }
 
     textEdit->setTabWidth(4);
@@ -84,12 +84,14 @@ CodeWindow::CodeWindow( QSettings* appSettings, const QString& path, QWidget* pa
     textEdit->setBraceMatching( QsciScintilla::StrictBraceMatch);
     textEdit->setMatchedBraceForegroundColor( Qt::red);
 #else
-    QFontMetrics fm( font);
+    QFontMetrics fm( _font);
     int  tabWidthInPixels = fm.width("    ");
     textEdit->setTabStopWidth( tabWidthInPixels);
-    textEdit->setCurrentFont( font);
+    textEdit->setCurrentFont( _font);
 #endif
 
+    _isHtml = path.endsWith(".html") || path.endsWith(".xhtml");
+    _isSetPlainText = true;  // Default
     _arnItem.open( path);
     setText( _arnItem.toString());
 }
@@ -147,6 +149,12 @@ void  CodeWindow::on_findNextButton_clicked()
 }
 
 
+void  CodeWindow::on_forceText_clicked()
+{
+    setText( getText());
+}
+
+
 void  CodeWindow::loadFile( const QString& fileName)
 {
     QFile  file( fileName);
@@ -168,8 +176,22 @@ void  CodeWindow::loadFile( const QString& fileName)
 
 void  CodeWindow::setText( const QString& text)
 {
+    _lastSetText = text;
+
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    _ui->textEdit->setText( text);
+    if (!_isHtml || _ui->forceText->isChecked()) {
+        _ui->textEdit->setCurrentFont( _font);
+        //qDebug() << "Set font size=" << _font.pointSizeF();
+        _ui->textEdit->setPlainText( text);
+        _ui->textEdit->setReadOnly( false);
+        //qDebug() << "Used font: size=" << _ui->textEdit->fontInfo().pointSizeF();
+        _isSetPlainText = true;
+    }
+    else {
+        _ui->textEdit->setHtml( text);
+        _ui->textEdit->setReadOnly( true);
+        _isSetPlainText = false;
+    }
     QApplication::restoreOverrideCursor();
 }
 
@@ -197,7 +219,7 @@ void  CodeWindow::saveFile( const QString& fileName)
 QString  CodeWindow::getText()  const
 {
     QApplication::setOverrideCursor( Qt::WaitCursor);
-    QString  text = _ui->textEdit->text();
+    QString  text = _isSetPlainText ? _ui->textEdit->text() : _lastSetText;
     QApplication::restoreOverrideCursor();
 
     return text;

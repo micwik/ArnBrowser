@@ -35,6 +35,7 @@
 
 #include <ArnInc/ArnItem.hpp>
 #include <QDialog>
+#include <QFont>
 
 class QSettings;
 class QCloseEvent;
@@ -64,6 +65,7 @@ private slots:
     void  on_saveButton_clicked();
     void  on_findButton_clicked();
     void  on_findNextButton_clicked();
+    void  on_forceText_clicked();
     void  readSettings();
     void  writeSettings();
 
@@ -74,6 +76,10 @@ private:
     Ui::CodeWindow*  _ui;    
     ArnItem  _arnItem;
     QSettings*  _appSettings;
+    QFont  _font;
+    bool  _isHtml;
+    bool  _isSetPlainText;
+    QString  _lastSetText;
 };
 
 #endif // CODEWINDOW_HPP
