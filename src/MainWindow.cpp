@@ -57,6 +57,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     _appSettings = new QSettings("MicTron", "ArnBrowser");
 
+    ArnM::instance().setSkipLocalSysLoading( true);
+
     //// Error log from Arn system
     ArnM::setConsoleError( false);
     connect( &ArnM::instance(), SIGNAL(errorLogSig(QString,uint,void*)),
