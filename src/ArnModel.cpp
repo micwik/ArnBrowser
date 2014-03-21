@@ -519,7 +519,7 @@ void  ArnModel::doInsertItem( const QModelIndex& index, ArnNode* node, QString p
     // qDebug() << "arnModel netChildFound: create item=" << itemName;
     ArnNode*  child = new ArnNode( node, itemName, insRow);
     connect( child, SIGNAL(changed()), this, SLOT(nodeDataChanged()));
-    connect( child, SIGNAL(modeChanged(ArnItem::Mode)), this, SLOT(nodeModeChanged()));
+    connect( child, SIGNAL(modeChanged(Arn::ObjectMode)), this, SLOT(nodeModeChanged()));
     connect( child, SIGNAL(arnLinkDestroyed()), this, SLOT(destroyNode()));
     this->endInsertRows();
 

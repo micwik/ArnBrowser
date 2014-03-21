@@ -142,7 +142,7 @@ void  ManageWindow::doUpdate()
     _ui->persistSelBox->setDisabled( !isTypePersistable || !isPathOpen);
     _ui->mandatoryButton->setDisabled( !isPersistDB);
 
-    ArnItem::Mode  modePath = _arnPath.getMode();
+    Arn::ObjectMode  modePath = _arnPath.getMode();
     if (!isPathFolder && isPathOpen) {
         if (modePath.is( modePath.Pipe)) {
             _ui->typeNormalButton->setDisabled(true);
@@ -179,7 +179,7 @@ void  ManageWindow::doUpdate()
 
 void  ManageWindow::doTypeUpdate()
 {
-    ArnItem::Mode  pathMode = _arnPath.getMode();
+    Arn::ObjectMode  pathMode = _arnPath.getMode();
     if (!_arnPath.isFolder()) {
         if (pathMode.is( pathMode.Pipe))
             _ui->typePipeButton->setChecked(true);
@@ -198,7 +198,7 @@ void  ManageWindow::doTypeUpdate()
 
 void  ManageWindow::doPersistUpdate()
 {
-    ArnItem::Mode  modePath = _arnPath.getMode();
+    Arn::ObjectMode  modePath = _arnPath.getMode();
     if (_isPersistFile)
         _ui->persistFileButton->setChecked(true);
     else if (modePath.is( modePath.Save))
@@ -279,7 +279,7 @@ void  ManageWindow::on_saveButton_clicked()
         arnItem = &_arnPath;
     if (!arnItem->isOpen())  return;
 
-    ArnItem::Mode  mode;
+    Arn::ObjectMode  mode;
 
     if (_ui->typeBidirButton->isChecked())
         arnItem->addMode( mode.BiDir);
