@@ -66,7 +66,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //// Prepare connect to Arn server
     _arnClient = new ArnClient( this);
-    connect( _arnClient, SIGNAL(tcpConnected()), this, SLOT(clientConnected()));
+    connect( _arnClient, SIGNAL(tcpConnected(QString,quint16)), this, SLOT(clientConnected()));
     connect( _arnClient, SIGNAL(tcpError(QString,QAbstractSocket::SocketError)),
              this, SLOT(clientError(QString)));
 
