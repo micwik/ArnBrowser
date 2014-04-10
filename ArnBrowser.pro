@@ -65,6 +65,8 @@ ArnLibCompile {
     include(../ArnLib/src/ArnLib.pri)
     INCLUDEPATH += $$PWD/../ArnLib/src
 } else {
+    win32: INCLUDEPATH += $$PWD/../ArnLib/src
+
     win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../ArnLib/release/ -l$${ARNLIB}
     else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ArnLib/debug/ -l$${ARNLIB}
     else:unix: LIBS += -L$$OUT_PWD/../ArnLib/ -l$${ARNLIB}
