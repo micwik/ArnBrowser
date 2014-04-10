@@ -289,7 +289,7 @@ void  MainWindow::readSettings()
 {
     QPoint  pos = _appSettings->value("main/pos", QPoint(200, 200)).toPoint();
     QSize  size = _appSettings->value("main/size", QSize(400, 400)).toSize();
-    _pathWidth = _appSettings->value("main/pathW", 50).toInt();
+    _pathWidth = _appSettings->value("main/pathW", 120).toInt();
     bool  viewHidden = _appSettings->value("main/viewHidden", false).toBool();
     bool  hideBidir  = _appSettings->value("main/hideBidir",  false).toBool();
     resize( size);
