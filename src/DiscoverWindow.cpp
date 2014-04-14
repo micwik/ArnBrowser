@@ -126,8 +126,7 @@ void  DiscoverWindow::updateBrowse()
 void  DiscoverWindow::updateCurService()
 {
     int  index = _ui->serviceTabView->currentRow();
-    if (index >= 0)
-        _serviceBrowser->goTowardState( index, ArnDiscoverInfo::State::HostIp);
+    _serviceBrowser->goTowardState( index, ArnDiscoverInfo::State::HostIp);
     updateInfoView( index);
 }
 
@@ -165,13 +164,12 @@ void  DiscoverWindow::updateInfoView( int index)
 {
     int  curIndex = _ui->serviceTabView->currentRow();
     // qDebug() << "updateInfoView: curRow=" << curIndex << " index=" << index;
-    if (index != curIndex)  return;
+    if (index != curIndex)  return;  // The updated info is not for selected row
 
-    bool  isOk = (curIndex >= 0);
-    ArnDiscoverInfo  info = isOk ? _serviceBrowser->infoByIndex( curIndex) : ArnDiscoverInfo();
+    const ArnDiscoverInfo&  info = _serviceBrowser->infoByIndex( curIndex);
     XStringMap  xsmTxt = info.properties();
 
-    _ui->connectButton->setEnabled( isOk);
+    _ui->connectButton->setEnabled( curIndex >= 0);
 
     _ui->discoverTypeValue->setText( info.typeString());
     _ui->hostNameValue->setText( info.hostName());
