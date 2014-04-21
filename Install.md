@@ -26,6 +26,14 @@ The configuration in ArnBrowser.pro will give a starting point.
 It works well when using the same base directory for ArnLib as the application,
 e.g. basedir/ArnLib and basedir/ArnBrowser. 
 
+It's possible to include the ArnLib source in the ArnBrowser compiling by adding
+ArnLibCompile to CONFIG.
+
+Internal mDNS (ZeroConfig) is selected by adding mDnsIntern to CONFIG.
+
+    CONFIG += ArnLibCompile
+    CONFIG += mDnsIntern
+
 
 ### A) Unix 
 
@@ -33,16 +41,17 @@ e.g. basedir/ArnLib and basedir/ArnBrowser.
 > make <Br>
 
 Regarding ArnLib, the easiest way is to let it be placed in a standard location 
-for librarys and includes, e.g. /usr/lib and /usr/include/ArnLib.
+for librarys and includes, e.g. /usr/lib and /usr/include/ArnInc.
 
 When using a shared library it's path has to be known to 
 the run-time linker of your operating system. On Linux systems read
-"man ldconfig" ( or google for it ). Another option is to use
+"man ldconfig" (or google for it). Another option is to use
 the LD_LIBRARY_PATH (on some systems LIBPATH is used instead, on MacOSX
 it is called DYLD_LIBRARY_PATH) environment variable.
 
 If you only want to check the ArnBrowser without installing ArnLib,
-you can set the LD_LIBRARY_PATH to the lib directory of your local build ArnLib. 
+you can set the LD_LIBRARY_PATH to the lib directory of your local build ArnLib.
+it's also possible to compile the sources together by ArnLibCompile (see above).
 
 
 ### B) Win32/MSVC 

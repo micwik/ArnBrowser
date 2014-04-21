@@ -61,7 +61,6 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 ArnLibCompile {
     ARN += client
     ARN += discover
-    #CONFIG += mDnsIntern
     include(../ArnLib/src/ArnLib.pri)
     INCLUDEPATH += $$PWD/../ArnLib/src
 } else {
@@ -91,3 +90,7 @@ qscintilla {
 
 RESOURCES += \
     src/files.qrc
+
+OTHER_FILES += \
+    README.md \
+    Install.md
