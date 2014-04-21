@@ -36,6 +36,3 @@ Read [Install.md](Install.md) how to build, install and use.
 * Managing Version Control (VCS) for objects stored in files.
 
 * ZeroConfig browsing for _arn_ services on local network.
-
-* ...
-  To be Continued
