@@ -50,6 +50,14 @@ FORMS += src/MainWindow.ui \
     src/VcsWindow.ui \
     src/DiscoverWindow.ui
 
+RESOURCES += \
+    src/files.qrc
+
+OTHER_FILES += \
+    README.md \
+    Install.md
+
+
 INCLUDEPATH += src $$PWD/.. $$PWD/../include
 
 greaterThan(QT_MAJOR_VERSION, 4) {
@@ -71,7 +79,6 @@ ArnLibCompile {
     else:unix: LIBS += -L$$OUT_PWD/../ArnLib/ -l$${ARNLIB}
 }
 
-
 !mDnsIntern {
     win32:CONFIG(release, debug|release): LIBS +=  -ldns_sd
     else:win32:CONFIG(debug, debug|release): LIBS +=  -ldns_sd
@@ -87,10 +94,3 @@ qscintilla {
 
   INCLUDEPATH += $$PWD/../QScintilla/Qt4
 }
-
-RESOURCES += \
-    src/files.qrc
-
-OTHER_FILES += \
-    README.md \
-    Install.md
