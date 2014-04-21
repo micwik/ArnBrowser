@@ -1,4 +1,4 @@
-    Copyright (C) 2010-2013 Michael Wiklund.
+    Copyright (C) 2010-2014 Michael Wiklund.
     All rights reserved.
     Contact: arnlib@wiklunden.se
 
@@ -34,6 +34,8 @@ Read [Install.md](Install.md) how to build, install and use.
 * Managing Arn Data Object properties.
 
 * Managing Version Control (VCS) for objects stored in files.
+
+* ZeroConfig browsing for _arn_ services on local network.
 
 * ...
   To be Continued
