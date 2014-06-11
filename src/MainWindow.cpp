@@ -57,8 +57,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     _appSettings = new QSettings("MicTron", "ArnBrowser");
 
-    ArnM::instance().setSkipLocalSysLoading( true);
-
     //// Error log from Arn system
     ArnM::setConsoleError( false);
     connect( &ArnM::instance(), SIGNAL(errorLogSig(QString,uint,void*)),
@@ -70,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect( _arnClient, SIGNAL(tcpError(QString,QAbstractSocket::SocketError)),
              this, SLOT(clientError(QString)));
 
-    /// Setup model
+    //// Setup model
     _arnModel = new ArnModel( this);
     _arnModel->setClient( _arnClient);
 

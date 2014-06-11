@@ -37,6 +37,8 @@
 #include <QPixmap>
 #include <QStringList>
 
+#define HOST_ROOT_PATH  "/@host/"
+
 using Arn::XStringMap;
 
 
@@ -84,7 +86,8 @@ ArnNode::~ArnNode()
 ArnModel::ArnModel(QObject* parent) :
     QAbstractItemModel( parent)
 {
-    _rootNode = new ArnNode("/", this);
+    // _rootNode = new ArnNode("/", this);
+    _rootNode = new ArnNode( HOST_ROOT_PATH, this);
     _isHideBidir = false;
 }
 
@@ -92,7 +95,7 @@ ArnModel::ArnModel(QObject* parent) :
 void  ArnModel::setClient( ArnClient* client)
 {
     _arnClient = client;
-    _arnClient->setMountPoint("/");
+    _arnClient->addMountPoint( HOST_ROOT_PATH, "/");
 }
 
 
@@ -355,7 +358,9 @@ void  ArnModel::arnMonStart( ArnNode* node)
         arnMon = new ArnMonitor( node);
         node->_arnMon = arnMon;
         connect( arnMon, SIGNAL(arnChildFound(QString)), this, SLOT(netChildFound(QString)));
-        arnMon->setMonitorPath( node->path(), _arnClient);
+        QString  path = node->path();
+        ArnClient*  client = path.startsWith( HOST_ROOT_PATH) ? _arnClient : 0;
+        arnMon->start( path, client);
     }
 }
 
