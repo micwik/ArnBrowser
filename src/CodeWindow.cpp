@@ -45,7 +45,8 @@
 #include <QDebug>
 
 #ifdef QSCINTILLA
-#  include <Qsci/qscilexerjavascript.h>
+# include <Qsci/qscilexerjavascript.h>
+# include <Qsci/qscilexerhtml.h>
 #endif
 
 CodeWindow::CodeWindow( QSettings* appSettings, const QString& path, QWidget* parent) :
@@ -64,9 +65,11 @@ CodeWindow::CodeWindow( QSettings* appSettings, const QString& path, QWidget* pa
     MTextEdit*  textEdit = _ui->textEdit;
 
 #ifdef QSCINTILLA
-    QsciLexerJavaScript*  lexer = 0;
+    QsciLexer*  lexer = 0;
     if (path.endsWith(".js"))
         lexer = new QsciLexerJavaScript;
+    if (path.endsWith(".html") || path.endsWith(".xhtml"))
+        lexer = new QsciLexerHTML;
 
     if (lexer) {
         lexer->setFont( _font);
