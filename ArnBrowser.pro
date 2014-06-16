@@ -2,10 +2,10 @@
 # Project created by QtCreator 2010-08-12T21:08:40
 # -------------------------------------------------
 
-# CONFIG += ArnLibCompile
+CONFIG += ArnLibCompile
 
 # Usage of js aware code editor
-CONFIG += qscintilla
+# CONFIG += qscintilla
 
 # Usage of internal mDNS code (no external dependency)
 CONFIG += mDnsIntern

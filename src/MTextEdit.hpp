@@ -59,6 +59,9 @@ public:
     QString  text()  const;
     MTextEditor*  editor()  const;
 
+protected:
+    void  setupEditor();
+
 private:
     MTextEditor*  _textEdit;
     QTextEdit*  _textView;

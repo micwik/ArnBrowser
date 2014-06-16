@@ -36,13 +36,11 @@
 MTextEdit::MTextEdit( QWidget* parent)
     : QStackedWidget( parent)
 {
-#ifdef QSCINTILLA
-    _textEdit = new QsciScintilla;
-#else
-    _textEdit = new QTextEdit;
-#endif
+    setupEditor();
+
     _textView = new QTextEdit;
     _textView->setReadOnly( true);
+
     addWidget( _textEdit);
     addWidget( _textView);
 }
@@ -107,4 +105,14 @@ QString  MTextEdit::text()  const
 MTextEditor* MTextEdit::editor() const
 {
     return _textEdit;
+}
+
+
+void  MTextEdit::setupEditor()
+{
+#ifdef QSCINTILLA
+    _textEdit = new QsciScintilla;
+#else
+    _textEdit = new QTextEdit;
+#endif
 }
