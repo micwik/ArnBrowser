@@ -30,40 +30,81 @@
 // GNU Lesser General Public License for more details.
 //
 
-#ifndef MTEXTEDIT_HPP
-#define MTEXTEDIT_HPP
-
-#include <QStackedWidget>
-#include <QTextEdit>
-#include <QString>
+#include "MTextEdit.hpp"
 
 
-/// Wrapper for textediting using QScintilla or QTextEdit
-
-#ifdef QSCINTILLA
-# include <Qsci/qsciscintilla.h>
-  typedef QsciScintilla MTextEditor;
-#else
-  typedef QTextEdit MTextEditor;
-#endif
-
-
-class MTextEdit : public QStackedWidget
+MTextEdit::MTextEdit( QWidget* parent)
+    : QStackedWidget( parent)
 {
-public:
-    MTextEdit( QWidget *parent = 0);
-    bool  findFirst( QString text);
-    bool  findNext();
-    void  setPlainText( const QString& text);
-    void  setHtml( const QString& text);
-    QString  text()  const;
-    MTextEditor*  editor()  const;
-
-private:
-    MTextEditor*  _textEdit;
-    QTextEdit*  _textView;
-    QString  _lastFind;
-};
+#ifdef QSCINTILLA
+    _textEdit = new QsciScintilla;
+#else
+    _textEdit = new QTextEdit;
+#endif
+    _textView = new QTextEdit;
+    _textView->setReadOnly( true);
+    addWidget( _textEdit);
+    addWidget( _textView);
+}
 
 
-#endif // MTEXTEDIT_HPP
+bool  MTextEdit::findFirst( QString text)
+{
+    setCurrentIndex(0);
+    _lastFind = text;
+#ifdef QSCINTILLA
+    return _textEdit->findFirst( text, false, false, false, true);
+#else
+    return _textEdit->find( text);
+#endif
+}
+
+
+bool  MTextEdit::findNext()
+{
+    setCurrentIndex(0);
+#ifdef QSCINTILLA
+    return _textEdit->findNext();
+#else
+    return _textEdit->find( _lastFind);
+#endif
+}
+
+
+void  MTextEdit::setPlainText( const QString& text)
+{
+    setCurrentIndex(0);
+#ifdef QSCINTILLA
+    _textEdit->setText( text);
+#else
+    _textEdit->setPlainText( text);
+#endif
+}
+
+
+void  MTextEdit::setHtml( const QString& text)
+{
+    setCurrentIndex(1);
+    _textView->setHtml( text);
+#ifdef QSCINTILLA
+    _textEdit->setText( text);
+#else
+    _textEdit->setPlainText( text);
+#endif
+}
+
+
+QString  MTextEdit::text()  const
+{
+#ifdef QSCINTILLA
+    return _textEdit->text();
+#else
+    return _textEdit->toPlainText();
+#endif
+}
+
+
+MTextEditor* MTextEdit::editor() const
+{
+    return _textEdit;
+}

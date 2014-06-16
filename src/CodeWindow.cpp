@@ -70,24 +70,24 @@ CodeWindow::CodeWindow( QSettings* appSettings, const QString& path, QWidget* pa
 
     if (lexer) {
         lexer->setFont( _font);
-        textEdit->setLexer( lexer);
+        textEdit->editor()->setLexer( lexer);
     }
     else {
         textEdit->setFont( _font);
     }
 
-    textEdit->setTabWidth(4);
-    textEdit->setMarginWidth(0, 35);
-    textEdit->setMarginLineNumbers(0, true);
-    textEdit->setUtf8(true);
-    textEdit->setAutoIndent(true);
-    textEdit->setBraceMatching( QsciScintilla::StrictBraceMatch);
-    textEdit->setMatchedBraceForegroundColor( Qt::red);
+    textEdit->editor()->setTabWidth(4);
+    textEdit->editor()->setMarginWidth(0, 35);
+    textEdit->editor()->setMarginLineNumbers(0, true);
+    textEdit->editor()->setUtf8(true);
+    textEdit->editor()->setAutoIndent(true);
+    textEdit->editor()->setBraceMatching( QsciScintilla::StrictBraceMatch);
+    textEdit->editor()->setMatchedBraceForegroundColor( Qt::red);
 #else
     QFontMetrics fm( _font);
     int  tabWidthInPixels = fm.width("    ");
-    textEdit->setTabStopWidth( tabWidthInPixels);
-    textEdit->setCurrentFont( _font);
+    textEdit->editor()->setTabStopWidth( tabWidthInPixels);
+    textEdit->editor()->setCurrentFont( _font);
 #endif
 
     _isHtml = path.endsWith(".html") || path.endsWith(".xhtml");
@@ -180,16 +180,11 @@ void  CodeWindow::setText( const QString& text)
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
     if (!_isHtml || _ui->forceText->isChecked()) {
-        _ui->textEdit->setCurrentFont( _font);
-        //qDebug() << "Set font size=" << _font.pointSizeF();
         _ui->textEdit->setPlainText( text);
-        _ui->textEdit->setReadOnly( false);
-        //qDebug() << "Used font: size=" << _ui->textEdit->fontInfo().pointSizeF();
         _isSetPlainText = true;
     }
     else {
         _ui->textEdit->setHtml( text);
-        _ui->textEdit->setReadOnly( true);
         _isSetPlainText = false;
     }
     QApplication::restoreOverrideCursor();
