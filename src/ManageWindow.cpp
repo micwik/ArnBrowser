@@ -31,6 +31,7 @@
 //
 
 #include "ManageWindow.hpp"
+#include "ArnModel.hpp"
 #include "ui_ManageWindow.h"
 #include <QCloseEvent>
 #include <QSettings>
@@ -58,7 +59,7 @@ ManageWindow::ManageWindow( QSettings* appSettings, const QString& path, QWidget
     _ui->itemEdit->setValidator( validator);
 
     //// Logics
-    _persistSapi.open("//.sys/Persist/Pipes/CommonPipe");
+    _persistSapi.open( HOST_ROOT_PATH "/.sys/Persist/Pipes/CommonPipe");
     connect( &_persistSapi, SIGNAL(rq_lsR(QStringList)), this, SLOT(lsR(QStringList)));
     connect( &_persistSapi, SIGNAL(rq_dbMandatoryLsR(QStringList)), this, SLOT(mandatoryLsR(QStringList)));
 

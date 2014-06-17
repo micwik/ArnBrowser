@@ -31,6 +31,7 @@
 //
 
 #include "VcsWindow.hpp"
+#include "ArnModel.hpp"
 #include "ui_VcsWindow.h"
 #include <QInputDialog>
 #include <QCloseEvent>
@@ -53,7 +54,7 @@ VcsWindow::VcsWindow( QSettings* appSettings, QWidget* parent) :
     _refUpdated   = false;
 
     //// Logics
-    _sapiVcs.open("//.sys/Persist/Pipes/CommonPipe");
+    _sapiVcs.open( HOST_ROOT_PATH "/.sys/Persist/Pipes/CommonPipe");
     _sapiVcs.batchConnect( QRegExp("^rq_(.+)"), this, "sapi\\1");
 
     connect( _ui->treeWorkButton, SIGNAL(clicked()), this, SLOT(onTreeChanged()));

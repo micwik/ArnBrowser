@@ -37,8 +37,6 @@
 #include <QPixmap>
 #include <QStringList>
 
-#define HOST_ROOT_PATH  "/@host/"
-
 using Arn::XStringMap;
 
 

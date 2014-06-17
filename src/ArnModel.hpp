@@ -38,6 +38,8 @@
 #include <ArnInc/ArnItem.hpp>
 #include <ArnInc/ArnClient.hpp>
 
+#define HOST_ROOT_PATH  "/@host/"
+
 class ArnMonitor;
 
 namespace Arn {
