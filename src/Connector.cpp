@@ -30,63 +30,63 @@
 // GNU Lesser General Public License for more details.
 //
 
-#ifndef MAINWINDOW_HPP
-#define MAINWINDOW_HPP
-
-#include <QMainWindow>
-#include <QTreeView>
-#include "ArnModel.hpp"
 #include "Connector.hpp"
+#include <ArnInc/Arn.hpp>
 
-class MultiDelegate;
-class QSettings;
-class QCloseEvent;
 
-namespace Ui {
-    class MainWindow;
+Connector::Connector( QObject *parent)
+    : QObject( parent)
+    , _hostRootPath("/@host/")
+{
 }
 
 
-class MainWindow : public QMainWindow {
-    Q_OBJECT
-public:
-    MainWindow( QWidget* parent = 0);
-    ~MainWindow();
+QString  Connector::toNormPath( const QString& path)  const
+{
+    return Arn::changeBasePath( _hostRootPath, "/", path);
+}
 
-private slots:
-    void  itemClicked( const QModelIndex &index);
-    void  clientConnected();
-    void  clientError( QString errorText);
-    void  on_connectButton_clicked();
-    void  on_discoverButton_clicked();
-    void  on_terminalButton_clicked();
-    void  on_editButton_clicked();
-    void  on_manageButton_clicked();
-    void  on_vcsButton_clicked();
-    void  on_viewHidden_clicked();
-    void  on_hideBidir_clicked();
-    void  errorLog( QString errText);
-    void  readSettings();
-    void  writeSettings();
-    //void  dataChanged( const QModelIndex& topLeft, const QModelIndex& bottomRight);
-    void  updateHidden( int row, QModelIndex parent, bool isHidden);
 
-protected:
-    void changeEvent( QEvent *e);
-    void closeEvent( QCloseEvent *event);
+QString  Connector::toLocalPath( const QString& path)  const
+{
+    if (path.startsWith( _hostRootPath))
+        return path;
+    else
+        return Arn::changeBasePath("/", _hostRootPath, path);
+}
 
-private:    
-    void  updateHiddenTree( const QModelIndex& index);
 
-    Ui::MainWindow*  _ui;
-    MultiDelegate*  _delegate;
-    ArnModel*  _arnModel;
-    ArnClient*  _arnClient;
-    Connector*  _connector;
+//////////////// ConnectorPath
 
-    QSettings*  _appSettings;
-    QString  _curItemPath;
-    int  _pathWidth;
-};
+ConnectorPath::ConnectorPath( Connector* connector, QString localPath)
+{
+    _connector = connector;
+    _localPath = localPath;
+}
 
-#endif // MAINWINDOW_HPP
+
+QString  ConnectorPath::normPath()  const
+{
+    if (_connector)
+        return _connector->toNormPath( _localPath);
+    else
+        return QString();
+}
+
+
+QString  ConnectorPath::localPath()  const
+{
+    return _localPath;
+}
+
+
+QString  ConnectorPath::toNormPath( const QString& path)  const
+{
+    return _connector ? _connector->toNormPath( path) : QString();
+}
+
+
+QString  ConnectorPath::toLocalPath( const QString& path)  const
+{
+    return _connector ? _connector->toLocalPath( path) : QString();
+}

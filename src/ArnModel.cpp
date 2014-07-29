@@ -81,19 +81,19 @@ ArnNode::~ArnNode()
 }
 
 
-ArnModel::ArnModel(QObject* parent) :
+ArnModel::ArnModel( Connector* connector, QObject* parent) :
     QAbstractItemModel( parent)
 {
-    // _rootNode = new ArnNode("/", this);
-    _rootNode = new ArnNode( HOST_ROOT_PATH, this);
+    _connector = connector;
+    _rootNode = new ArnNode( _connector->toLocalPath("/"), this);
     _isHideBidir = false;
 }
 
 
-void  ArnModel::setClient( ArnClient* client)
+void  ArnModel::setClient(ArnClient* client)
 {
     _arnClient = client;
-    _arnClient->addMountPoint( HOST_ROOT_PATH, "/");
+    _arnClient->addMountPoint( _connector->toLocalPath("/"), "/");
 }
 
 
@@ -357,7 +357,7 @@ void  ArnModel::arnMonStart( ArnNode* node)
         node->_arnMon = arnMon;
         connect( arnMon, SIGNAL(arnChildFound(QString)), this, SLOT(netChildFound(QString)));
         QString  path = node->path();
-        ArnClient*  client = path.startsWith( HOST_ROOT_PATH) ? _arnClient : 0;
+        ArnClient*  client = path.startsWith( _connector->toLocalPath("/")) ? _arnClient : 0;
         arnMon->start( path, client);
     }
 }

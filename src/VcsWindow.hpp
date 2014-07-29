@@ -33,9 +33,11 @@
 #ifndef VCSWINDOW_HPP
 #define VCSWINDOW_HPP
 
+#include "Connector.hpp"
 #include <ArnInc/MQFlags.hpp>
 #include <ArnInc/Arn.hpp>
 #include <ArnInc/ArnPersistSapi.hpp>
+#include <QPointer>
 #include <QStringList>
 #include <QDialog>
 
@@ -52,7 +54,7 @@ class VcsWindow : public QDialog
     Q_OBJECT
     
 public:
-    explicit VcsWindow( QSettings* appSettings, QWidget* parent = 0);
+    explicit VcsWindow( QSettings* appSettings, Connector* connector, QWidget* parent = 0);
     ~VcsWindow();
     
 private slots:
@@ -95,6 +97,7 @@ private:
     QString  getRef();
     QStringList  getSelFiles();
 
+    QPointer<Connector>  _connector;
     ArnPersistSapi  _sapiVcs;
     QStringList  _refIdList;
     QStringList  _refIdMsgList;

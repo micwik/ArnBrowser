@@ -33,6 +33,7 @@
 #ifndef TERMWINDOW_HPP
 #define TERMWINDOW_HPP
 
+#include "Connector.hpp"
 #include <ArnInc/ArnItem.hpp>
 #include <QDialog>
 
@@ -49,7 +50,7 @@ class TermWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit TermWindow( QSettings* appSettings, const QString& path, QWidget* parent = 0);
+    explicit TermWindow( QSettings* appSettings, const ConnectorPath& conPath, QWidget* parent = 0);
     ~TermWindow();
 
 private slots:

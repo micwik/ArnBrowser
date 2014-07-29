@@ -39,12 +39,13 @@
 #include <QDebug>
 
 
-VcsWindow::VcsWindow( QSettings* appSettings, QWidget* parent) :
-    QDialog( parent),
+VcsWindow::VcsWindow( QSettings* appSettings, Connector* connector, QWidget* parent)
+    : QDialog( parent),
     _ui( new Ui::VcsWindow)
 {
     _ui->setupUi( this);
 
+    _connector = connector;
     this->setWindowTitle( QString("Version Control System"));
 
     _appSettings = appSettings;
@@ -54,8 +55,8 @@ VcsWindow::VcsWindow( QSettings* appSettings, QWidget* parent) :
     _refUpdated   = false;
 
     //// Logics
-    _sapiVcs.open( HOST_ROOT_PATH "/.sys/Persist/Pipes/CommonPipe");
-    _sapiVcs.batchConnect( QRegExp("^rq_(.+)"), this, "sapi\\1");
+    _sapiVcs.open( _connector->toLocalPath("//.sys/Persist/Pipes/CommonPipe"));
+    _sapiVcs.batchConnectTo( this, "sapi");
 
     connect( _ui->treeWorkButton, SIGNAL(clicked()), this, SLOT(onTreeChanged()));
     connect( _ui->treeRepoButton, SIGNAL(clicked()), this, SLOT(onTreeChanged()));
@@ -220,47 +221,6 @@ void  VcsWindow::on_tagButton_clicked()
     inpDialog->setInputMode( QInputDialog::TextInput);
     inpDialog->show();
     connect( inpDialog, SIGNAL(textValueSelected(QString)), this, SLOT(doCloseTagWindow(QString)));
-/*
-    WDialog* dia;
-    dia = new WDialog("Set tag name");
-    dia->setModal(true);
-    dia->show();
-    dia->setResizable(false);
-    dia->setClosable(true);
-    dia->rejectWhenEscapePressed();
-
-    WLabel*  tagLabel = new WLabel("Tag");
-    WLineEdit*  tagEdit = new WLineEdit();
-    tagEdit->setValidator( new WRegExpValidator("[^ \\/\\\\]+"));
-    tagLabel->setBuddy( tagEdit);
-    WPushButton*  cancelButton = new WPushButton("Cancel");
-    cancelButton->resize(80, 25);
-    WPushButton*  okButton = new WPushButton("Ok");
-    okButton->resize(80, 25);
-
-    WHBoxLayout*  hlay1 = new WHBoxLayout;
-    hlay1->addWidget( tagLabel);
-    hlay1->addWidget( tagEdit, 1);
-    hlay1->setSpacing(8);
-    WHBoxLayout*  butlay = new WHBoxLayout;
-    butlay->addWidget( cancelButton);
-    butlay->addWidget( okButton);
-    butlay->addStretch(1);
-    butlay->setSpacing(20);
-    WVBoxLayout*  toplay = new WVBoxLayout;
-    toplay->addLayout( hlay1);
-    toplay->addLayout( butlay);
-    toplay->setSpacing(20);
-
-    dia->contents()->setPadding(8);
-    dia->resize(300, 120);
-    dia->contents()->setLayout( toplay);
-    tagEdit->setFocus(true);
-
-    cancelButton->clicked().connect( dia, &WDialog::reject);
-    okButton->clicked().connect( dia, &WDialog::accept);
-    dia->finished().connect( boost::bind( &VcsWindow::doCloseTagWindow, this, dia, tagEdit));
-*/
 }
 
 

@@ -34,11 +34,10 @@
 #define ARNMODEL_HPP
 
 #include "ItemDataRole.hpp"
+#include "Connector.hpp"
 #include <QAbstractItemModel>
 #include <ArnInc/ArnItem.hpp>
 #include <ArnInc/ArnClient.hpp>
-
-#define HOST_ROOT_PATH  "/@host/"
 
 class ArnMonitor;
 
@@ -87,7 +86,7 @@ public:
         Role( E v_ = E(0)) : e( v_)  {}
     };
 
-    explicit ArnModel( QObject* parent = 0);
+    explicit ArnModel( Connector* connector, QObject* parent = 0);
     void  setClient( ArnClient* client);
     void  setHideBidir( bool isHide);
 
@@ -131,6 +130,7 @@ private:
     QList<ArnNode*>  _folderChildren;
 
     ArnClient*  _arnClient;
+    Connector*  _connector;
 };
 
 #endif // ARNMODEL_HPP

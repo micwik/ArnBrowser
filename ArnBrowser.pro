@@ -2,7 +2,7 @@
 # Project created by QtCreator 2010-08-12T21:08:40
 # -------------------------------------------------
 
-CONFIG += ArnLibCompile
+# CONFIG += ArnLibCompile
 
 # Usage of js aware code editor
 # CONFIG += qscintilla
@@ -30,7 +30,8 @@ SOURCES += src/main.cpp \
     src/ManageWindow.cpp \
     src/VcsWindow.cpp \
     src/DiscoverWindow.cpp \
-    src/MTextEdit.cpp
+    src/MTextEdit.cpp \
+    src/Connector.cpp
 
 HEADERS += src/MainWindow.hpp \
     src/TermWindow.hpp \
@@ -42,7 +43,8 @@ HEADERS += src/MainWindow.hpp \
     src/MTextEdit.hpp \
     src/ManageWindow.hpp \
     src/VcsWindow.hpp \
-    src/DiscoverWindow.hpp
+    src/DiscoverWindow.hpp \
+    src/Connector.hpp
 
 FORMS += src/MainWindow.ui \
     src/TermWindow.ui \

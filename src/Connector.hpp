@@ -30,63 +30,41 @@
 // GNU Lesser General Public License for more details.
 //
 
-#ifndef MAINWINDOW_HPP
-#define MAINWINDOW_HPP
+#ifndef CONNECTOR_HPP
+#define CONNECTOR_HPP
 
-#include <QMainWindow>
-#include <QTreeView>
-#include "ArnModel.hpp"
-#include "Connector.hpp"
-
-class MultiDelegate;
-class QSettings;
-class QCloseEvent;
-
-namespace Ui {
-    class MainWindow;
-}
+#include <QObject>
+#include <QString>
+#include <QPointer>
 
 
-class MainWindow : public QMainWindow {
+class Connector : public QObject
+{
     Q_OBJECT
 public:
-    MainWindow( QWidget* parent = 0);
-    ~MainWindow();
+    explicit Connector( QObject* parent = 0);
 
-private slots:
-    void  itemClicked( const QModelIndex &index);
-    void  clientConnected();
-    void  clientError( QString errorText);
-    void  on_connectButton_clicked();
-    void  on_discoverButton_clicked();
-    void  on_terminalButton_clicked();
-    void  on_editButton_clicked();
-    void  on_manageButton_clicked();
-    void  on_vcsButton_clicked();
-    void  on_viewHidden_clicked();
-    void  on_hideBidir_clicked();
-    void  errorLog( QString errText);
-    void  readSettings();
-    void  writeSettings();
-    //void  dataChanged( const QModelIndex& topLeft, const QModelIndex& bottomRight);
-    void  updateHidden( int row, QModelIndex parent, bool isHidden);
+    QString  toNormPath( const QString& path)  const;  // Normal path, also as remote path and viewed path
+    QString  toLocalPath( const QString& path)  const;
 
-protected:
-    void changeEvent( QEvent *e);
-    void closeEvent( QCloseEvent *event);
-
-private:    
-    void  updateHiddenTree( const QModelIndex& index);
-
-    Ui::MainWindow*  _ui;
-    MultiDelegate*  _delegate;
-    ArnModel*  _arnModel;
-    ArnClient*  _arnClient;
-    Connector*  _connector;
-
-    QSettings*  _appSettings;
-    QString  _curItemPath;
-    int  _pathWidth;
+private:
+    const QString  _hostRootPath;
 };
 
-#endif // MAINWINDOW_HPP
+
+class ConnectorPath
+{
+public:
+    explicit ConnectorPath( Connector* connector = 0, QString localPath = QString());
+
+    QString  normPath()  const;  // Normal path, also as remote path and viewed path
+    QString  localPath()  const;
+    QString  toNormPath( const QString& path)  const;  // Normal path, also as remote path and viewed path
+    QString  toLocalPath( const QString& path)  const;
+
+private:
+    QPointer<Connector>  _connector;
+    QString  _localPath;
+};
+
+#endif // CONNECTOR_HPP

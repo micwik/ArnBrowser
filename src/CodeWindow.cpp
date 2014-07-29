@@ -49,13 +49,13 @@
 # include <Qsci/qscilexerhtml.h>
 #endif
 
-CodeWindow::CodeWindow( QSettings* appSettings, const QString& path, QWidget* parent) :
-    QDialog( parent),
+CodeWindow::CodeWindow( QSettings* appSettings, const ConnectorPath& conPath, QWidget* parent)
+    : QDialog( parent),
     _ui( new Ui::CodeWindow)
 {
     _ui->setupUi( this);
 
-    this->setWindowTitle( QString("CodeEdit ") + path);
+    this->setWindowTitle( QString("CodeEdit ") + conPath.normPath());
 
     _appSettings = appSettings;
     readSettings();
@@ -93,6 +93,7 @@ CodeWindow::CodeWindow( QSettings* appSettings, const QString& path, QWidget* pa
     textEdit->editor()->setCurrentFont( _font);
 #endif
 
+    QString  path = conPath.localPath();
     _isHtml = path.endsWith(".html") || path.endsWith(".xhtml");
     _isSetPlainText = true;  // Default
     _arnItem.open( path);

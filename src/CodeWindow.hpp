@@ -33,6 +33,7 @@
 #ifndef CODEWINDOW_HPP
 #define CODEWINDOW_HPP
 
+#include "Connector.hpp"
 #include <ArnInc/ArnItem.hpp>
 #include <QDialog>
 #include <QFont>
@@ -50,7 +51,7 @@ class CodeWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit CodeWindow( QSettings* appSettings, const QString& path, QWidget* parent = 0);
+    explicit CodeWindow( QSettings* appSettings, const ConnectorPath& conPath, QWidget* parent = 0);
     ~CodeWindow();
 
     void  loadFile( const QString& fileName);

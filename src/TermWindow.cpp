@@ -37,27 +37,25 @@
 #include <QDebug>
 
 
-TermWindow::TermWindow( QSettings* appSettings, const QString& path, QWidget* parent) :
-    QDialog( parent),
+TermWindow::TermWindow( QSettings* appSettings, const ConnectorPath& conPath, QWidget* parent)
+    : QDialog( parent),
     _ui( new Ui::TermWindow)
 {
     _ui->setupUi( this);
-    this->setWindowTitle( QString("Terminal ") + path);
+
+    QString  path = conPath.localPath();
+    QString  rqPath = Arn::providerPath( path, false);
+
+    QString  normPath = conPath.toNormPath( rqPath);
+    this->setWindowTitle( QString("Terminal ") + normPath);
 
     _appSettings = appSettings;
     readSettings();
 
-    QString  twinPath = Arn::twinPath( path);
-    if (Arn::isProviderPath( path)) {
-        _pipePv.open( path);
-        _pipeRq.open( twinPath);
-    }
-    else {  // path is requester side (normal)
-        _pipeRq.open( path);
-        _pipePv.open( twinPath);
-    }
+    _pipeRq.open( rqPath);
+    _pipePv.open( Arn::twinPath( rqPath));
 
-    _ui->pipePath->setText( _pipeRq.path());
+    _ui->pipePath->setText( normPath);
     _ui->pipePath->setReadOnly( true);
     _ui->textEdit->setReadOnly( true);
     _ui->lineEditRq->setFocus();

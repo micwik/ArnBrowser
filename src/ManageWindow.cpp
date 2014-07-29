@@ -39,17 +39,18 @@
 #include <QDebug>
 
 
-ManageWindow::ManageWindow( QSettings* appSettings, const QString& path, QWidget* parent) :
+ManageWindow::ManageWindow( QSettings* appSettings, const ConnectorPath& conPath, QWidget* parent) :
     QDialog( parent),
     _ui( new Ui::ManageWindow)
 {
     _ui->setupUi( this);
-    this->setWindowTitle( QString("Manage ") + path);
+
+    _conPath = conPath;
+    this->setWindowTitle( QString("Manage ") + _conPath.normPath());
 
     _appSettings = appSettings;
     readSettings();
 
-    _path          = path;
     _isNewMode     = false;
     _isPersistFile = false;
     _isMandatory   = false;
@@ -59,11 +60,11 @@ ManageWindow::ManageWindow( QSettings* appSettings, const QString& path, QWidget
     _ui->itemEdit->setValidator( validator);
 
     //// Logics
-    _persistSapi.open( HOST_ROOT_PATH "/.sys/Persist/Pipes/CommonPipe");
+    _persistSapi.open( _conPath.toLocalPath("//.sys/Persist/Pipes/CommonPipe"));
     connect( &_persistSapi, SIGNAL(rq_lsR(QStringList)), this, SLOT(lsR(QStringList)));
     connect( &_persistSapi, SIGNAL(rq_dbMandatoryLsR(QStringList)), this, SLOT(mandatoryLsR(QStringList)));
 
-    _arnPath.open( path);
+    _arnPath.open( conPath.localPath());
     connect( &_arnPath, SIGNAL(arnLinkDestroyed()), this, SLOT(doUpdate()));
     connect( _ui->armDelButton, SIGNAL(clicked()), this, SLOT(doUpdate()));
     connect( _ui->folderButton, SIGNAL(clicked()), this, SLOT(doUpdate()));
@@ -76,8 +77,9 @@ ManageWindow::ManageWindow( QSettings* appSettings, const QString& path, QWidget
     //_wt->finished().connect( this, &ManageWindow::doCloseWindow);
 
     if (!_arnPath.isFolder()) {
-        emit _persistSapi.pv_ls( path);  // Will finally trigger update of persist
-        emit _persistSapi.pv_dbMandatoryLs( path);  // Will finally trigger update of mandatory
+        QString  normPath = _conPath.normPath();
+        _persistSapi.pv_ls( normPath);  // Will finally trigger update of persist
+        _persistSapi.pv_dbMandatoryLs( normPath);  // Will finally trigger update of mandatory
     }
 
     doTypeUpdate();
@@ -94,7 +96,7 @@ void  ManageWindow::doUpdate()
     bool  isPathFolder = _arnPath.isFolder();
     bool  isPathOpen   = _arnPath.isOpen();
 
-    _ui->pathEdit->setText( isPathOpen ? _path : QString());
+    _ui->pathEdit->setText( isPathOpen ? _conPath.normPath() : QString());
 
     if (!isPathOpen) {  // Path link has been destroyed
         _isNewMode = false;
@@ -223,10 +225,11 @@ void  ManageWindow::timeoutSave()
 
 void  ManageWindow::timeoutReset()
 {
-    _arnPath.open( _path);
+    _arnPath.open( _conPath.localPath());
     _arnPath.arnImport( _storeValue);
-    emit _persistSapi.pv_ls( _path);  // Will finally trigger update of persist
-    emit _persistSapi.pv_dbMandatoryLs( _path);  // Will finally trigger update of mandatory
+    QString  normPath = _conPath.normPath();
+    _persistSapi.pv_ls( normPath);  // Will finally trigger update of persist
+    _persistSapi.pv_dbMandatoryLs( normPath);  // Will finally trigger update of mandatory
 
     doTypeUpdate();
 }
@@ -250,10 +253,11 @@ void  ManageWindow::on_newButton_clicked()
 void  ManageWindow::on_deleteButton_clicked()
 {
     if (!_arnPath.isFolder()) {
-        emit _persistSapi.pv_rm( _arnPath.path());  // Any persist file is deleted
+        QString  normPath = _conPath.normPath();
+        _persistSapi.pv_rm( normPath);  // Any persist file is deleted
         if (_arnPath.isSaveMode())
-            emit _persistSapi.pv_dbMandatory( _arnPath.path(), false);
-        emit _persistSapi.pv_ls( _arnPath.path());
+            _persistSapi.pv_dbMandatory( normPath, false);
+        _persistSapi.pv_ls( normPath);
         _arnPath.destroyLink();
     }
 
@@ -265,6 +269,7 @@ void  ManageWindow::on_saveButton_clicked()
 {
     ArnItem  arnItemNew;
     ArnItem*  arnItem;
+    QString  normPath;
 
     if (_isNewMode) {
         _ui->itemEdit->setFocus();
@@ -272,12 +277,15 @@ void  ManageWindow::on_saveButton_clicked()
         QString  item = _ui->itemEdit->text();
         if (item.isEmpty())  return;  // Item may not be empty
 
-        QString  itemPath = Arn::addPath( _arnPath.path(), item);
+        QString  itemPath = Arn::addPath( _conPath.localPath(), item);
         arnItemNew.open( itemPath);
         arnItem = &arnItemNew;
+        normPath = _conPath.toNormPath( itemPath);
     }
-    else
+    else {
         arnItem = &_arnPath;
+        normPath = _conPath.normPath();
+    }
     if (!arnItem->isOpen())  return;
 
     Arn::ObjectMode  mode;
@@ -289,20 +297,22 @@ void  ManageWindow::on_saveButton_clicked()
 
     if (_ui->persistDbButton->isChecked()) {
         arnItem->addMode( mode.Save);
-        emit _persistSapi.pv_rm( arnItem->path());
+        _persistSapi.pv_rm( normPath);
     }
     else if (_ui->persistFileButton->isChecked())
-        emit _persistSapi.pv_touch( arnItem->path());
+        _persistSapi.pv_touch( normPath);
     else if (_ui->persistNoneButton->isChecked())
-        emit _persistSapi.pv_rm( arnItem->path());
+        _persistSapi.pv_rm( normPath);
 
-    emit _persistSapi.pv_dbMandatory( arnItem->path(), _ui->mandatoryButton->isChecked());
+    _persistSapi.pv_dbMandatory( normPath, _ui->mandatoryButton->isChecked());
 
-    emit _persistSapi.pv_ls( arnItem->path());
-    emit _persistSapi.pv_dbMandatoryLs( arnItem->path());
+    _persistSapi.pv_ls( normPath);
+    _persistSapi.pv_dbMandatoryLs( normPath);
 
-    _storeValue = _arnPath.arnExport();
-    QTimer::singleShot(300, this, SLOT(timeoutSave()));
+    if (!_arnPath.isFolder()) {
+        _storeValue = _arnPath.arnExport();
+        QTimer::singleShot(300, this, SLOT(timeoutSave()));
+    }
 
     _isNewMode = false;
     doUpdate();
@@ -322,7 +332,7 @@ void  ManageWindow::on_resetButton_clicked()
     if (!_arnPath.isFolder()) {
         _storeValue = _arnPath.arnExport();
         if (_arnPath.isSaveMode())
-            emit _persistSapi.pv_dbMandatory( _arnPath.path(), false);
+            _persistSapi.pv_dbMandatory( _conPath.normPath(), false);
         _arnPath.destroyLink();
         QTimer::singleShot(300, this, SLOT(timeoutReset()));
     }
@@ -337,8 +347,9 @@ void  ManageWindow::on_folderButton_clicked()
 void  ManageWindow::lsR( QStringList files)
 {
     _isPersistFile = false;
+    QString  normPath = _conPath.normPath();
     foreach (QString file, files) {
-        if (file == _arnPath.path())
+        if (file == normPath)
             _isPersistFile = true;
     }
 
@@ -349,8 +360,9 @@ void  ManageWindow::lsR( QStringList files)
 void  ManageWindow::mandatoryLsR( QStringList files)
 {
     _isMandatory = false;
+    QString  normPath = _conPath.normPath();
     foreach (QString file, files) {
-        if (file == _arnPath.path())
+        if (file == normPath)
             _isMandatory = true;
     }
 

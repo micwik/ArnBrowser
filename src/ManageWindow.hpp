@@ -33,6 +33,7 @@
 #ifndef MANAGEWINDOW_HPP
 #define MANAGEWINDOW_HPP
 
+#include "Connector.hpp"
 #include <ArnInc/ArnPersistSapi.hpp>
 #include <ArnInc/MQFlags.hpp>
 #include <ArnInc/ArnItem.hpp>
@@ -62,7 +63,7 @@ class ManageWindow : public QDialog
 {
     Q_OBJECT    
 public:
-    explicit ManageWindow( QSettings* appSettings, const QString& path, QWidget* parent = 0);
+    explicit ManageWindow( QSettings* appSettings, const ConnectorPath& conPath,  QWidget* parent = 0);
     ~ManageWindow();
     
 private slots:
@@ -92,7 +93,7 @@ private:
     ArnPersistSapi  _persistSapi;
     QByteArray  _storeValue;
     ArnItemUnidir  _arnPath;
-    QString  _path;
+    ConnectorPath  _conPath;
     bool  _isNewMode;
     bool  _isPersistFile;
     bool  _isMandatory;

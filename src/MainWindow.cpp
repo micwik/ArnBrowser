@@ -63,13 +63,14 @@ MainWindow::MainWindow(QWidget *parent) :
              this, SLOT(errorLog(QString)));
 
     //// Prepare connect to Arn server
+    _connector = new Connector( this);
     _arnClient = new ArnClient( this);
     connect( _arnClient, SIGNAL(tcpConnected(QString,quint16)), this, SLOT(clientConnected()));
     connect( _arnClient, SIGNAL(tcpError(QString,QAbstractSocket::SocketError)),
              this, SLOT(clientError(QString)));
 
     //// Setup model
-    _arnModel = new ArnModel( this);
+    _arnModel = new ArnModel( _connector, this);
     _arnModel->setClient( _arnClient);
 
     setWindowTitle(tr("Arn Browser  ") + ver);
@@ -134,28 +135,31 @@ void  MainWindow::on_discoverButton_clicked()
 
 void  MainWindow::on_terminalButton_clicked()
 {
-    TermWindow*  termWindow = new TermWindow( _appSettings, _curItemPath, 0);
+    ConnectorPath  conPath( _connector, _curItemPath);
+    TermWindow*  termWindow = new TermWindow( _appSettings, conPath, 0);
     termWindow->show();
 }
 
 
 void  MainWindow::on_editButton_clicked()
 {
-    CodeWindow*  codeWindow = new CodeWindow( _appSettings, _curItemPath, 0);
+    ConnectorPath  conPath( _connector, _curItemPath);
+    CodeWindow*  codeWindow = new CodeWindow( _appSettings, conPath, 0);
     codeWindow->show();
 }
 
 
 void  MainWindow::on_manageButton_clicked()
 {
-    ManageWindow*  manageWindow = new ManageWindow( _appSettings, _curItemPath, 0);
+    ConnectorPath  conPath( _connector, _curItemPath);
+    ManageWindow*  manageWindow = new ManageWindow( _appSettings, conPath, 0);
     manageWindow->show();
 }
 
 
 void  MainWindow::on_vcsButton_clicked()
 {
-    VcsWindow*  vcsWindow = new VcsWindow( _appSettings, 0);
+    VcsWindow*  vcsWindow = new VcsWindow( _appSettings, _connector, 0);
     vcsWindow->show();
 }
 
