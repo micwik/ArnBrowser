@@ -1,7 +1,7 @@
 #include <QApplication>
 #include "MainWindow.hpp"
 
-extern const QString ver = "2.1";  // Don't forget to change in setup.iss -file
+extern const QString ver = "2.2";  // Don't forget to change in setup.iss -file
 
 
 int main(int argc, char *argv[])
