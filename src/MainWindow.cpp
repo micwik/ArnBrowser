@@ -34,6 +34,7 @@
 #include "ui_MainWindow.h"
 #include "TermWindow.hpp"
 #include "CodeWindow.hpp"
+#include "QmlRunWindow.hpp"
 #include "ManageWindow.hpp"
 #include "VcsWindow.hpp"
 #include "DiscoverWindow.hpp"
@@ -45,6 +46,9 @@
 #include <QSettings>
 #include <QCloseEvent>
 #include <QDebug>
+#ifdef QMLRUN
+  #include <ArnInc/ArnQml.hpp>
+#endif
 
 extern const QString ver;
 
@@ -68,6 +72,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect( _arnClient, SIGNAL(tcpConnected(QString,quint16)), this, SLOT(clientConnected()));
     connect( _arnClient, SIGNAL(tcpError(QString,QAbstractSocket::SocketError)),
              this, SLOT(clientError(QString)));
+
+#ifdef QMLRUN
+    ArnQml::setup( ArnQml::UseFlags::ArnLib | ArnQml::UseFlags::MSystem);
+#endif
 
     //// Setup model
     _arnModel = new ArnModel( _connector, this);
@@ -94,6 +102,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     _ui->terminalButton->setEnabled( false);
     _ui->editButton->setEnabled( false);
+    _ui->runButton->setEnabled( false);
     _ui->manageButton->setEnabled( false);
     _ui->vcsButton->setEnabled( false);
 }
@@ -149,6 +158,14 @@ void  MainWindow::on_editButton_clicked()
 }
 
 
+void  MainWindow::on_runButton_clicked()
+{
+    ConnectorPath  conPath( _connector, _curItemPath);
+    QmlRunWindow*  qmlRunWindow = new QmlRunWindow( _appSettings, conPath, 0);
+    qmlRunWindow->show();
+}
+
+
 void  MainWindow::on_manageButton_clicked()
 {
     ConnectorPath  conPath( _connector, _curItemPath);
@@ -199,10 +216,16 @@ void  MainWindow::itemClicked( const QModelIndex& index)
     _ui->terminalButton->setEnabled( arnItem.isPipeMode());
 
     // Set state for Edit button
-    bool editEn = !arnItem.isFolder() && ((type == type.Null)
-                                      ||  (type == type.ByteArray)
-                                      ||  (type == type.String));
+    bool  editEn = !arnItem.isFolder() && ((type == type.Null)
+                                       ||  (type == type.ByteArray)
+                                       ||  (type == type.String));
     _ui->editButton->setEnabled( editEn);
+
+    // Set state for Run button
+#ifdef QMLRUN
+    bool  runEn = !arnItem.isFolder() && arnItem.name( Arn::NameF()).endsWith(".qml");
+    _ui->runButton->setEnabled( runEn);
+#endif
 
     _ui->manageButton->setEnabled( true);
 }
