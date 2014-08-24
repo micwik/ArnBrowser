@@ -8,7 +8,6 @@
 class QSettings;
 class QCloseEvent;
 
-class QNetworkAccessManager;
 
 class QmlRunWindow : public QQuickView
 {

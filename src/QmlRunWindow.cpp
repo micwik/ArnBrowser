@@ -13,7 +13,6 @@ QmlRunWindow::QmlRunWindow( QSettings* appSettings, const ConnectorPath& conPath
     : QQuickView()
 {
     QObject::setParent( parent);
-    this->set
     //this->setWindowTitle( QString("CodeEdit ") + conPath.normPath());
 
     _appSettings = appSettings;
