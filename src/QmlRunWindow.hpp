@@ -6,7 +6,7 @@
 #include <QtQuick/QQuickView>
 
 class QSettings;
-class QCloseEvent;
+class QQuickCloseEvent;
 
 
 class QmlRunWindow : public QQuickView
@@ -19,15 +19,16 @@ signals:
 
 public slots:
 
-protected:
-    void  closeEvent( QCloseEvent* event);
 
 private slots:
+    void  postSetup();
+    void  onClose();
     void  readSettings();
     void  writeSettings();
 
 private:
     QSettings*  _appSettings;
+    QUrl  _url;
 };
 
 #endif // QMLRUN_HPP

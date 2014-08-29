@@ -34,8 +34,7 @@ SOURCES += src/main.cpp \
     src/VcsWindow.cpp \
     src/DiscoverWindow.cpp \
     src/MTextEdit.cpp \
-    src/Connector.cpp \
-    src/QmlRunWindow.cpp
+    src/Connector.cpp
 
 HEADERS += src/MainWindow.hpp \
     src/TermWindow.hpp \
@@ -48,8 +47,7 @@ HEADERS += src/MainWindow.hpp \
     src/ManageWindow.hpp \
     src/VcsWindow.hpp \
     src/DiscoverWindow.hpp \
-    src/Connector.hpp \
-    src/QmlRunWindow.hpp
+    src/Connector.hpp
 
 FORMS += src/MainWindow.ui \
     src/TermWindow.ui \
@@ -68,9 +66,10 @@ OTHER_FILES += \
 
 QmlRun {
     ARN += qml
+    QT += qml quick
     DEFINES += QMLRUN
-    SOURCES +=
-    HEADERS +=
+    SOURCES += src/QmlRunWindow.cpp
+    HEADERS += src/QmlRunWindow.hpp
 }
 
 INCLUDEPATH += src $$PWD/.. $$PWD/../include

@@ -34,7 +34,6 @@
 #include "ui_MainWindow.h"
 #include "TermWindow.hpp"
 #include "CodeWindow.hpp"
-#include "QmlRunWindow.hpp"
 #include "ManageWindow.hpp"
 #include "VcsWindow.hpp"
 #include "DiscoverWindow.hpp"
@@ -47,6 +46,7 @@
 #include <QCloseEvent>
 #include <QDebug>
 #ifdef QMLRUN
+  #include "QmlRunWindow.hpp"
   #include <ArnInc/ArnQml.hpp>
 #endif
 
@@ -72,10 +72,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect( _arnClient, SIGNAL(tcpConnected(QString,quint16)), this, SLOT(clientConnected()));
     connect( _arnClient, SIGNAL(tcpError(QString,QAbstractSocket::SocketError)),
              this, SLOT(clientError(QString)));
-
-#ifdef QMLRUN
-    ArnQml::setup( ArnQml::UseFlags::ArnLib | ArnQml::UseFlags::MSystem);
-#endif
 
     //// Setup model
     _arnModel = new ArnModel( _connector, this);
@@ -160,9 +156,11 @@ void  MainWindow::on_editButton_clicked()
 
 void  MainWindow::on_runButton_clicked()
 {
+#ifdef QMLRUN
     ConnectorPath  conPath( _connector, _curItemPath);
     QmlRunWindow*  qmlRunWindow = new QmlRunWindow( _appSettings, conPath, 0);
     qmlRunWindow->show();
+#endif
 }
 
 

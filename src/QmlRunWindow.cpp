@@ -4,8 +4,8 @@
 #include <QQmlEngine>
 #include <QString>
 #include <QSettings>
-#include <QCloseEvent>
 #include <QFile>
+#include <QTimer>
 #include <QDebug>
 
 
@@ -13,33 +13,40 @@ QmlRunWindow::QmlRunWindow( QSettings* appSettings, const ConnectorPath& conPath
     : QQuickView()
 {
     QObject::setParent( parent);
-    //this->setWindowTitle( QString("CodeEdit ") + conPath.normPath());
+    this->setTitle( QString("QmlRun ") + conPath.normPath());
 
     _appSettings = appSettings;
     readSettings();
 
     ArnQml::setArnRootPath( conPath.toLocalPath("/"));
-    QString  path = conPath.localPath();
-    ArnItem  arnItem( path);
-    QFile file("tmp.qml");
-    if (!file.open(QFile::WriteOnly | QFile::Truncate))
-        return;
+    ArnQml::arnCachedValue( conPath.localPath());
 
-    file.write( arnItem.toByteArray());
-    file.close();
+    ArnQml::setup( engine(), ArnQml::UseFlags::ArnLib | ArnQml::UseFlags::MSystem);
 
-    connect( engine(), SIGNAL(quit()), this, SLOT(close()));
-    setResizeMode( QQuickView::SizeRootObjectToView);
+    connect( engine(), SIGNAL(quit()), this, SLOT(onClose()));
+    connect( this, SIGNAL(closing(QQuickCloseEvent*)), this, SLOT(onClose()));
+    // setResizeMode( QQuickView::SizeRootObjectToView);
 
-    setSource( QUrl::fromLocalFile("tmp.qml"));
+    _url.setScheme("arn");
+    _url.setPath( Arn::convertPath( conPath.normPath(), Arn::NameF()));
+    // QTimer::singleShot( 0, this, SLOT(postSetup()));
+
+    qDebug() << "Qml running Url=" << _url.toString();
+    setSource( _url);
 }
 
 
-void  QmlRunWindow::closeEvent( QCloseEvent* event)
+void  QmlRunWindow::postSetup()
+{
+    qDebug() << "Qml running Url=" << _url.toString();
+    setSource( _url);
+}
+
+
+void  QmlRunWindow::onClose()
 {
     qDebug() << "Close event";
     writeSettings();
-    event->accept();
     deleteLater();
 }
 
