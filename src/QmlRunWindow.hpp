@@ -21,7 +21,6 @@ public slots:
 
 
 private slots:
-    void  postSetup();
     void  onClose();
     void  readSettings();
     void  writeSettings();

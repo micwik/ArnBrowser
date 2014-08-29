@@ -19,8 +19,6 @@ QmlRunWindow::QmlRunWindow( QSettings* appSettings, const ConnectorPath& conPath
     readSettings();
 
     ArnQml::setArnRootPath( conPath.toLocalPath("/"));
-    ArnQml::arnCachedValue( conPath.localPath());
-
     ArnQml::setup( engine(), ArnQml::UseFlags::ArnLib | ArnQml::UseFlags::MSystem);
 
     connect( engine(), SIGNAL(quit()), this, SLOT(onClose()));
@@ -29,15 +27,7 @@ QmlRunWindow::QmlRunWindow( QSettings* appSettings, const ConnectorPath& conPath
 
     _url.setScheme("arn");
     _url.setPath( Arn::convertPath( conPath.normPath(), Arn::NameF()));
-    // QTimer::singleShot( 0, this, SLOT(postSetup()));
 
-    qDebug() << "Qml running Url=" << _url.toString();
-    setSource( _url);
-}
-
-
-void  QmlRunWindow::postSetup()
-{
     qDebug() << "Qml running Url=" << _url.toString();
     setSource( _url);
 }
