@@ -19,7 +19,7 @@ QmlRunWindow::QmlRunWindow( QSettings* appSettings, const ConnectorPath& conPath
     readSettings();
 
     ArnQml::setArnRootPath( conPath.toLocalPath("/"));
-    ArnQml::setup( engine(), ArnQml::UseFlags::ArnLib | ArnQml::UseFlags::MSystem);
+    ArnQml::setup( engine(), ArnQml::UseFlags::All);
 
     connect( engine(), SIGNAL(quit()), this, SLOT(onClose()));
     connect( this, SIGNAL(closing(QQuickCloseEvent*)), this, SLOT(onClose()));
