@@ -70,6 +70,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _connector = new Connector( this);
     _arnClient = new ArnClient( this);
     connect( _arnClient, SIGNAL(tcpConnected(QString,quint16)), this, SLOT(clientConnected()));
+    connect( _arnClient, SIGNAL(tcpDisConnected()), this, SLOT(clientDisconnected()));
     connect( _arnClient, SIGNAL(tcpError(QString,QAbstractSocket::SocketError)),
              this, SLOT(clientError(QString)));
 
@@ -89,6 +90,7 @@ MainWindow::MainWindow(QWidget *parent) :
         port = Arn::defaultTcpPort;
     _ui->hostEdit->setText( host);    // Default host
     _ui->portEdit->setValue( port);
+    _ui->connectStat->hide();
 
 #if QT_VERSION >= 0x050000
     _ui->portEdit->setRange( 1, 1065535);  // Fix Qt5 layout bug giving to little space
@@ -237,6 +239,8 @@ void  MainWindow::clientConnected()
 
     _ui->connectButton->setEnabled( false);
     _ui->discoverButton->setEnabled( false);
+    _ui->connectStat->setChecked( true);
+    _ui->connectStat->show();
     _ui->arnView->setModel( _arnModel);
     _arnModel->setHideBidir( _ui->hideBidir->isChecked());
     connect( _arnModel, SIGNAL(hiddenRow(int,QModelIndex,bool)),
@@ -257,9 +261,15 @@ void  MainWindow::clientConnected()
 }
 
 
+void MainWindow::clientDisconnected()
+{
+    _ui->connectStat->setChecked( false);
+    _ui->connectStat->show();
+}
+
+
 void  MainWindow::clientError( QString errorText)
 {
-    // cout << "Client TCP error: " << errorText << endl;
     QMessageBox msgBox;
     msgBox.setWindowTitle( tr("Error"));
     msgBox.setIcon( QMessageBox::Information);
@@ -304,7 +314,7 @@ void  MainWindow::closeEvent( QCloseEvent* event)
 
 void  MainWindow::errorLog( QString errText)
 {
-    qDebug() << "MW-Err:" << errText;
+    // qDebug() << "MW-Err:" << errText;
 }
 
 
