@@ -12,7 +12,7 @@
 QmlRunWindow::QmlRunWindow( QSettings* appSettings, const ConnectorPath& conPath, QObject* parent)
     : QQuickView()
 {
-    //QObject::setParent( parent);
+    Q_UNUSED(parent)
     this->setTitle( QString("QmlRun ") + conPath.normPath());
 
     _appSettings = appSettings;

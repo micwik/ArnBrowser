@@ -314,7 +314,8 @@ void  MainWindow::closeEvent( QCloseEvent* event)
 
 void  MainWindow::errorLog( QString errText)
 {
-    // qDebug() << "MW-Err:" << errText;
+    if (_ui->connectStat->isChecked())    
+        qDebug() << "MW-Err:" << errText;
 }
 
 

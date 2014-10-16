@@ -187,6 +187,22 @@ QCheckBox::indicator:disabled:checked[class=trafic] {
        </widget>
       </item>
       <item>
+       <spacer name="horizontalSpacer_4">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Maximum</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>5</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
        <widget class="QCheckBox" name="connectStat">
         <property name="enabled">
          <bool>false</bool>
@@ -224,7 +240,7 @@ QCheckBox::indicator:disabled:checked[class=trafic] {
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>15</width>
+          <width>10</width>
           <height>20</height>
          </size>
         </property>
