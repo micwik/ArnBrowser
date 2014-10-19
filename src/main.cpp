@@ -1,7 +1,13 @@
 #include <QApplication>
 #include "MainWindow.hpp"
 
-extern const QString ver = "2.3";  // Don't forget to change in setup.iss -file
+#if QT_VERSION >= 0x050000
+    const QString QtVerTxt = "(Qt5)";
+#else
+    const QString QtVerTxt = "(Qt4)";
+#endif
+
+    extern const QString ver = "2.3  " + QtVerTxt;  // Don't forget to change in setup.iss -file
 
 
 int main(int argc, char *argv[])
