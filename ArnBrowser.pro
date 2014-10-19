@@ -60,6 +60,8 @@ FORMS += src/MainWindow.ui \
 RESOURCES += \
     src/files.qrc
 
+RC_FILE = src/arnbrowser_ico.rc
+
 OTHER_FILES += \
     README.md \
     Install.md
