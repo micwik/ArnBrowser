@@ -116,6 +116,8 @@ MainWindow::~MainWindow()
 void  MainWindow::on_connectButton_clicked()
 {
     _arnClient->connectToArn( _ui->hostEdit->text(), _ui->portEdit->value());
+    _ui->connectButton->setEnabled( false);
+    _ui->discoverButton->setEnabled( false);
     _ui->hostEdit->setEnabled( false);
     _ui->portEdit->setEnabled( false);
 }
@@ -237,8 +239,6 @@ void  MainWindow::clientConnected()
     disconnect( _arnClient, SIGNAL(tcpError(QString,QAbstractSocket::SocketError)),
              this, SLOT(clientError(QString)));
 
-    _ui->connectButton->setEnabled( false);
-    _ui->discoverButton->setEnabled( false);
     _ui->connectStat->setChecked( true);
     _ui->connectStat->show();
     _ui->arnView->setModel( _arnModel);
@@ -276,6 +276,8 @@ void  MainWindow::clientError( QString errorText)
     msgBox.setText( tr("Can not Connect to Host"));
     msgBox.setInformativeText( errorText);
     msgBox.exec();
+    _ui->connectButton->setEnabled( true);
+    _ui->discoverButton->setEnabled( true);
     _ui->hostEdit->setEnabled( true);
     _ui->portEdit->setEnabled( true);
 }
@@ -323,9 +325,9 @@ void  MainWindow::readSettings()
 {
     QPoint  pos = _appSettings->value("main/pos", QPoint(200, 200)).toPoint();
     QSize  size = _appSettings->value("main/size", QSize(400, 400)).toSize();
-    _pathWidth = _appSettings->value("main/pathW", 120).toInt();
+    _pathWidth = _appSettings->value("main/pathW", 200).toInt();
     bool  viewHidden = _appSettings->value("main/viewHidden", false).toBool();
-    bool  hideBidir  = _appSettings->value("main/hideBidir",  false).toBool();
+    bool  hideBidir  = _appSettings->value("main/hideBidir",  true).toBool();
     resize( size);
     move( pos);
     _ui->viewHidden->setChecked( viewHidden);
