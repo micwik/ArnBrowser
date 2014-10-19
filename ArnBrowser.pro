@@ -21,6 +21,7 @@ TARGET = ArnBrowser
 TEMPLATE = app
 OBJECTS_DIR = tmp
 MOC_DIR = tmp
+RCC_DIR = tmp
 UI_DIR = tmp
 
 SOURCES += src/main.cpp \
