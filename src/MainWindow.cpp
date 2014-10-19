@@ -92,8 +92,8 @@ MainWindow::MainWindow(QWidget *parent) :
     _ui->portEdit->setValue( port);
     _ui->connectStat->hide();
 
-#if QT_VERSION >= 0x050000
-    _ui->portEdit->setRange( 1, 1065535);  // Fix Qt5 layout bug giving to little space
+#if QT_VERSION >= 0x050000 && QT_VERSION < 0x050300
+    _ui->portEdit->setRange( 1, 1065535);  // Fix early Qt5 layout bug giving to little space
 #endif
 
     connect( _ui->arnView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemClicked(QModelIndex)));
