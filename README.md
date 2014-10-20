@@ -36,3 +36,6 @@ Read [Install.md](Install.md) how to build, install and use.
 * Managing Version Control (VCS) for objects stored in files.
 
 * ZeroConfig browsing for _arn_ services on local network.
+
+* Qml running environment with support for Arn.
+  This is comparable to a web browser running an arbitrary web application.
