@@ -9,6 +9,7 @@
 
 #define Code "."
 #define Qt "C:\Qt\Qt5.3.2\5.3\mingw482_32"
+#define Mingw "C:\Qt\Qt5.3.2\5.3\mingw482_32\bin"
 
 #define AppData "{commonappdata}\" + MyAppPublisher + "\" + MyAppName 
 #define QtBin Qt+"\bin"
@@ -28,7 +29,6 @@ AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf32}\{#MyAppPublisher}\{#MyAppName}
-;DefaultGroupName=ARN {#MyAppName}
 DefaultGroupName=ARN
 AllowNoIcons=yes
 OutputDir=Install
@@ -45,8 +45,7 @@ Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescrip
 
 [Files]
 Source: "{#Code}\release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "{#Code}\ikon.ico"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "{#Code}\tools\*"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#Mingw}\libgcc_s_dw2-1.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#QtBin}\icudt52.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#QtBin}\icuin52.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#QtBin}\icuuc52.dll"; DestDir: "{app}"; Flags: ignoreversion
