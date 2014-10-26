@@ -1,7 +1,6 @@
 #include "QmlRunWindow.hpp"
 #include <ArnInc/ArnItem.hpp>
 #include <ArnInc/ArnQml.hpp>
-#include <QQmlEngine>
 #include <QString>
 #include <QSettings>
 #include <QFile>
@@ -10,10 +9,11 @@
 
 
 QmlRunWindow::QmlRunWindow( QSettings* appSettings, const ConnectorPath& conPath, QObject* parent)
-    : QQuickView()
+    : QML_VIEW()
 {
     Q_UNUSED(parent)
-    this->setTitle( QString("QmlRun ") + conPath.normPath());
+
+    this->QML_SET_TITLE( QString("QmlRun ") + conPath.normPath());
 
     _appSettings = appSettings;
     readSettings();
@@ -22,7 +22,9 @@ QmlRunWindow::QmlRunWindow( QSettings* appSettings, const ConnectorPath& conPath
     ArnQml::setup( engine(), ArnQml::UseFlags::All);
 
     connect( engine(), SIGNAL(quit()), this, SLOT(onClose()));
+#ifndef QML_Qt4
     connect( this, SIGNAL(closing(QQuickCloseEvent*)), this, SLOT(onClose()));
+#endif
     // setResizeMode( QQuickView::SizeRootObjectToView);
 
     _url.setScheme("arn");
@@ -31,6 +33,22 @@ QmlRunWindow::QmlRunWindow( QSettings* appSettings, const ConnectorPath& conPath
     qDebug() << "Qml running Url=" << _url.toString();
     setSource( _url);
 }
+
+
+QmlRunWindow::~QmlRunWindow()
+{
+    // qDebug() << "Destruct QmlRunWindow";
+}
+
+
+#ifdef QML_Qt4
+void QmlRunWindow::closeEvent(QCloseEvent* event)
+{
+    Q_UNUSED(event)
+
+    onClose();
+}
+#endif
 
 
 void  QmlRunWindow::onClose()
@@ -46,13 +64,13 @@ void  QmlRunWindow::readSettings()
     QPoint  pos = _appSettings->value("qmlRun/pos", QPoint(200, 200)).toPoint();
     //QSize  size = _appSettings->value("qmlRun/size", QSize(400, 400)).toSize();
     //resize( size);
-    setPosition( pos);
+    QML_SET_POS( pos);
 }
 
 
 void  QmlRunWindow::writeSettings()
 {
     qDebug() << "Write code settings";
-    _appSettings->setValue("qmlRun/pos", position());
+    _appSettings->setValue("qmlRun/pos", QML_POS());
     //_appSettings->setValue("qmlRun/size", size());
 }

@@ -4,8 +4,8 @@
 
 CONFIG += ArnLibCompile
 
-# Usage of running qml script in Arn (must be Qt5)
-greaterThan(QT_MAJOR_VERSION, 4): CONFIG += QmlRun
+# Usage of running qml script in Arn
+CONFIG += QmlRun
 
 # Usage of js aware code editor
 # CONFIG += qscintilla
@@ -69,8 +69,12 @@ OTHER_FILES += \
 
 QmlRun {
     ARN += qml
-    QT += qml quick
     DEFINES += QMLRUN
+    greaterThan(QT_MAJOR_VERSION, 4) {
+        QT += qml quick
+    } else {
+        QT += declarative
+    }
     SOURCES += src/QmlRunWindow.cpp
     HEADERS += src/QmlRunWindow.hpp
 }
