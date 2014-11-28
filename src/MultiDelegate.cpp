@@ -74,11 +74,11 @@ PixmapViewer::PixmapViewer( QWidget* parent)
 
 void  PixmapViewer::setPixmap( const QPixmap& pixmap)
 {
-    qDebug() << "PixmapViewer setPixmap";
+    // qDebug() << "PixmapViewer setPixmap";
 
     _img->setPixmap( pixmap);
     this->resize(0, 0);  // Minimize size of viewer
-    qDebug() << "pixMapSize=" << pixmap.size();
+    // qDebug() << "pixMapSize=" << pixmap.size();
 }
 
 
