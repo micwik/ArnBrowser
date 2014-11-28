@@ -69,8 +69,9 @@ MainWindow::MainWindow(QWidget *parent) :
     //// Prepare connect to Arn server
     _connector = new Connector( this);
     _arnClient = new ArnClient( this);
+    // _arnClient->setReceiveTimeout(5);  // Base time for receiver timeout
     connect( _arnClient, SIGNAL(tcpConnected(QString,quint16)), this, SLOT(clientConnected()));
-    connect( _arnClient, SIGNAL(tcpDisConnected()), this, SLOT(clientDisconnected()));
+    connect( _arnClient, SIGNAL(connectionStatusChanged(int,int)), this, SLOT(doClientStateChanged(int)));
     connect( _arnClient, SIGNAL(tcpError(QString,QAbstractSocket::SocketError)),
              this, SLOT(clientError(QString)));
 
@@ -239,8 +240,6 @@ void  MainWindow::clientConnected()
     disconnect( _arnClient, SIGNAL(tcpError(QString,QAbstractSocket::SocketError)),
              this, SLOT(clientError(QString)));
 
-    _ui->connectStat->setChecked( true);
-    _ui->connectStat->show();
     _ui->arnView->setModel( _arnModel);
     _arnModel->setHideBidir( _ui->hideBidir->isChecked());
     connect( _arnModel, SIGNAL(hiddenRow(int,QModelIndex,bool)),
@@ -261,9 +260,10 @@ void  MainWindow::clientConnected()
 }
 
 
-void MainWindow::clientDisconnected()
+void MainWindow::doClientStateChanged(int status)
 {
-    _ui->connectStat->setChecked( false);
+    // qDebug() << "ClientStateChanged: state=" << status;
+    _ui->connectStat->setChecked( status == ArnClient::ConnectStat::Connected);
     _ui->connectStat->show();
 }
 
