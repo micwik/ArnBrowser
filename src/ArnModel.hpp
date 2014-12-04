@@ -68,6 +68,7 @@ public:
     int  _folderChildN;  // -1 = Has been at least one,  >= 0 Actual number so far
     int  _leafChildN;    // -1 = Has been at least one,  >= 0 Actual number so far
     bool  _isExpanded;
+    bool  _isBitSet;
     QList<ArnNode*>  _children;
 };
 
@@ -112,6 +113,7 @@ private slots:
     void  nodeDataChanged();
     void  nodeModeChanged();
     void  updateSetMap( ArnNode* node = 0);
+    void  updateBitSetMap( ArnNode* node = 0);
     void  updatePropMap( ArnNode* node = 0);
     void  destroyNode();
 

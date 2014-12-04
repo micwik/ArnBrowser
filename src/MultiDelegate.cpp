@@ -38,6 +38,8 @@
 #include <QDateEdit>
 #include <QCalendarWidget>
 #include <QComboBox>
+#include <QListWidget>
+#include <QListWidgetItem>
 #include <QCheckBox>
 #include <QFrame>
 #include <QLabel>
@@ -155,18 +157,21 @@ QWidget*  MultiDelegate::createEditor( QWidget* parent,
 {
     QVariant  value = index.model()->data( index, Qt::EditRole);
     switch (value.type()) {
-    case QMetaType::QTime: {
+    case QMetaType::QTime:
+    {
         QTimeEdit*  editor = new QTimeEdit( parent);
         editor->setMaximumWidth( editor->sizeHint().width());
         return editor;
     }
-    case QMetaType::QDate: {
+    case QMetaType::QDate:
+    {
         QDateEdit*  editor = new QDateEdit( parent);
         setupCalenderWidget( editor);
         editor->setMaximumWidth( editor->sizeHint().width());
         return editor;
     }
-    case QMetaType::QDateTime: {
+    case QMetaType::QDateTime:
+    {
         QDateTimeEdit*  editor = new QDateTimeEdit( parent);
         setupCalenderWidget( editor);
         editor->setMaximumWidth( editor->sizeHint().width());
@@ -181,7 +186,24 @@ QWidget*  MultiDelegate::createEditor( QWidget* parent,
         PixmapViewer*  editor = new PixmapViewer( parent);
         return editor;
     }
-    case QMetaType::QString: {
+    case QMetaType::QStringList:
+    {
+        QVariant  varList = index.model()->data( index, ItemDataRole::EnumList);
+        if (varList.isNull())  break;  // Not a enum-list, fall to std
+
+        QListWidget*  editor = new QListWidget( parent);
+        editor->setSizeAdjustPolicy(QListWidget::AdjustToContents);
+        foreach (const QString& bitItemText, varList.toStringList()) {
+            QListWidgetItem* bitItem = new QListWidgetItem( bitItemText, editor);
+            bitItem->setFlags(bitItem->flags() | Qt::ItemIsUserCheckable);
+            bitItem->setCheckState(Qt::Unchecked);
+        }
+        editor->setMaximumWidth( editor->minimumSizeHint().width());
+        editor->setMinimumHeight( editor->minimumSizeHint().height());
+        return editor;
+    }
+    case QMetaType::QString:
+    {
         QVariant  varList = index.model()->data( index, ItemDataRole::EnumList);
         if (varList.isNull())  break;  // Not a enum-list, fall to std
 
@@ -252,6 +274,17 @@ void  MultiDelegate::setEditorData( QWidget* editor,
         Q_ASSERT( ed);
         ed->setCurrentIndex( ed->findText( value.toString()));
     }
+    else if (className == "QListWidget") {
+        QListWidget*  ed = qobject_cast<QListWidget*>(editor);
+        Q_ASSERT( ed);
+        QStringList  valList = value.toStringList();
+        int  itemCount = ed->count();
+        for (int i = 0; i < itemCount; ++i) {
+            QListWidgetItem*  bitItem = ed->item(i);
+            bool  isActive = valList.contains( bitItem->text());
+            bitItem->setCheckState( isActive ? Qt::Checked : Qt::Unchecked);
+        }
+    }
     else if (className == "QCheckBox") {
         QCheckBox*  ed = qobject_cast<QCheckBox*>(editor);
         Q_ASSERT( ed);
@@ -292,6 +325,19 @@ void MultiDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
         QComboBox*  ed = qobject_cast<QComboBox*>(editor);
         Q_ASSERT( ed);
         value = QVariant( ed->currentText());
+    }
+    else if (className == "QListWidget") {
+        QListWidget*  ed = qobject_cast<QListWidget*>(editor);
+        Q_ASSERT( ed);
+        QStringList  valList;
+        int  itemCount = ed->count();
+        for (int i = 0; i < itemCount; ++i) {
+            QListWidgetItem*  bitItem = ed->item(i);
+            bool  isChecked = (bitItem->checkState() == Qt::Checked);
+            if (isChecked)
+                valList += bitItem->text();
+        }
+        value = QVariant( valList);
     }
     else if (className == "QCheckBox") {
         QCheckBox*  ed = qobject_cast<QCheckBox*>(editor);

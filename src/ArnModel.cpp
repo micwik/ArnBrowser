@@ -53,6 +53,7 @@ void  ArnNode::init()
     _folderChildN = 0;
     _leafChildN   = 0;
     _isExpanded   = false;
+    _isBitSet     = false;
 }
 
 
@@ -232,6 +233,26 @@ QVariant  ArnModel::adjustedNodeData( const ArnNode *node, int role) const
 
         valueNode = node->_valueChild;
 
+        if (node->_isBitSet) {
+            QStringList  valList;
+            const XStringMap*  setMap = node->_setMap;
+            int  itemVal = valueNode->toInt();
+            int  setSize = setMap->size();
+            for (int i = 0; i < setSize; ++i) {
+                QByteArray  key = setMap->key(i);
+                if (key.startsWith('B')) {
+                    int  bit = key.mid(1).toInt();
+                    if (itemVal & (1 << bit)) {
+                        valList += setMap->valueString(i);
+                    }
+                }
+            }
+            if (role == Qt::DisplayRole)
+                return valList.join(" | ");
+            else
+                return valList;
+        }
+
         if (node->_setMap) {
             QByteArray  itemVal = valueNode->toByteArray();
             int  index = node->_setMap->indexOf( itemVal);
@@ -385,7 +406,24 @@ bool  ArnModel::setData( const QModelIndex& index, const QVariant& value, int ro
 
         if (node->isFolder()) {
             if (node->_valueChild) {
-                if (node->_setMap) {
+                if (node->_isBitSet) {
+                    int  itemVal = 0;
+                    QStringList  listVal = value.toStringList();
+                    const XStringMap*  setMap = node->_setMap;
+                    int  setSize = node->_setMap->size();
+                    for (int i = 0; i < setSize; ++i) {
+                        QByteArray  key = setMap->key(i);
+                        if (key.startsWith('B')) {
+                            QString  val = setMap->valueString(i);
+                            if (listVal.contains( val)) {
+                                int  bit = key.mid(1).toInt();
+                                itemVal |= (1 << bit);
+                            }
+                        }
+                    }
+                    node->_valueChild->setValue( itemVal);
+                }
+                else if (node->_setMap) {
                     node->_valueChild->setValue( node->_setMap->keyString( value.toString()));
                 }
                 else {
@@ -460,6 +498,15 @@ void  ArnModel::netChildFound( QString path)
         connect( node->_setChild, SIGNAL(changed()), this, SLOT(updateSetMap()));
         connect( node->_setChild, SIGNAL(arnLinkDestroyed()), this, SLOT(destroyNode()));
         updateSetMap( node->_setChild);
+    }
+    else if (!node->_setChild && (itemName == "bitSet")) {
+        //// Peek at child item "bitSet"
+        node->_isBitSet = true;
+        node->_setMap   = new ArnNode::SetMap;
+        node->_setChild = new ArnNode( path, node);
+        connect( node->_setChild, SIGNAL(changed()), this, SLOT(updateBitSetMap()));
+        connect( node->_setChild, SIGNAL(arnLinkDestroyed()), this, SLOT(destroyNode()));
+        updateBitSetMap( node->_setChild);
     }
     else if (!node->_propChild && (itemName == "property")) {
         //// Peek at child item "property"
@@ -566,20 +613,39 @@ void ArnModel::nodeModeChanged()
 
 
 
-void  ArnModel::updateSetMap( ArnNode* node_)
+void  ArnModel::updateSetMap( ArnNode* node)
 {
-    ArnNode*  node = node_;
-    if (!node)
-        node = qobject_cast<ArnNode*>( sender());
-    Q_ASSERT( node);
-    ArnNode*  parent = qobject_cast<ArnNode*>( node->parent());
+    ArnNode*  node_ = node;
+    if (!node_)
+        node_ = qobject_cast<ArnNode*>( sender());
+    Q_ASSERT( node_);
+    ArnNode*  parent = qobject_cast<ArnNode*>( node_->parent());
     Q_ASSERT( parent);
     Q_ASSERT( parent->_setMap);
 
-    if (node != parent->_setChild)  return;
+    if (node_ != parent->_setChild)  return;
 
-    parent->_setMap->fromXString( node->toByteArray());
+    parent->_setMap->fromXString( node_->toByteArray());
     parent->_setMap->setEmptyKeysToValue();
+
+    QModelIndex  valueIndex = indexFromNode( parent, 1);
+    emit dataChanged( valueIndex, valueIndex);
+}
+
+
+void  ArnModel::updateBitSetMap( ArnNode* node)
+{
+    ArnNode*  node_ = node;
+    if (!node_)
+        node_ = qobject_cast<ArnNode*>( sender());
+    Q_ASSERT( node_);
+    ArnNode*  parent = qobject_cast<ArnNode*>( node_->parent());
+    Q_ASSERT( parent);
+    Q_ASSERT( parent->_setMap);
+
+    if (node_ != parent->_setChild)  return;
+
+    parent->_setMap->fromXString( node_->toByteArray());
 
     QModelIndex  valueIndex = indexFromNode( parent, 1);
     emit dataChanged( valueIndex, valueIndex);
@@ -622,6 +688,7 @@ void  ArnModel::destroyNode()
     }
     if (node == parent->_setChild) { // Remove Set-child
         delete parent->_setMap;
+        parent->_isBitSet = false;
         parent->_setMap = 0;
         parent->_setChild = 0;
         QModelIndex  valueIndex = indexFromNode( parent, 1);
