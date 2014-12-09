@@ -50,6 +50,7 @@
 #include <QPainter>
 #include <QRect>
 #include <QGridLayout>
+#include <QVBoxLayout>
 #include <QDebug>
 
 
@@ -192,14 +193,17 @@ QWidget*  MultiDelegate::createEditor( QWidget* parent,
         if (varList.isNull())  break;  // Not a enum-list, fall to std
 
         QListWidget*  editor = new QListWidget( parent);
-        editor->setSizeAdjustPolicy(QListWidget::AdjustToContents);
         foreach (const QString& bitItemText, varList.toStringList()) {
             QListWidgetItem* bitItem = new QListWidgetItem( bitItemText, editor);
             bitItem->setFlags(bitItem->flags() | Qt::ItemIsUserCheckable);
             bitItem->setCheckState(Qt::Unchecked);
         }
-        editor->setMaximumWidth( editor->minimumSizeHint().width());
-        editor->setMinimumHeight( editor->minimumSizeHint().height());
+        int width  = editor->sizeHintForColumn(0) + 25;
+        int height = editor->sizeHintForRow(0) * editor->count() + 10;
+        editor->setMinimumWidth( width);
+        editor->setMaximumWidth( width);
+        editor->setMinimumHeight( height);
+        editor->setMaximumHeight( height);
         return editor;
     }
     case QMetaType::QString:
