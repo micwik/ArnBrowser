@@ -41,7 +41,6 @@
 #include <ArnInc/ArnClient.hpp>
 #include <QMessageBox>
 #include <QSpinBox>
-#include <QImage>
 #include <QSettings>
 #include <QCloseEvent>
 #include <QDebug>

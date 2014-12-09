@@ -11,5 +11,6 @@
         <file>pic/search_arn.png</file>
         <file>pic/disconnect.png</file>
         <file>pic/close.png</file>
+        <file>pic/arn_browser_128.png</file>
     </qresource>
 </RCC>
