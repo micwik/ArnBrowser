@@ -194,6 +194,8 @@ QVariant  ArnModel::data(const QModelIndex &index, int role) const
             else {
                 if (node->isPipeMode())
                     return QPixmap("://pic/pipe.png");
+                else if (node->isBiDirMode())
+                    return QPixmap("://pic/document_valid.png");
                 else
                     return QPixmap("://pic/document.png");
             }

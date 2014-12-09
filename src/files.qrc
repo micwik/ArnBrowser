@@ -12,5 +12,6 @@
         <file>pic/disconnect.png</file>
         <file>pic/close.png</file>
         <file>pic/arn_browser_128.png</file>
+        <file>pic/document_valid.png</file>
     </qresource>
 </RCC>
