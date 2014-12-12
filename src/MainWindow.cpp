@@ -41,6 +41,8 @@
 #include <ArnInc/ArnClient.hpp>
 #include <QMessageBox>
 #include <QSpinBox>
+#include <QLabel>
+#include <QLineEdit>
 #include <QSettings>
 #include <QCloseEvent>
 #include <QDebug>
@@ -57,6 +59,12 @@ MainWindow::MainWindow(QWidget *parent) :
     _ui( new Ui::MainWindow)
 {
     _ui->setupUi( this);
+    QLabel*  curItemPathLabel = new QLabel;
+    curItemPathLabel->setText("Path:");
+    _curItemPathStatus = new QLineEdit;
+    _curItemPathStatus->setReadOnly( true);
+    _ui->statusBar->addPermanentWidget( curItemPathLabel);
+    _ui->statusBar->addPermanentWidget( _curItemPathStatus);
 
     _appSettings = new QSettings("MicTron", "ArnBrowser");
 
@@ -210,7 +218,7 @@ void  MainWindow::updateHiddenTree( const QModelIndex& index)
 void  MainWindow::itemClicked( const QModelIndex& index)
 {
     _curItemPath = _arnModel->data( index, ArnModel::Role::Path).toString();
-    //qDebug() << "ItemClicked: path=" << _curItemPath;
+    _curItemPathStatus->setText( _connector->toNormPath( _curItemPath));
     ArnItem  arnItem( _curItemPath);
     Arn::DataType  type = arnItem.type();
 

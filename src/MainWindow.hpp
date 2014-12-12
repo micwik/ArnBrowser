@@ -41,6 +41,8 @@
 class MultiDelegate;
 class QSettings;
 class QCloseEvent;
+class QLabel;
+class QLineEdit;
 
 namespace Ui {
     class MainWindow;
@@ -81,6 +83,7 @@ private:
     void  updateHiddenTree( const QModelIndex& index);
 
     Ui::MainWindow*  _ui;
+    QLineEdit*  _curItemPathStatus;
     MultiDelegate*  _delegate;
     ArnModel*  _arnModel;
     ArnClient*  _arnClient;
