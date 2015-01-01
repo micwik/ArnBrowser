@@ -63,6 +63,7 @@ MainWindow::MainWindow(QWidget *parent) :
     curItemPathLabel->setText("Path:");
     _curItemPathStatus = new QLineEdit;
     _curItemPathStatus->setReadOnly( true);
+    _curItemPathStatus->setStyleSheet("QLineEdit{background: lightgrey;}");
     _ui->statusBar->addPermanentWidget( curItemPathLabel);
     _ui->statusBar->addPermanentWidget( _curItemPathStatus);
 
