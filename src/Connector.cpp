@@ -54,6 +54,16 @@ QString  Connector::toLocalPath( const QString& path)  const
     else
         return Arn::changeBasePath("/", _hostRootPath, path);
 }
+QString Connector::curHost() const
+{
+    return _curHost;
+}
+
+void Connector::setCurHost(const QString &curHost)
+{
+    _curHost = curHost;
+}
+
 
 
 //////////////// ConnectorPath
@@ -89,4 +99,10 @@ QString  ConnectorPath::toNormPath( const QString& path)  const
 QString  ConnectorPath::toLocalPath( const QString& path)  const
 {
     return _connector ? _connector->toLocalPath( path) : QString();
+}
+
+
+QString ConnectorPath::curHost() const
+{
+    return _connector ? _connector->curHost() : QString();
 }

@@ -47,7 +47,8 @@ TermWindow::TermWindow( QSettings* appSettings, const ConnectorPath& conPath, QW
     QString  rqPath = Arn::providerPath( path, false);
 
     QString  normPath = conPath.toNormPath( rqPath);
-    this->setWindowTitle( QString("Terminal ") + normPath);
+    QString  curHost  = conPath.curHost();
+    this->setWindowTitle( QString("Terminal ") + normPath + " @" + curHost);
 
     _appSettings = appSettings;
     readSettings();

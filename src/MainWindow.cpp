@@ -125,6 +125,7 @@ MainWindow::~MainWindow()
 void  MainWindow::on_connectButton_clicked()
 {
     _arnClient->connectToArn( _ui->hostEdit->text(), _ui->portEdit->value());
+    _connector->setCurHost( _ui->hostEdit->text());
     _ui->connectButton->setEnabled( false);
     _ui->discoverButton->setEnabled( false);
     _ui->hostEdit->setEnabled( false);
