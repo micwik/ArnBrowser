@@ -35,7 +35,8 @@ SOURCES += src/main.cpp \
     src/VcsWindow.cpp \
     src/DiscoverWindow.cpp \
     src/MTextEdit.cpp \
-    src/Connector.cpp
+    src/Connector.cpp \
+    src/LogWindow.cpp
 
 HEADERS += src/MainWindow.hpp \
     src/TermWindow.hpp \
@@ -48,14 +49,16 @@ HEADERS += src/MainWindow.hpp \
     src/ManageWindow.hpp \
     src/VcsWindow.hpp \
     src/DiscoverWindow.hpp \
-    src/Connector.hpp
+    src/Connector.hpp \
+    src/LogWindow.hpp
 
 FORMS += src/MainWindow.ui \
     src/TermWindow.ui \
     src/CodeWindow.ui \
     src/ManageWindow.ui \
     src/VcsWindow.ui \
-    src/DiscoverWindow.ui
+    src/DiscoverWindow.ui \
+    src/LogWindow.ui
 
 RESOURCES += \
     src/files.qrc

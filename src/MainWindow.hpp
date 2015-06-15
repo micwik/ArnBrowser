@@ -63,6 +63,7 @@ private slots:
     void  on_connectButton_clicked();
     void  on_discoverButton_clicked();
     void  on_terminalButton_clicked();
+    void  on_logButton_clicked();
     void  on_editButton_clicked();
     void  on_runButton_clicked();
     void  on_manageButton_clicked();

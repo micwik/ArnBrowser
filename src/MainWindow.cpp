@@ -33,6 +33,7 @@
 #include "MainWindow.hpp"
 #include "ui_MainWindow.h"
 #include "TermWindow.hpp"
+#include "LogWindow.hpp"
 #include "CodeWindow.hpp"
 #include "ManageWindow.hpp"
 #include "VcsWindow.hpp"
@@ -108,6 +109,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect( _ui->arnView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemClicked(QModelIndex)));
 
     _ui->terminalButton->setEnabled( false);
+    _ui->logButton->setEnabled( false);
     _ui->editButton->setEnabled( false);
     _ui->runButton->setEnabled( false);
     _ui->manageButton->setEnabled( false);
@@ -157,6 +159,14 @@ void  MainWindow::on_terminalButton_clicked()
     ConnectorPath  conPath( _connector, _curItemPath);
     TermWindow*  termWindow = new TermWindow( _appSettings, conPath, 0);
     termWindow->show();
+}
+
+
+void MainWindow::on_logButton_clicked()
+{
+    ConnectorPath  conPath( _connector, _curItemPath);
+    LogWindow*  logWindow = new LogWindow( _appSettings, conPath, 0);
+    logWindow->show();
 }
 
 
@@ -224,8 +234,9 @@ void  MainWindow::itemClicked( const QModelIndex& index)
     ArnItem  arnItem( _curItemPath);
     Arn::DataType  type = arnItem.type();
 
-    // Set state for Terminal button
+    // Set state for Terminal & Log button
     _ui->terminalButton->setEnabled( arnItem.isPipeMode());
+    _ui->logButton->setEnabled( arnItem.isPipeMode());
 
     // Set state for Edit button
     bool  editEn = !arnItem.isFolder() && ((type == type.Null)

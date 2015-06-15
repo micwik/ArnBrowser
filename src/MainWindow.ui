@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>770</width>
+    <width>802</width>
     <height>537</height>
    </rect>
   </property>
@@ -364,6 +364,13 @@ QCheckBox::indicator:disabled:checked[class=trafic] {
             </property>
             <property name="text">
              <string>Terminal</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="logButton">
+            <property name="text">
+             <string>Log</string>
             </property>
            </widget>
           </item>
