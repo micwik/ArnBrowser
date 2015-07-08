@@ -57,10 +57,18 @@ void  ArnNode::init()
 }
 
 
+ArnNode::ArnNode( QObject *qobjParent) :
+        ArnItem( qobjParent)
+{
+    //// Init Root Node
+    init();
+}
+
+
 ArnNode::ArnNode( const QString &path, QObject *qobjParent) :
         ArnItem( path, qobjParent)
 {
-    //// Init Root Node / ValueChild Node / SetChild Node
+    //// Root Node / ValueChild Node / SetChild Node
     init();
 }
 
@@ -85,8 +93,8 @@ ArnNode::~ArnNode()
 ArnModel::ArnModel( Connector* connector, QObject* parent) :
     QAbstractItemModel( parent)
 {
-    _connector = connector;
-    _rootNode = new ArnNode( _connector->toLocalPath("/"), this);
+    _connector   = connector;
+    _rootNode    = new ArnNode( this);
     _isHideBidir = false;
 }
 
@@ -101,6 +109,23 @@ void  ArnModel::setClient(ArnClient* client)
 void  ArnModel::setHideBidir( bool isHide)
 {
     _isHideBidir = isHide;
+}
+
+
+void  ArnModel::start()
+{
+    _rootNode->open( _connector->toLocalPath("/"));
+}
+
+
+void  ArnModel::stop()
+{
+    QList<ArnNode*>  children = _rootNode->_children;
+    foreach (ArnNode *child, children) {
+        child->destroyLinkLocal();
+    }
+    delete _rootNode;
+    _rootNode = new ArnNode( this);
 }
 
 

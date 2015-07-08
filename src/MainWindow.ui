@@ -168,7 +168,7 @@ QCheckBox::indicator:disabled:checked[class=trafic] {
         </property>
         <property name="minimumSize">
          <size>
-          <width>102</width>
+          <width>122</width>
           <height>0</height>
          </size>
         </property>
@@ -178,17 +178,21 @@ QCheckBox::indicator:disabled:checked[class=trafic] {
          </font>
         </property>
         <property name="text">
-         <string>Connect</string>
+         <string>Connection</string>
         </property>
         <property name="icon">
          <iconset resource="files.qrc">
-          <normaloff>:/pic/connect.png</normaloff>:/pic/connect.png</iconset>
+          <normaloff>:/pic/connect.png</normaloff>
+          <normalon>:/pic/disconnect.png</normalon>:/pic/connect.png</iconset>
         </property>
         <property name="iconSize">
          <size>
           <width>25</width>
           <height>24</height>
          </size>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

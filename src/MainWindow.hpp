@@ -81,6 +81,8 @@ protected:
     void closeEvent( QCloseEvent *event);
 
 private:    
+    void  connection( bool isConnect);
+    void  setConnectOffGui();
     void  updateHiddenTree( const QModelIndex& index);
 
     Ui::MainWindow*  _ui;
@@ -93,6 +95,7 @@ private:
     QSettings*  _appSettings;
     QString  _curItemPath;
     int  _pathWidth;
+    bool _isConnect;
 };
 
 #endif // MAINWINDOW_HPP

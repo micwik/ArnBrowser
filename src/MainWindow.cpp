@@ -60,6 +60,9 @@ MainWindow::MainWindow(QWidget *parent) :
     _ui( new Ui::MainWindow)
 {
     _ui->setupUi( this);
+
+    _isConnect = false;
+
     QLabel*  curItemPathLabel = new QLabel;
     curItemPathLabel->setText("Path:");
     _curItemPathStatus = new QLineEdit;
@@ -87,6 +90,8 @@ MainWindow::MainWindow(QWidget *parent) :
     //// Setup model
     _arnModel = new ArnModel( _connector, this);
     _arnModel->setClient( _arnClient);
+    connect( _arnModel, SIGNAL(hiddenRow(int,QModelIndex,bool)),
+             this, SLOT(updateHidden(int,QModelIndex,bool)));
 
     setWindowTitle(tr("Arn Browser  ") + ver);
     _ui->arnView->setEnabled( false);
@@ -108,12 +113,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect( _ui->arnView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemClicked(QModelIndex)));
 
-    _ui->terminalButton->setEnabled( false);
-    _ui->logButton->setEnabled( false);
-    _ui->editButton->setEnabled( false);
-    _ui->runButton->setEnabled( false);
-    _ui->manageButton->setEnabled( false);
-    _ui->vcsButton->setEnabled( false);
+    setConnectOffGui();
 }
 
 
@@ -126,12 +126,45 @@ MainWindow::~MainWindow()
 
 void  MainWindow::on_connectButton_clicked()
 {
-    _arnClient->connectToArn( _ui->hostEdit->text(), _ui->portEdit->value());
-    _connector->setCurHost( _ui->hostEdit->text());
+    bool isConnect = _ui->connectButton->isChecked();
+    connection( isConnect);
+}
+
+
+void  MainWindow::connection( bool isConnect)
+{
+    _isConnect = isConnect;
+    _ui->connectButton->setChecked( isConnect);
+
     _ui->connectButton->setEnabled( false);
-    _ui->discoverButton->setEnabled( false);
-    _ui->hostEdit->setEnabled( false);
-    _ui->portEdit->setEnabled( false);
+    if (isConnect) {
+        _arnClient->connectToArn( _ui->hostEdit->text(), _ui->portEdit->value());
+        _connector->setCurHost( _ui->hostEdit->text());
+        _ui->discoverButton->setEnabled( false);
+        _ui->hostEdit->setEnabled( false);
+        _ui->portEdit->setEnabled( false);
+    }
+    else {
+        _arnModel->stop();
+        _arnClient->close();
+    }
+}
+
+
+void MainWindow::setConnectOffGui()
+{
+    _ui->terminalButton->setEnabled( false);
+    _ui->logButton->setEnabled( false);
+    _ui->editButton->setEnabled( false);
+    _ui->runButton->setEnabled( false);
+    _ui->manageButton->setEnabled( false);
+    _ui->vcsButton->setEnabled( false);
+
+    _ui->connectButton->setEnabled( true);
+    _ui->discoverButton->setEnabled( true);
+
+    _ui->hostEdit->setEnabled( true);
+    _ui->portEdit->setEnabled( true);
 }
 
 
@@ -150,7 +183,7 @@ void  MainWindow::on_discoverButton_clicked()
     _ui->hostEdit->setText( hostName);
     _ui->portEdit->setValue( hostPort);
 
-    on_connectButton_clicked();
+    connection( true);
 }
 
 
@@ -260,13 +293,18 @@ void  MainWindow::clientConnected()
     disconnect( _arnClient, SIGNAL(tcpError(QString,QAbstractSocket::SocketError)),
              this, SLOT(clientError(QString)));
 
-    _ui->arnView->setModel( _arnModel);
+    _arnModel->start();
+    if (_ui->arnView->model()) // model already set, just reset viewer
+        _ui->arnView->reset();
+    else    // model has not been set, do it now
+        _ui->arnView->setModel( _arnModel);
     _arnModel->setHideBidir( _ui->hideBidir->isChecked());
-    connect( _arnModel, SIGNAL(hiddenRow(int,QModelIndex,bool)),
-             this, SLOT(updateHidden(int,QModelIndex,bool)));
     _ui->vcsButton->setEnabled( true);
+    _ui->connectButton->setEnabled( true);
 
-    _delegate = new MultiDelegate;
+    _delegate = qobject_cast<MultiDelegate*>( _ui->arnView->itemDelegate());
+    if (!_delegate)
+        _delegate = new MultiDelegate;
     _ui->arnView->setItemDelegate( _delegate);
     _ui->arnView->setEnabled( true);
     _ui->arnView->setColumnWidth(0, _pathWidth);
@@ -284,7 +322,12 @@ void MainWindow::doClientStateChanged(int status)
 {
     // qDebug() << "ClientStateChanged: state=" << status;
     _ui->connectStat->setChecked( status == ArnClient::ConnectStat::Connected);
-    _ui->connectStat->show();
+    _ui->connectStat->setVisible( _isConnect);
+
+    if ((status == ArnClient::ConnectStat::Disconnected) && !_isConnect) {
+        //// Manual disconnection from user
+        setConnectOffGui();
+    }
 }
 
 

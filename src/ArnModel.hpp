@@ -50,6 +50,7 @@ class ArnNode : public ArnItem
 {
 Q_OBJECT
 public:
+    ArnNode( QObject *qobjParent = 0);
     ArnNode( const QString &path, QObject *qobjParent = 0);
     ArnNode( ArnNode* parent, const QString& item, int row);
     ~ArnNode();
@@ -90,6 +91,8 @@ public:
     explicit ArnModel( Connector* connector, QObject* parent = 0);
     void  setClient( ArnClient* client);
     void  setHideBidir( bool isHide);
+    void  start();
+    void  stop();
 
     QModelIndex  index( int row, int column, const QModelIndex &parent)  const;
     QModelIndex  parent(const QModelIndex &child)  const;
