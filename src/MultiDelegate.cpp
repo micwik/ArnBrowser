@@ -185,6 +185,7 @@ QWidget*  MultiDelegate::createEditor( QWidget* parent,
     case QMetaType::QIcon:
     {
         PixmapViewer*  editor = new PixmapViewer( parent);
+        connect( editor, SIGNAL(finished(int)), this, SLOT(closeEmittingEditor()));
         return editor;
     }
     case QMetaType::QStringList:
@@ -361,4 +362,14 @@ void MultiDelegate::updateEditorGeometry(QWidget *editor,
 {
     Q_UNUSED( index);
     editor->setGeometry(option.rect);
+}
+
+
+//// Experimental ...
+void MultiDelegate::closeEmittingEditor()
+{
+    QWidget*  ed = qobject_cast<QWidget*>( sender());
+    Q_ASSERT(ed);
+    qDebug() << "Closing editor: type=" << ed->metaObject()->className();
+    emit closeEditor( ed);
 }

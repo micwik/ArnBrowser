@@ -393,6 +393,13 @@ QCheckBox::indicator:disabled:checked[class=trafic] {
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="manageButton">
+            <property name="text">
+             <string>Manage</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="verticalSpacer_3">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -409,9 +416,9 @@ QCheckBox::indicator:disabled:checked[class=trafic] {
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="manageButton">
+           <widget class="QPushButton" name="resetButton">
             <property name="text">
-             <string>Manage</string>
+             <string>Reset</string>
             </property>
            </widget>
           </item>

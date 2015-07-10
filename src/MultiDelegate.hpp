@@ -74,7 +74,8 @@ public:
     QSize  sizeHint( const QStyleOptionViewItem& option, const QModelIndex& index)  const ;
 signals:
 
-public slots:
+private slots:
+    void  closeEmittingEditor();
 
 private:
     //QIcon  _icon;

@@ -57,6 +57,33 @@ void  ArnNode::init()
 }
 
 
+//// Must deallocate everything, also qobjects
+void  ArnNode::dealloc()
+{
+    if (_valueChild)  delete _valueChild;
+    if (_setChild)    delete _setChild;
+    if (_propChild)   delete _propChild;
+    if (_infoChild)   delete _infoChild;
+    if (_arnMon)      delete _arnMon;
+
+    if (_setMap)      delete _setMap;
+    if (_propMap)     delete _propMap;
+}
+
+
+void  ArnNode::reInit()
+{
+    dealloc();
+    init();
+}
+
+
+ArnNode::~ArnNode()
+{
+    dealloc();
+}
+
+
 ArnNode::ArnNode( QObject *qobjParent) :
         ArnItem( qobjParent)
 {
@@ -80,13 +107,6 @@ ArnNode::ArnNode( ArnNode* parent, const QString& item, int row) :
     _parent = parent;
     if (row >= 0)
         parent->_children.insert( row, this);
-}
-
-
-ArnNode::~ArnNode()
-{
-    if (_setMap)  delete _setMap;
-    if (_propMap)  delete _propMap;
 }
 
 
@@ -118,14 +138,13 @@ void  ArnModel::start()
 }
 
 
-void  ArnModel::stop()
+void  ArnModel::clear()
 {
     QList<ArnNode*>  children = _rootNode->_children;
     foreach (ArnNode *child, children) {
         child->destroyLinkLocal();
     }
-    delete _rootNode;
-    _rootNode = new ArnNode( this);
+    _rootNode->reInit();
 }
 
 

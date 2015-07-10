@@ -84,12 +84,11 @@ MainWindow::MainWindow(QWidget *parent) :
     // _arnClient->setReceiveTimeout(5);  // Base time for receiver timeout
     connect( _arnClient, SIGNAL(tcpConnected(QString,quint16)), this, SLOT(clientConnected()));
     connect( _arnClient, SIGNAL(connectionStatusChanged(int,int)), this, SLOT(doClientStateChanged(int)));
-    connect( _arnClient, SIGNAL(tcpError(QString,QAbstractSocket::SocketError)),
-             this, SLOT(clientError(QString)));
 
     //// Setup model
     _arnModel = new ArnModel( _connector, this);
     _arnModel->setClient( _arnClient);
+    _arnModel->start();
     connect( _arnModel, SIGNAL(hiddenRow(int,QModelIndex,bool)),
              this, SLOT(updateHidden(int,QModelIndex,bool)));
 
@@ -133,11 +132,12 @@ void  MainWindow::on_connectButton_clicked()
 
 void  MainWindow::connection( bool isConnect)
 {
-    _isConnect = isConnect;
-    _ui->connectButton->setChecked( isConnect);
+    setConnectionState( isConnect);
 
     _ui->connectButton->setEnabled( false);
     if (isConnect) {
+        connect( _arnClient, SIGNAL(tcpError(QString,QAbstractSocket::SocketError)),
+                 this, SLOT(clientError(QString)));
         _arnClient->connectToArn( _ui->hostEdit->text(), _ui->portEdit->value());
         _connector->setCurHost( _ui->hostEdit->text());
         _ui->discoverButton->setEnabled( false);
@@ -145,9 +145,16 @@ void  MainWindow::connection( bool isConnect)
         _ui->portEdit->setEnabled( false);
     }
     else {
-        _arnModel->stop();
+        _arnModel->clear();
         _arnClient->close();
     }
+}
+
+
+void  MainWindow::setConnectionState( bool isConnect)
+{
+    _isConnect = isConnect;
+    _ui->connectButton->setChecked( isConnect);
 }
 
 
@@ -158,8 +165,10 @@ void MainWindow::setConnectOffGui()
     _ui->editButton->setEnabled( false);
     _ui->runButton->setEnabled( false);
     _ui->manageButton->setEnabled( false);
+    _ui->resetButton->setEnabled( false);
     _ui->vcsButton->setEnabled( false);
 
+    _ui->connectStat->setVisible( false);
     _ui->connectButton->setEnabled( true);
     _ui->discoverButton->setEnabled( true);
 
@@ -229,6 +238,13 @@ void  MainWindow::on_manageButton_clicked()
 }
 
 
+void  MainWindow::on_resetButton_clicked()
+{
+    _arnModel->clear();
+    _ui->arnView->reset();
+}
+
+
 void  MainWindow::on_vcsButton_clicked()
 {
     VcsWindow*  vcsWindow = new VcsWindow( _appSettings, _connector, 0);
@@ -293,12 +309,12 @@ void  MainWindow::clientConnected()
     disconnect( _arnClient, SIGNAL(tcpError(QString,QAbstractSocket::SocketError)),
              this, SLOT(clientError(QString)));
 
-    _arnModel->start();
     if (_ui->arnView->model()) // model already set, just reset viewer
         _ui->arnView->reset();
     else    // model has not been set, do it now
         _ui->arnView->setModel( _arnModel);
     _arnModel->setHideBidir( _ui->hideBidir->isChecked());
+    _ui->resetButton->setEnabled( true);
     _ui->vcsButton->setEnabled( true);
     _ui->connectButton->setEnabled( true);
 
@@ -322,7 +338,7 @@ void MainWindow::doClientStateChanged(int status)
 {
     // qDebug() << "ClientStateChanged: state=" << status;
     _ui->connectStat->setChecked( status == ArnClient::ConnectStat::Connected);
-    _ui->connectStat->setVisible( _isConnect);
+    _ui->connectStat->setVisible( _isConnect && (status != ArnClient::ConnectStat::Error));
 
     if ((status == ArnClient::ConnectStat::Disconnected) && !_isConnect) {
         //// Manual disconnection from user
@@ -333,16 +349,18 @@ void MainWindow::doClientStateChanged(int status)
 
 void  MainWindow::clientError( QString errorText)
 {
+    disconnect( _arnClient, SIGNAL(tcpError(QString,QAbstractSocket::SocketError)),
+             this, SLOT(clientError(QString)));
+
+    setConnectionState( false);
+    setConnectOffGui();
+
     QMessageBox msgBox;
     msgBox.setWindowTitle( tr("Error"));
     msgBox.setIcon( QMessageBox::Information);
     msgBox.setText( tr("Can not Connect to Host"));
     msgBox.setInformativeText( errorText);
     msgBox.exec();
-    _ui->connectButton->setEnabled( true);
-    _ui->discoverButton->setEnabled( true);
-    _ui->hostEdit->setEnabled( true);
-    _ui->portEdit->setEnabled( true);
 }
 
 

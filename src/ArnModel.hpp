@@ -48,13 +48,15 @@ class XStringMap;
 
 class ArnNode : public ArnItem
 {
-Q_OBJECT
+    Q_OBJECT
 public:
     ArnNode( QObject *qobjParent = 0);
     ArnNode( const QString &path, QObject *qobjParent = 0);
     ArnNode( ArnNode* parent, const QString& item, int row);
     ~ArnNode();
     void  init();
+    void  dealloc();
+    void  reInit();
 
     ArnNode*  _parent;
     ArnNode*  _valueChild;
@@ -92,7 +94,7 @@ public:
     void  setClient( ArnClient* client);
     void  setHideBidir( bool isHide);
     void  start();
-    void  stop();
+    void  clear();
 
     QModelIndex  index( int row, int column, const QModelIndex &parent)  const;
     QModelIndex  parent(const QModelIndex &child)  const;
