@@ -165,7 +165,7 @@ void MainWindow::setConnectOffGui()
     _ui->editButton->setEnabled( false);
     _ui->runButton->setEnabled( false);
     _ui->manageButton->setEnabled( false);
-    _ui->resetButton->setEnabled( false);
+    _ui->releaseButton->setEnabled( false);
     _ui->vcsButton->setEnabled( false);
 
     _ui->connectStat->setVisible( false);
@@ -238,7 +238,7 @@ void  MainWindow::on_manageButton_clicked()
 }
 
 
-void  MainWindow::on_resetButton_clicked()
+void  MainWindow::on_releaseButton_clicked()
 {
     _arnModel->clear();
     _ui->arnView->reset();
@@ -314,7 +314,7 @@ void  MainWindow::clientConnected()
     else    // model has not been set, do it now
         _ui->arnView->setModel( _arnModel);
     _arnModel->setHideBidir( _ui->hideBidir->isChecked());
-    _ui->resetButton->setEnabled( true);
+    _ui->releaseButton->setEnabled( true);
     _ui->vcsButton->setEnabled( true);
     _ui->connectButton->setEnabled( true);
 

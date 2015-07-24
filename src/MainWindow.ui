@@ -416,9 +416,9 @@ QCheckBox::indicator:disabled:checked[class=trafic] {
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="resetButton">
+           <widget class="QPushButton" name="releaseButton">
             <property name="text">
-             <string>Reset</string>
+             <string>Release</string>
             </property>
            </widget>
           </item>

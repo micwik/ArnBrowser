@@ -67,7 +67,7 @@ private slots:
     void  on_editButton_clicked();
     void  on_runButton_clicked();
     void  on_manageButton_clicked();
-    void  on_resetButton_clicked();
+    void  on_releaseButton_clicked();
     void  on_vcsButton_clicked();
     void  on_viewHidden_clicked();
     void  on_hideBidir_clicked();
