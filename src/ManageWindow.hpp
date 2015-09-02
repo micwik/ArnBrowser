@@ -67,6 +67,7 @@ public:
     ~ManageWindow();
     
 private slots:
+    void  on_itemEdit_textChanged( const QString& txt);
     void  on_newButton_clicked();
     void  on_deleteButton_clicked();
     void  on_saveButton_clicked();

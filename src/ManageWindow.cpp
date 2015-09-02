@@ -55,7 +55,7 @@ ManageWindow::ManageWindow( QSettings* appSettings, const ConnectorPath& conPath
     _isPersistFile = false;
     _isMandatory   = false;
 
-    QRegExp  rx("^[^/ ]+([^ ]*[^/ ])*$");
+    QRegExp  rx("^[^/ ][^ ]*$");
     QRegExpValidator*  validator = new QRegExpValidator( rx, this);
     _ui->itemEdit->setValidator( validator);
 
@@ -91,6 +91,14 @@ ManageWindow::~ManageWindow()
 }
 
 
+void ManageWindow::on_itemEdit_textChanged( const QString& txt)
+{
+    Q_UNUSED(txt)
+
+    doUpdate();
+}
+
+
 void  ManageWindow::doUpdate()
 {
     bool  isPathFolder = _arnPath.isFolder();
@@ -121,12 +129,11 @@ void  ManageWindow::doUpdate()
         _ui->itemEdit->setDisabled(true);
         _ui->folderButton->setChecked(true);
         _ui->folderButton->setDisabled(true);
-        _ui->armDelButton->setChecked(false);
-        _ui->armDelButton->setDisabled(true);
     }
-    else {  // Edit new non folder item
+    else {  // Edit new item
         _ui->itemEdit->setDisabled(false);
-        _ui->folderButton->setDisabled(true);  // No support yet for new folder (will not sync)
+        _ui->folderButton->setDisabled(false);
+        _ui->folderButton->setChecked( Arn::isFolderPath( _ui->itemEdit->text()));
         _ui->armDelButton->setChecked(false);
         _ui->armDelButton->setDisabled(true);
     }
@@ -136,7 +143,8 @@ void  ManageWindow::doUpdate()
     bool  isPersistDB       = isTypePersistable && (_ui->persistDbButton->isChecked());
 
     _ui->newButton->setEnabled( !_isNewMode && isPathFolder);
-    _ui->saveButton->setEnabled((_isNewMode || !isPathFolder) && isPathOpen);
+    _ui->saveButton->setEnabled(((_isNewMode && _ui->itemEdit->hasAcceptableInput())
+                               || !isPathFolder) && isPathOpen);
     _ui->cancelButton->setEnabled( _isNewMode);
     _ui->deleteButton->setEnabled( _ui->armDelButton->isChecked());
     _ui->resetButton->setEnabled(false);  // Default
@@ -175,8 +183,6 @@ void  ManageWindow::doUpdate()
             _ui->persistNoneButton->setDisabled(false);
         }
     }
-
-    //_app->triggerUpdate();
 }
 
 
@@ -241,25 +247,23 @@ void  ManageWindow::on_newButton_clicked()
     _isPersistFile = false;
 
     _ui->itemEdit->setText("");
-    _ui->itemEdit->setFocus();
     _ui->folderButton->setChecked(false);
     _ui->typeNormalButton->setChecked(true);
     _ui->persistNoneButton->setChecked(true);
 
     doUpdate();
+    _ui->itemEdit->setFocus();
 }
 
 
 void  ManageWindow::on_deleteButton_clicked()
 {
-    if (!_arnPath.isFolder()) {
-        QString  normPath = _conPath.normPath();
-        _persistSapi.pv_rm( normPath);  // Any persist file is deleted
-        if (_arnPath.isSaveMode())
-            _persistSapi.pv_dbMandatory( normPath, false);
-        _persistSapi.pv_ls( normPath);
-        _arnPath.destroyLink();
-    }
+    QString  normPath = _conPath.normPath();
+    _persistSapi.pv_rm( normPath);  // Any persist file/tree is deleted
+    if (Arn::isFolderPath( normPath) || _arnPath.isSaveMode())
+        _persistSapi.pv_dbMandatory( normPath, false);
+    _persistSapi.pv_ls( normPath);
+    _arnPath.destroyLink();
 
     doUpdate();
 }
@@ -273,9 +277,7 @@ void  ManageWindow::on_saveButton_clicked()
 
     if (_isNewMode) {
         _ui->itemEdit->setFocus();
-        if (!_ui->itemEdit->hasAcceptableInput())  return;  // Item not valid
         QString  item = _ui->itemEdit->text();
-        if (item.isEmpty())  return;  // Item may not be empty
 
         QString  itemPath = Arn::addPath( _conPath.localPath(), item);
         arnItemNew.open( itemPath);
@@ -341,6 +343,15 @@ void  ManageWindow::on_resetButton_clicked()
 
 void  ManageWindow::on_folderButton_clicked()
 {
+    QString  subPath = _ui->itemEdit->text();
+    bool  isFolder   = Arn::isFolderPath( subPath);
+    bool  wantFolder = _ui->folderButton->isChecked();
+    if (wantFolder && !isFolder)
+        _ui->itemEdit->setText( subPath + "/");
+    else if (!wantFolder && isFolder) {
+        subPath.chop(1);
+        _ui->itemEdit->setText( subPath);
+    }
 }
 
 
@@ -390,7 +401,7 @@ void  ManageWindow::readSettings()
 
 void  ManageWindow::writeSettings()
 {
-    qDebug() << "Write code settings";
+    qDebug() << "Write manage settings";
     _appSettings->setValue("manage/pos", pos());
     _appSettings->setValue("manage/size", size());
 }

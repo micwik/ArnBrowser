@@ -417,7 +417,7 @@ void  VcsWindow::readSettings()
 
 void  VcsWindow::writeSettings()
 {
-    qDebug() << "Write code settings";
+    qDebug() << "Write vcs settings";
     _appSettings->setValue("vcs/pos", pos());
     _appSettings->setValue("vcs/size", size());
     _appSettings->setValue("vcs/split", _ui->splitter->saveState());

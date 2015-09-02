@@ -70,7 +70,7 @@ void  QmlRunWindow::readSettings()
 
 void  QmlRunWindow::writeSettings()
 {
-    qDebug() << "Write code settings";
+    qDebug() << "Write qmlRun settings";
     _appSettings->setValue("qmlRun/pos", QML_POS());
     //_appSettings->setValue("qmlRun/size", size());
 }

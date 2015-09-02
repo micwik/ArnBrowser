@@ -759,7 +759,7 @@ void  ArnModel::destroyNode()
         return;
     }
 
-    parent->_arnMon->foundChildDeleted( node->path());  // Remove from found list
+    // parent->_arnMon->foundChildDeleted( node->path());  // Remove from found list
     int  row = parent->_children.indexOf( node);
     if (row >= 0) {  // Remove normal child node
         QModelIndex  index = indexFromNode( parent, 0);
