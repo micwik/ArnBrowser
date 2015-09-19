@@ -59,6 +59,7 @@ private slots:
     void  itemClicked( const QModelIndex &index);
     void  clientConnected();
     void  doClientStateChanged( int status);
+    void  doStartLogin( int code);
     void  clientError( QString errorText);
     void  on_connectButton_clicked();
     void  on_discoverButton_clicked();

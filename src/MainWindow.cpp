@@ -38,6 +38,7 @@
 #include "ManageWindow.hpp"
 #include "VcsWindow.hpp"
 #include "DiscoverWindow.hpp"
+#include "LoginDialog.hpp"
 #include "MultiDelegate.hpp"
 #include <ArnInc/ArnClient.hpp>
 #include <QMessageBox>
@@ -84,6 +85,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // _arnClient->setReceiveTimeout(5);  // Base time for receiver timeout
     connect( _arnClient, SIGNAL(tcpConnected(QString,quint16)), this, SLOT(clientConnected()));
     connect( _arnClient, SIGNAL(connectionStatusChanged(int,int)), this, SLOT(doClientStateChanged(int)));
+    connect( _arnClient, SIGNAL(loginRequired(int)), this, SLOT(doStartLogin(int)));
 
     //// Setup model
     _arnModel = new ArnModel( _connector, this);
@@ -344,6 +346,24 @@ void MainWindow::doClientStateChanged(int status)
         //// Manual disconnection from user
         setConnectOffGui();
     }
+}
+
+
+void  MainWindow::doStartLogin( int code)
+{
+    LoginDialog*  loginDialog = new LoginDialog(0);
+    loginDialog->exec();
+    if (loginDialog->result() != QDialog::Accepted) {
+        connection( false);
+        return;
+    }
+
+    QString  userName;
+    QString  password;
+    loginDialog->getResult( userName, password);
+    qDebug() << "doStartLogin user=" << userName << " pass=" << password;
+
+    _arnClient->loginToArn( userName, password);
 }
 
 
