@@ -325,9 +325,8 @@ void MainWindow::doClientStateChanged( int status)
     qDebug() << "ClientStateChanged: state=" << status;
     _ui->connectStat->setChecked( status == ArnClient::ConnectStat::Connected);
     _ui->connectStat->setVisible( _hasConnected);
-    //_ui->connectStat->setVisible( _isConnect && (status != ArnClient::ConnectStat::Error));
 
-    if (status == ArnClient::ConnectStat::Connected) {
+    if ((status == ArnClient::ConnectStat::Connected) && !_arnClient->isReConnect()) {
         //// Fully connected also after any negotiation and login
         if (_ui->arnView->model()) // model already set, just reset viewer
             _ui->arnView->reset();
