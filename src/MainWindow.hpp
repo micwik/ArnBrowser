@@ -59,7 +59,8 @@ private slots:
     void  itemClicked( const QModelIndex &index);
     void  clientConnected();
     void  doClientStateChanged( int status);
-    void  doStartLogin( int code);
+    void  doStartLogin( int contextCode);
+    void  doEndLogin( int resultCode);
     void  clientError( QString errorText);
     void  on_connectButton_clicked();
     void  on_discoverButton_clicked();
@@ -98,7 +99,8 @@ private:
     QSettings*  _appSettings;
     QString  _curItemPath;
     int  _pathWidth;
-    bool _isConnect;
+    bool  _isConnect;
+    bool  _hasConnected;
 };
 
 #endif // MAINWINDOW_HPP

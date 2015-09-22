@@ -62,7 +62,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     _ui->setupUi( this);
 
-    _isConnect = false;
+    _isConnect    = false;
+    _hasConnected = false;
 
     QLabel*  curItemPathLabel = new QLabel;
     curItemPathLabel->setText("Path:");
@@ -156,6 +157,8 @@ void  MainWindow::connection( bool isConnect)
 void  MainWindow::setConnectionState( bool isConnect)
 {
     _isConnect = isConnect;
+    if (!isConnect)
+        _hasConnected = false;
     _ui->connectButton->setChecked( isConnect);
 }
 
@@ -307,61 +310,73 @@ void  MainWindow::itemClicked( const QModelIndex& index)
 
 void  MainWindow::clientConnected()
 {
+    _hasConnected = true;
     _arnClient->setAutoConnect( true, 2);
     disconnect( _arnClient, SIGNAL(tcpError(QString,QAbstractSocket::SocketError)),
-             this, SLOT(clientError(QString)));
-
-    if (_ui->arnView->model()) // model already set, just reset viewer
-        _ui->arnView->reset();
-    else    // model has not been set, do it now
-        _ui->arnView->setModel( _arnModel);
-    _arnModel->setHideBidir( _ui->hideBidir->isChecked());
-    _ui->releaseButton->setEnabled( true);
-    _ui->vcsButton->setEnabled( true);
-    _ui->connectButton->setEnabled( true);
-
-    _delegate = qobject_cast<MultiDelegate*>( _ui->arnView->itemDelegate());
-    if (!_delegate)
-        _delegate = new MultiDelegate;
-    _ui->arnView->setItemDelegate( _delegate);
-    _ui->arnView->setEnabled( true);
-    _ui->arnView->setColumnWidth(0, _pathWidth);
-    _ui->arnView->setColumnWidth(1, 10);
-
-    _curItemPath = "/";
-    _ui->manageButton->setEnabled( true);
+                this, SLOT(clientError(QString)));
 
     _appSettings->setValue("connect/host", _ui->hostEdit->text());
     _appSettings->setValue("connect/port", _ui->portEdit->value());
 }
 
 
-void MainWindow::doClientStateChanged(int status)
+void MainWindow::doClientStateChanged( int status)
 {
-    // qDebug() << "ClientStateChanged: state=" << status;
+    qDebug() << "ClientStateChanged: state=" << status;
     _ui->connectStat->setChecked( status == ArnClient::ConnectStat::Connected);
-    _ui->connectStat->setVisible( _isConnect && (status != ArnClient::ConnectStat::Error));
+    _ui->connectStat->setVisible( _hasConnected);
+    //_ui->connectStat->setVisible( _isConnect && (status != ArnClient::ConnectStat::Error));
 
-    if ((status == ArnClient::ConnectStat::Disconnected) && !_isConnect) {
+    if (status == ArnClient::ConnectStat::Connected) {
+        //// Fully connected also after any negotiation and login
+        if (_ui->arnView->model()) // model already set, just reset viewer
+            _ui->arnView->reset();
+        else    // model has not been set, do it now
+            _ui->arnView->setModel( _arnModel);
+        _arnModel->setHideBidir( _ui->hideBidir->isChecked());
+        _ui->releaseButton->setEnabled( true);
+        _ui->vcsButton->setEnabled( true);
+        _ui->connectButton->setEnabled( true);
+        _ui->manageButton->setEnabled( true);
+
+        _delegate = qobject_cast<MultiDelegate*>( _ui->arnView->itemDelegate());
+        if (!_delegate)
+            _delegate = new MultiDelegate;
+        _ui->arnView->setItemDelegate( _delegate);
+        _ui->arnView->setEnabled( true);
+        _ui->arnView->setColumnWidth(0, _pathWidth);
+        _ui->arnView->setColumnWidth(1, 10);
+
+        _curItemPath = "/";
+    }
+    else if ((status == ArnClient::ConnectStat::Disconnected) && !_isConnect) {
         //// Manual disconnection from user
         setConnectOffGui();
     }
 }
 
 
-void  MainWindow::doStartLogin( int code)
+void  MainWindow::doStartLogin( int contextCode)
 {
-    LoginDialog*  loginDialog = new LoginDialog(0);
-    loginDialog->exec();
-    if (loginDialog->result() != QDialog::Accepted) {
+    LoginDialog*  loginDialog = new LoginDialog( contextCode, 0);
+    connect( loginDialog, SIGNAL(finished(int)), this, SLOT(doEndLogin(int)));
+}
+
+
+void  MainWindow::doEndLogin( int resultCode)
+{
+    if (resultCode != QDialog::Accepted) {
         connection( false);
         return;
     }
 
+    LoginDialog*  loginDialog = qobject_cast<LoginDialog*>( sender());
+    Q_ASSERT(loginDialog);
+
     QString  userName;
     QString  password;
     loginDialog->getResult( userName, password);
-    qDebug() << "doStartLogin user=" << userName << " pass=" << password;
+    qDebug() << "doEndLogin user=" << userName << " pass=" << password;
 
     _arnClient->loginToArn( userName, password);
 }

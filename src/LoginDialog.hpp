@@ -46,7 +46,7 @@ class LoginDialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit LoginDialog( QWidget* parent = 0);
+    explicit LoginDialog( int contextCode, QWidget* parent = 0);
     ~LoginDialog();
 
     void  getResult( QString& userName,  QString& password);
@@ -58,6 +58,8 @@ protected:
     void  closeEvent( QCloseEvent *event);
 
 private:
+    void  setGuiNoLogin();
+
     Ui::LoginDialog*  _ui;
 };
 

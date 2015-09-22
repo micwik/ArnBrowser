@@ -32,21 +32,52 @@
 
 #include "LoginDialog.hpp"
 #include "ui_LoginDialog.h"
+#include <QDialogButtonBox>
 #include <QCloseEvent>
 #include <QDebug>
 
 
-LoginDialog::LoginDialog( QWidget* parent) :
+LoginDialog::LoginDialog( int contextCode, QWidget* parent) :
     QDialog( parent),
     _ui( new Ui::LoginDialog)
 {
     _ui->setupUi( this);
+    this->setWindowTitle( QString("Login ARN"));
+    setModal( true);
+    show();
+
+    switch (contextCode) {
+    case 0:
+        _ui->messageLabel->setText("Login to ARN server");
+        break;
+    case 1:
+        _ui->messageLabel->setText("Login failed, retry login to ARN server");
+        break;
+    case 2:
+        _ui->messageLabel->setText("ARN server gave bad password, it's not trusted");
+        setGuiNoLogin();
+        break;
+    case 3:
+        _ui->messageLabel->setText("ARN server don't support login as demanded");
+        setGuiNoLogin();
+        break;
+    default:
+        break;
+    }
 }
 
 
 LoginDialog::~LoginDialog()
 {
     delete _ui;
+}
+
+
+void LoginDialog::setGuiNoLogin()
+{
+    _ui->userEdit->setEnabled( false);
+    _ui->passEdit->setEnabled( false);
+    _ui->buttonBox->setStandardButtons( QDialogButtonBox::Abort);
 }
 
 
