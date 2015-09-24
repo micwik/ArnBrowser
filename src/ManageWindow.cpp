@@ -383,7 +383,7 @@ void  ManageWindow::mandatoryLsR( QStringList files)
 
 void  ManageWindow::closeEvent( QCloseEvent* event)
 {
-    qDebug() << "Close event";
+    // qDebug() << "Close event";
     writeSettings();
     event->accept();
     deleteLater();
@@ -401,7 +401,7 @@ void  ManageWindow::readSettings()
 
 void  ManageWindow::writeSettings()
 {
-    qDebug() << "Write manage settings";
+    // qDebug() << "Write manage settings";
     _appSettings->setValue("manage/pos", pos());
     _appSettings->setValue("manage/size", size());
 }

@@ -147,7 +147,7 @@ void LogWindow::on_startLogButton_clicked()
 
 void  LogWindow::closeEvent( QCloseEvent* event)
 {
-    qDebug() << "Close event";
+    // qDebug() << "Close event";
     if (_logFile.isOpen())
         _logFile.close();
 
@@ -171,7 +171,7 @@ void LogWindow::readSettings()
 
 void LogWindow::writeSettings()
 {
-    qDebug() << "Write log settings";
+    // qDebug() << "Write log settings";
     _appSettings->setValue("log/fileName", _ui->fileNameEdit->text());
     _appSettings->setValue("log/dirPath", _fileDir);
     _appSettings->setValue("log/pos", pos());

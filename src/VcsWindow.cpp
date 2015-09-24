@@ -397,7 +397,7 @@ void  VcsWindow::sapiLsR( QStringList files)
 
 void  VcsWindow::closeEvent( QCloseEvent* event)
 {
-    qDebug() << "Close event";
+    // qDebug() << "Close event";
     writeSettings();
     event->accept();
     deleteLater();
@@ -417,7 +417,7 @@ void  VcsWindow::readSettings()
 
 void  VcsWindow::writeSettings()
 {
-    qDebug() << "Write vcs settings";
+    // qDebug() << "Write vcs settings";
     _appSettings->setValue("vcs/pos", pos());
     _appSettings->setValue("vcs/size", size());
     _appSettings->setValue("vcs/split", _ui->splitter->saveState());

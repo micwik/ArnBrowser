@@ -107,7 +107,7 @@ void  TermWindow::doLineInputPv()
 
 void  TermWindow::closeEvent( QCloseEvent* event)
 {
-    qDebug() << "Close event";
+    // qDebug() << "Close event";
     writeSettings();
     event->accept();
     deleteLater();
@@ -125,7 +125,7 @@ void  TermWindow::readSettings()
 
 void  TermWindow::writeSettings()
 {
-    qDebug() << "Write term settings";
+    // qDebug() << "Write term settings";
     _appSettings->setValue("term/pos", pos());
     _appSettings->setValue("term/size", size());
 }

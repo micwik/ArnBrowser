@@ -53,7 +53,7 @@ void QmlRunWindow::closeEvent(QCloseEvent* event)
 
 void  QmlRunWindow::onClose()
 {
-    qDebug() << "Close event";
+    // qDebug() << "Close event";
     writeSettings();
     deleteLater();
 }
@@ -70,7 +70,7 @@ void  QmlRunWindow::readSettings()
 
 void  QmlRunWindow::writeSettings()
 {
-    qDebug() << "Write qmlRun settings";
+    // qDebug() << "Write qmlRun settings";
     _appSettings->setValue("qmlRun/pos", QML_POS());
     //_appSettings->setValue("qmlRun/size", size());
 }

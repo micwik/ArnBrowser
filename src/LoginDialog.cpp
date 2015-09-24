@@ -104,7 +104,7 @@ void LoginDialog::reject()
 
 void  LoginDialog::closeEvent( QCloseEvent* event)
 {
-    qDebug() << "LoginDialog Close event";
+    // qDebug() << "LoginDialog Close event";
     event->accept();
     deleteLater();
 }

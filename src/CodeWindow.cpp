@@ -227,7 +227,7 @@ QString  CodeWindow::getText()  const
 
 void  CodeWindow::closeEvent( QCloseEvent* event)
 {
-    qDebug() << "Close event";
+    // qDebug() << "Close event";
     writeSettings();
     event->accept();
     deleteLater();
@@ -245,7 +245,7 @@ void  CodeWindow::readSettings()
 
 void  CodeWindow::writeSettings()
 {
-    qDebug() << "Write code settings";
+    // qDebug() << "Write code settings";
     _appSettings->setValue("codeEdit/pos", pos());
     _appSettings->setValue("codeEdit/size", size());
 }

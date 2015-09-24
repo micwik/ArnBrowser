@@ -221,7 +221,7 @@ void  DiscoverWindow::onServiceSelectChanged()
 
 void  DiscoverWindow::closeEvent( QCloseEvent* event)
 {
-    qDebug() << "Close event";
+    // qDebug() << "Close event";
     writeSettings();
     event->accept();
     deleteLater();
@@ -241,7 +241,7 @@ void  DiscoverWindow::readSettings()
 
 void  DiscoverWindow::writeSettings()
 {
-    qDebug() << "Write discover settings";
+    // qDebug() << "Write discover settings";
     _appSettings->setValue("discover/pos", pos());
     _appSettings->setValue("discover/size", size());
     _appSettings->setValue("discover/group", _ui->groupEdit->text());

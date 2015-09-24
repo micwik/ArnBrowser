@@ -83,8 +83,8 @@ MainWindow::MainWindow(QWidget *parent) :
     //// Prepare connect to Arn server
     _connector = new Connector( this);
     _arnClient = new ArnClient( this);
+    _arnClient->setDemandLogin( false);
     // _arnClient->setReceiveTimeout(5);  // Base time for receiver timeout
-    connect( _arnClient, SIGNAL(tcpConnected(QString,quint16)), this, SLOT(clientConnected()));
     connect( _arnClient, SIGNAL(connectionStatusChanged(int,int)), this, SLOT(doClientStateChanged(int)));
     connect( _arnClient, SIGNAL(loginRequired(int)), this, SLOT(doStartLogin(int)));
 
@@ -308,26 +308,22 @@ void  MainWindow::itemClicked( const QModelIndex& index)
 }
 
 
-void  MainWindow::clientConnected()
-{
-    _hasConnected = true;
-    _arnClient->setAutoConnect( true, 2);
-    disconnect( _arnClient, SIGNAL(tcpError(QString,QAbstractSocket::SocketError)),
-                this, SLOT(clientError(QString)));
-
-    _appSettings->setValue("connect/host", _ui->hostEdit->text());
-    _appSettings->setValue("connect/port", _ui->portEdit->value());
-}
-
-
 void MainWindow::doClientStateChanged( int status)
 {
-    qDebug() << "ClientStateChanged: state=" << status;
-    _ui->connectStat->setChecked( status == ArnClient::ConnectStat::Connected);
-    _ui->connectStat->setVisible( _hasConnected);
+    // qDebug() << "ClientStateChanged: state=" << status;
 
-    if ((status == ArnClient::ConnectStat::Connected) && !_arnClient->isReConnect()) {
-        //// Fully connected also after any negotiation and login
+    if (status == ArnClient::ConnectStat::Negotiating) {
+        //// Initialy connected for negotiation and login
+        _hasConnected = true;
+        _arnClient->setAutoConnect( true, 2);
+        disconnect( _arnClient, SIGNAL(tcpError(QString,QAbstractSocket::SocketError)),
+                    this, SLOT(clientError(QString)));
+
+        _appSettings->setValue("connect/host", _ui->hostEdit->text());
+        _appSettings->setValue("connect/port", _ui->portEdit->value());
+    }
+    else if ((status == ArnClient::ConnectStat::Connected) && !_arnClient->isReConnect()) {
+        //// Fully connected also after any negotiation and login, but not reconnected
         if (_ui->arnView->model()) // model already set, just reset viewer
             _ui->arnView->reset();
         else    // model has not been set, do it now
@@ -352,6 +348,9 @@ void MainWindow::doClientStateChanged( int status)
         //// Manual disconnection from user
         setConnectOffGui();
     }
+
+    _ui->connectStat->setChecked( status == ArnClient::ConnectStat::Connected);
+    _ui->connectStat->setVisible( _hasConnected);
 }
 
 
@@ -375,7 +374,7 @@ void  MainWindow::doEndLogin( int resultCode)
     QString  userName;
     QString  password;
     loginDialog->getResult( userName, password);
-    qDebug() << "doEndLogin user=" << userName << " pass=" << password;
+    // qDebug() << "doEndLogin user=" << userName << " pass=" << password;
 
     _arnClient->loginToArn( userName, password);
 }
@@ -391,7 +390,7 @@ void  MainWindow::clientError( QString errorText)
 
     QMessageBox msgBox;
     msgBox.setWindowTitle( tr("Error"));
-    msgBox.setIcon( QMessageBox::Information);
+    msgBox.setIcon( QMessageBox::Warning);
     msgBox.setText( tr("Can not Connect to Host"));
     msgBox.setInformativeText( errorText);
     msgBox.exec();
@@ -423,7 +422,7 @@ void  MainWindow::changeEvent(QEvent *e)
 
 void  MainWindow::closeEvent( QCloseEvent* event)
 {
-    qDebug() << "MainWindow: Close event";
+    // qDebug() << "MainWindow: Close event";
     writeSettings();
     event->accept();
 }
@@ -452,7 +451,7 @@ void  MainWindow::readSettings()
 
 void  MainWindow::writeSettings()
 {
-    qDebug() << "Write main settings";
+    // qDebug() << "Write main settings";
     _appSettings->setValue("main/pos", pos());
     _appSettings->setValue("main/size", size());
     if (_ui->arnView->isEnabled())
