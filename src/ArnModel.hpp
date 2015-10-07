@@ -95,6 +95,7 @@ public:
     void  setHideBidir( bool isHide);
     void  start();
     void  clear();
+    void  doFakePath( const QString& path);
 
     QModelIndex  index( int row, int column, const QModelIndex &parent)  const;
     QModelIndex  parent(const QModelIndex &child)  const;
@@ -108,13 +109,16 @@ public:
     Qt::ItemFlags  flags( const QModelIndex& index)  const;
     bool  setData( const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
 
+    ArnNode*  nodeFromIndex( const QModelIndex& index)  const;
+    QModelIndex  indexFromNode( ArnNode* node, int column);
+
 signals:
     void  hiddenRow( int row, QModelIndex parent, bool isHidden)  const;
 
 public slots:
+    void  netChildFound( QString path, ArnNode* node = 0);
 
 private slots:
-    void  netChildFound( QString path);
     void  nodeDataChanged();
     void  nodeModeChanged();
     void  updateSetMap( ArnNode* node = 0);
@@ -123,8 +127,6 @@ private slots:
     void  destroyNode();
 
 private:
-    ArnNode*  nodeFromIndex( const QModelIndex& index)  const;
-    QModelIndex  indexFromNode( ArnNode* node, int column);
     void  arnMonStart( ArnNode* node);
     void  doInsertItem( const QModelIndex& index, ArnNode* node, QString path);
     bool  submitRowHidden( int row, const QModelIndex& index, const QString& name)  const;

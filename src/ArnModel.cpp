@@ -148,6 +148,38 @@ void  ArnModel::clear()
 }
 
 
+void  ArnModel::doFakePath( const QString& path)
+{
+    QString      relPath = Arn::fullPath( path).mid(1);  // Leading "/" removed
+    if (relPath.isEmpty())  return;
+
+    QModelIndex  nodeIdx = QModelIndex();
+    ArnNode*     node    = 0;
+    int          pos     = 0;
+    forever {
+        int nextPos = relPath.indexOf("/", pos) + 1;
+        if (nextPos <= 0)
+            nextPos = relPath.size();
+        QString  itemName = Arn::convertName( relPath.mid( pos, nextPos - pos));
+        pos = nextPos;
+
+        node = nodeFromIndex( nodeIdx);
+        node->_isExpanded = true;
+        netChildFound( itemName, node);
+        if (pos >= relPath.size())  break;
+
+        QList<ArnNode*>  children = node->_children;
+        int row = 0;
+        forever {
+            if (row >= children.size())  return;  // Internal failure
+            if (children.at( row)->name( Arn::NameF()) == itemName)  break;
+            ++row;
+        }
+        nodeIdx = index( row, 0, nodeIdx);
+    }
+}
+
+
 QModelIndex  ArnModel::index( int row, int column, const QModelIndex &parent) const
 {
     if (row < 0  ||  column < 0)  return QModelIndex();
@@ -511,14 +543,16 @@ bool  ArnModel::setAdjustedNodeData( ArnNode* node, const QVariant& data)
 }
 
 
-void  ArnModel::netChildFound( QString path)
+void  ArnModel::netChildFound(QString path, ArnNode* node)
 {
     // qDebug() << "arnModel netChildFound: path=" << path;
-    ArnMonitor*  arnMon = qobject_cast<ArnMonitor*>( sender());
-    Q_ASSERT( arnMon);
-    // if (!netMon)  return;
+    if (!node) {
+        ArnMonitor*  arnMon = qobject_cast<ArnMonitor*>( sender());
+        Q_ASSERT( arnMon);
+        // if (!netMon)  return;
 
-    ArnNode*  node = qobject_cast<ArnNode*>( arnMon->parent());
+        node = qobject_cast<ArnNode*>( arnMon->parent());
+    }
     Q_ASSERT( node);
     // if (!node)  return;
 

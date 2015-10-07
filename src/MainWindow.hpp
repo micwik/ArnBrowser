@@ -60,6 +60,7 @@ private slots:
     void  doClientStateChanged( int status);
     void  doStartLogin( int contextCode);
     void  doEndLogin( int resultCode);
+    void  doRinfo( int type, const QByteArray& data);
     void  clientError( QString errorText);
     void  on_connectButton_clicked();
     void  on_discoverButton_clicked();
@@ -82,10 +83,12 @@ protected:
     void changeEvent( QEvent *e);
     void closeEvent( QCloseEvent *event);
 
-private:    
+private:
+    void  doPostLoginCancel();
     void  connection( bool isConnect);
     void  setConnectionState( bool isConnect);
     void  setConnectOffGui();
+    void  setFuncButtonOffGui();
     void  updateHiddenTree( const QModelIndex& index);
 
     Ui::MainWindow*  _ui;
@@ -94,12 +97,14 @@ private:
     ArnModel*  _arnModel;
     ArnClient*  _arnClient;
     Connector*  _connector;
+    QStringList  _freePaths;
 
     QSettings*  _appSettings;
     QString  _curItemPath;
     int  _pathWidth;
     bool  _isConnect;
     bool  _hasConnected;
+    bool  _runPostLoginCancel;
 };
 
 #endif // MAINWINDOW_HPP
