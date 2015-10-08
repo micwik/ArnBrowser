@@ -97,7 +97,6 @@ private:
     ArnModel*  _arnModel;
     ArnClient*  _arnClient;
     Connector*  _connector;
-    QStringList  _freePaths;
 
     QSettings*  _appSettings;
     QString  _curItemPath;
@@ -105,6 +104,7 @@ private:
     bool  _isConnect;
     bool  _hasConnected;
     bool  _runPostLoginCancel;
+    int  _loginContextCode;
 };
 
 #endif // MAINWINDOW_HPP

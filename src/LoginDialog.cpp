@@ -61,6 +61,10 @@ LoginDialog::LoginDialog( int contextCode, QWidget* parent) :
         _ui->messageLabel->setText("ARN server don't support login as demanded");
         setGuiNoLogin();
         break;
+    case 4:
+        _ui->messageLabel->setText("ARN server bad sequence during negotiation");
+        setGuiNoLogin();
+        break;
     default:
         break;
     }

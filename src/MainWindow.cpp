@@ -66,6 +66,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _isConnect    = false;
     _hasConnected = false;
     _runPostLoginCancel = false;
+    _loginContextCode   = 0;
 
     QLabel*  curItemPathLabel = new QLabel;
     curItemPathLabel->setText("Path:");
@@ -367,6 +368,7 @@ void MainWindow::doClientStateChanged( int status)
 
 void  MainWindow::doStartLogin( int contextCode)
 {
+    _loginContextCode = contextCode;
     LoginDialog*  loginDialog = new LoginDialog( contextCode, 0);
     connect( loginDialog, SIGNAL(finished(int)), this, SLOT(doEndLogin(int)));
 }
@@ -375,11 +377,16 @@ void  MainWindow::doStartLogin( int contextCode)
 void  MainWindow::doEndLogin( int resultCode)
 {
     if (resultCode != QDialog::Accepted) {
+        if (_loginContextCode >= 2) {  // Fatal connection problem, abort
+            connection( false);
+            return;
+        }
+        //// Proceed with only viewing freePaths
         doClientStateChanged( ArnClient::ConnectStat::Connected);
         _arnClient->loginToArn("", "");  // Empty login to set local allow (all)
 
         _runPostLoginCancel = true;
-        _arnClient->commandInfo( Arn::InfoType::FreePaths);
+        _arnClient->commandInfo( Arn::InfoType::Custom);
 
         setFuncButtonOffGui();
         return;
@@ -401,9 +408,10 @@ void MainWindow::doPostLoginCancel()
 {
     if (!_runPostLoginCancel)  return;  // Only run in apropriate sequence
     _runPostLoginCancel = false;
-    // qDebug() << "doPostLoginCancel: freePaths=" << _freePaths;
+    QStringList  freePaths = _arnClient->freePaths();
+    // qDebug() << "doPostLoginCancel: freePaths=" << freePaths;
 
-    foreach (const QString& path, _freePaths) {
+    foreach (const QString& path, freePaths) {
         _arnModel->doFakePath( path);
     }
 }
@@ -412,14 +420,10 @@ void MainWindow::doPostLoginCancel()
 void  MainWindow::doRinfo( int type, const QByteArray& data)
 {
     switch (type) {
-    case Arn::InfoType::FreePaths:
+    case Arn::InfoType::Custom:
     {
         Arn::XStringMap  xm( data);
-        _freePaths = xm.values();
-
-        foreach (const QString& path, _freePaths) {
-            _arnClient->addFreePath( path);
-        }
+        Q_UNUSED(xm);
 
         doPostLoginCancel();
         break;
