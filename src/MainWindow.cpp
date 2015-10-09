@@ -37,6 +37,7 @@
 #include "CodeWindow.hpp"
 #include "ManageWindow.hpp"
 #include "VcsWindow.hpp"
+#include "SettingsWindow.hpp"
 #include "DiscoverWindow.hpp"
 #include "LoginDialog.hpp"
 #include "MultiDelegate.hpp"
@@ -264,6 +265,12 @@ void  MainWindow::on_vcsButton_clicked()
 {
     VcsWindow*  vcsWindow = new VcsWindow( _appSettings, _connector, 0);
     vcsWindow->show();
+}
+
+
+void MainWindow::on_settingsButton_clicked()
+{
+    SettingsWindow*  settings = new SettingsWindow(0);
 }
 
 

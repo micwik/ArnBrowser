@@ -37,7 +37,8 @@ SOURCES += src/main.cpp \
     src/MTextEdit.cpp \
     src/Connector.cpp \
     src/LogWindow.cpp \
-    src/LoginDialog.cpp
+    src/LoginDialog.cpp \
+    src/SettingsWindow.cpp
 
 HEADERS += src/MainWindow.hpp \
     src/TermWindow.hpp \
@@ -52,7 +53,8 @@ HEADERS += src/MainWindow.hpp \
     src/DiscoverWindow.hpp \
     src/Connector.hpp \
     src/LogWindow.hpp \
-    src/LoginDialog.hpp
+    src/LoginDialog.hpp \
+    src/SettingsWindow.hpp
 
 FORMS += src/MainWindow.ui \
     src/TermWindow.ui \
@@ -61,7 +63,8 @@ FORMS += src/MainWindow.ui \
     src/VcsWindow.ui \
     src/DiscoverWindow.ui \
     src/LogWindow.ui \
-    src/LoginDialog.ui
+    src/LoginDialog.ui \
+    src/SettingsWindow.ui
 
 RESOURCES += \
     src/files.qrc
