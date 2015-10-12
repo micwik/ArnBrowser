@@ -64,9 +64,12 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     _ui->setupUi( this);
 
-    _isConnect    = false;
-    _hasConnected = false;
+    _isConnect          = false;
+    _wasContact         = false;
+    _wasConnect         = false;
+    _isLoginCancel      = false;
     _runPostLoginCancel = false;
+    _isLoginDialog      = false;
     _loginContextCode   = 0;
 
     QLabel*  curItemPathLabel = new QLabel;
@@ -140,8 +143,10 @@ void  MainWindow::on_connectButton_clicked()
 
 void  MainWindow::connection( bool isConnect)
 {
+    bool  wasConnect = _wasConnect;
     setConnectionState( isConnect);
 
+    _isLoginCancel = false;
     _ui->connectButton->setEnabled( false);
     if (isConnect) {
         connect( _arnClient, SIGNAL(tcpError(QString,QAbstractSocket::SocketError)),
@@ -152,9 +157,17 @@ void  MainWindow::connection( bool isConnect)
         _ui->hostEdit->setEnabled( false);
         _ui->portEdit->setEnabled( false);
     }
-    else {
+    else if (wasConnect) {
         _arnModel->clear();
+        ArnClient::ConnectStat  stat = _arnClient->connectStatus();
+        if ((stat != ArnClient::ConnectStat::Connected)  // No contact with server
+        &&  (stat != ArnClient::ConnectStat::Negotiating))
+            setConnectOffGui();
         _arnClient->close();
+    }
+    else {  // Never got connected but got contact, model not dirty
+        _arnClient->close();
+        setConnectOffGui();
     }
 }
 
@@ -162,8 +175,10 @@ void  MainWindow::connection( bool isConnect)
 void  MainWindow::setConnectionState( bool isConnect)
 {
     _isConnect = isConnect;
-    if (!isConnect)
-        _hasConnected = false;
+    if (!isConnect) {
+        _wasContact = false;
+        _wasConnect = false;
+    }
     _ui->connectButton->setChecked( isConnect);
 }
 
@@ -271,6 +286,7 @@ void  MainWindow::on_vcsButton_clicked()
 void MainWindow::on_settingsButton_clicked()
 {
     SettingsWindow*  settings = new SettingsWindow(0);
+    Q_UNUSED(settings);
 }
 
 
@@ -329,9 +345,10 @@ void MainWindow::doClientStateChanged( int status)
 {
     // qDebug() << "ClientStateChanged: state=" << status;
 
-    if (status == ArnClient::ConnectStat::Negotiating) {
+    if ((status == ArnClient::ConnectStat::Negotiating) && !_arnClient->isReContact()) {
         //// Initialy connected for negotiation and login
-        _hasConnected = true;
+        // qDebug() << "ClientStateChanged Negotiating (!reContact):";
+        _wasContact = true;
         _arnClient->setAutoConnect( true, 2);
         disconnect( _arnClient, SIGNAL(tcpError(QString,QAbstractSocket::SocketError)),
                     this, SLOT(clientError(QString)));
@@ -341,6 +358,8 @@ void MainWindow::doClientStateChanged( int status)
     }
     else if ((status == ArnClient::ConnectStat::Connected) && !_arnClient->isReConnect()) {
         //// Fully connected also after any negotiation and login, but not reconnected
+        // qDebug() << "ClientStateChanged Connected (!reConnect):";
+        _wasConnect = true;
         if (_ui->arnView->model()) { // model already set, just reset viewer
             _arnModel->clear();  // Needed after a canceled login (why?)
             _ui->arnView->reset();
@@ -365,17 +384,23 @@ void MainWindow::doClientStateChanged( int status)
     }
     else if ((status == ArnClient::ConnectStat::Disconnected) && !_isConnect) {
         //// Manual disconnection from user
+        // qDebug() << "ClientStateChanged Manual Disconnect:";
         setConnectOffGui();
     }
 
-    _ui->connectStat->setChecked( status == ArnClient::ConnectStat::Connected);
-    _ui->connectStat->setVisible( _hasConnected);
+    _ui->connectStat->setChecked( (status == ArnClient::ConnectStat::Connected)
+                              || ((status == ArnClient::ConnectStat::Negotiating) && _isLoginCancel));
+    _ui->connectStat->setVisible( _wasContact);
 }
 
 
 void  MainWindow::doStartLogin( int contextCode)
 {
+    if (_isLoginDialog)  return;  // Login dialog already in use
+    if (_isLoginCancel)  return;  // User has canceled login earlier
+
     _loginContextCode = contextCode;
+    _isLoginDialog    = true;
     LoginDialog*  loginDialog = new LoginDialog( contextCode, 0);
     connect( loginDialog, SIGNAL(finished(int)), this, SLOT(doEndLogin(int)));
 }
@@ -383,6 +408,8 @@ void  MainWindow::doStartLogin( int contextCode)
 
 void  MainWindow::doEndLogin( int resultCode)
 {
+    _isLoginDialog = false;
+
     if (resultCode != QDialog::Accepted) {
         if (_loginContextCode >= 2) {  // Fatal connection problem, abort
             connection( false);
@@ -393,6 +420,7 @@ void  MainWindow::doEndLogin( int resultCode)
         _arnClient->loginToArn("", "");  // Empty login to set local allow (all)
 
         _runPostLoginCancel = true;
+        _isLoginCancel      = true;
         _arnClient->commandInfo( Arn::InfoType::Custom);
 
         setFuncButtonOffGui();
@@ -407,7 +435,10 @@ void  MainWindow::doEndLogin( int resultCode)
     loginDialog->getResult( userName, password);
     // qDebug() << "doEndLogin user=" << userName << " pass=" << password;
 
-    _arnClient->loginToArn( userName, password);
+    _arnClient->loginToArn( userName, password);    
+
+    if (_arnClient->connectStatus() != ArnClient::ConnectStat::Negotiating)  // Lost ArnServer ?
+        _ui->connectButton->setEnabled( true);
 }
 
 

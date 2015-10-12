@@ -103,8 +103,11 @@ private:
     QString  _curItemPath;
     int  _pathWidth;
     bool  _isConnect;
-    bool  _hasConnected;
+    bool  _wasContact;
+    bool  _wasConnect;
     bool  _runPostLoginCancel;
+    bool  _isLoginCancel;
+    bool  _isLoginDialog;
     int  _loginContextCode;
 };
 
