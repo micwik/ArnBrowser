@@ -13,5 +13,13 @@
         <file>pic/close.png</file>
         <file>pic/arn_browser_128.png</file>
         <file>pic/document_valid.png</file>
+        <file>pic/arn_browser_128.ico</file>
+        <file>pic/terminal.png</file>
+        <file>pic/Pencil-icon.png</file>
+        <file>pic/tools-icon.png</file>
+        <file>pic/Settings-icon.png</file>
+        <file>pic/empty.png</file>
+        <file>pic/old-versions.png</file>
+        <file>pic/Play.png</file>
     </qresource>
 </RCC>
