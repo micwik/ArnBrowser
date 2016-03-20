@@ -39,6 +39,7 @@
 #include "VcsWindow.hpp"
 #include "SettingsWindow.hpp"
 #include "DiscoverWindow.hpp"
+#include "ChatServWindow.hpp"
 #include "LoginDialog.hpp"
 #include "MultiDelegate.hpp"
 #include <ArnInc/ArnClient.hpp>
@@ -95,6 +96,13 @@ MainWindow::MainWindow(QWidget *parent) :
     connect( _arnClient, SIGNAL(connectionStatusChanged(int,int)), this, SLOT(doClientStateChanged(int)));
     connect( _arnClient, SIGNAL(loginRequired(int)), this, SLOT(doStartLogin(int)));
     connect( _arnClient, SIGNAL(replyInfo(int,QByteArray)), SLOT(doRinfo(int,QByteArray)));
+    connect( _arnClient, SIGNAL(killRequested()), this, SLOT(onKillRequest()));
+    connect( _arnClient, SIGNAL(chatReceived(QString,int)), this, SLOT(onChatReceived(QString,int)));
+
+    //// Setup WhoIAm
+    Arn::XStringMap  wimXsm;
+    wimXsm.add("Agent", "Arn Browser - " + ver);
+    _arnClient->setWhoIAm( wimXsm);
 
     //// Setup model
     _arnModel = new ArnModel( _connector, this);
@@ -116,6 +124,10 @@ MainWindow::MainWindow(QWidget *parent) :
     _ui->hostEdit->setText( host);    // Default host
     _ui->portEdit->setValue( port);
     _ui->connectStat->hide();
+
+    _chatServWin = new ChatServWindow( _appSettings, this);
+    connect( _chatServWin, SIGNAL(txtOutput(QString)), this, SLOT(doChatAdd(QString)));
+    connect( _chatServWin, SIGNAL(abortKillRequest()), this , SLOT(doAbortKillRequest()));
 
 #if QT_VERSION >= 0x050000 && QT_VERSION < 0x050300
     _ui->portEdit->setRange( 1, 1065535);  // Fix early Qt5 layout bug giving to little space
@@ -224,6 +236,12 @@ void  MainWindow::on_discoverButton_clicked()
     _ui->portEdit->setValue( hostPort);
 
     connection( true);
+}
+
+
+void  MainWindow::on_chatButton_clicked()
+{
+    _chatServWin->setVisible( true);
 }
 
 
@@ -495,6 +513,33 @@ void  MainWindow::updateHidden(int row, QModelIndex parent, bool isHidden)
         _ui->arnView->setRowHidden( row, parent, hide);
         // qDebug() << "UpdateHidden: row=" << row << "hide=" << hide;
     }
+}
+
+
+void MainWindow::onKillRequest()
+{
+    connection( false);
+}
+
+
+void  MainWindow::onChatReceived( const QString& text, int prioType)
+{
+    if (prioType == 1)
+        _chatServWin->addTxtPrio( text);
+    else
+        _chatServWin->addTxtNormal( text);
+}
+
+
+void  MainWindow::doChatAdd( const QString& text)
+{
+    _arnClient->chatSend( text, 2);
+}
+
+
+void MainWindow::doAbortKillRequest()
+{
+    _arnClient->abortKillRequest();
 }
 
 

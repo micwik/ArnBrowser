@@ -43,6 +43,7 @@ class QSettings;
 class QCloseEvent;
 class QLabel;
 class QLineEdit;
+class ChatServWindow;
 
 namespace Ui {
     class MainWindow;
@@ -64,6 +65,7 @@ private slots:
     void  clientError( QString errorText);
     void  on_connectButton_clicked();
     void  on_discoverButton_clicked();
+    void  on_chatButton_clicked();
     void  on_terminalButton_clicked();
     void  on_logButton_clicked();
     void  on_editButton_clicked();
@@ -79,6 +81,10 @@ private slots:
     void  writeSettings();
     //void  dataChanged( const QModelIndex& topLeft, const QModelIndex& bottomRight);
     void  updateHidden( int row, QModelIndex parent, bool isHidden);
+    void  onKillRequest();
+    void  onChatReceived( const QString& text, int prioType);
+    void  doChatAdd( const QString& text);
+    void  doAbortKillRequest();
 
 protected:
     void changeEvent( QEvent *e);
@@ -93,6 +99,7 @@ private:
     void  updateHiddenTree( const QModelIndex& index);
 
     Ui::MainWindow*  _ui;
+    ChatServWindow*  _chatServWin;
     QLineEdit*  _curItemPathStatus;
     MultiDelegate*  _delegate;
     ArnModel*  _arnModel;

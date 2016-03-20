@@ -38,7 +38,8 @@ SOURCES += src/main.cpp \
     src/Connector.cpp \
     src/LogWindow.cpp \
     src/LoginDialog.cpp \
-    src/SettingsWindow.cpp
+    src/SettingsWindow.cpp \
+    src/ChatServWindow.cpp
 
 HEADERS += src/MainWindow.hpp \
     src/TermWindow.hpp \
@@ -54,7 +55,8 @@ HEADERS += src/MainWindow.hpp \
     src/Connector.hpp \
     src/LogWindow.hpp \
     src/LoginDialog.hpp \
-    src/SettingsWindow.hpp
+    src/SettingsWindow.hpp \
+    src/ChatServWindow.hpp
 
 FORMS += src/MainWindow.ui \
     src/TermWindow.ui \
@@ -64,7 +66,8 @@ FORMS += src/MainWindow.ui \
     src/DiscoverWindow.ui \
     src/LogWindow.ui \
     src/LoginDialog.ui \
-    src/SettingsWindow.ui
+    src/SettingsWindow.ui \
+    src/ChatServWindow.ui
 
 RESOURCES += \
     src/files.qrc
