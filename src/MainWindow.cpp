@@ -179,7 +179,7 @@ void  MainWindow::connection( bool isConnect)
                  this, SLOT(clientError(QString)));
         _arnClient->connectToArn( _ui->hostEdit->text(), _ui->portEdit->value());
         _connector->setCurHost( _ui->hostEdit->text());
-        _ui->discoverButton->setEnabled( false);
+        _ui->discoverButton->setVisible( false);
         _ui->hostEdit->setEnabled( false);
         _ui->portEdit->setEnabled( false);
     }
@@ -215,7 +215,7 @@ void MainWindow::setConnectOffGui()
 
     _ui->connectStat->setVisible( false);
     _ui->connectButton->setEnabled( true);
-    _ui->discoverButton->setEnabled( true);
+    _ui->discoverButton->setVisible( true);
     _ui->chatButton->setVisible( false);
 
     _ui->hostEdit->setEnabled( true);
