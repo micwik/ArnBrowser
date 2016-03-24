@@ -291,9 +291,22 @@ QCheckBox::indicator:disabled:checked[class=trafic] {
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="chatButton">
+       <widget class="QToolButton" name="chatButton">
         <property name="text">
          <string>Chat</string>
+        </property>
+        <property name="icon">
+         <iconset resource="files.qrc">
+          <normaloff>:/pic/chat.png</normaloff>:/pic/chat.png</iconset>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
+        </property>
+        <property name="autoRaise">
+         <bool>false</bool>
+        </property>
+        <property name="arrowType">
+         <enum>Qt::NoArrow</enum>
         </property>
        </widget>
       </item>

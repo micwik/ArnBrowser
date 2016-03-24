@@ -69,7 +69,7 @@ private slots:
     void  writeSettings();
 
 protected:
-    void closeEvent( QCloseEvent *event);
+    void  closeEvent( QCloseEvent *event);
 
 private:
     void  addTxtLocal( const QString& text);

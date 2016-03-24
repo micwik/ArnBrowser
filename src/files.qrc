@@ -21,5 +21,6 @@
         <file>pic/empty.png</file>
         <file>pic/old-versions.png</file>
         <file>pic/Play.png</file>
+        <file>pic/chat.png</file>
     </qresource>
 </RCC>

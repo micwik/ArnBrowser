@@ -43,8 +43,6 @@ ChatServWindow::ChatServWindow( QSettings* appSettings, QWidget* parent)
 {
     _ui->setupUi( this);
 
-    //this->setWindowTitle( QString("Terminal ") + normPath + " @" + curHost);
-
     _appSettings = appSettings;
     readSettings();
 
@@ -75,6 +73,7 @@ void  ChatServWindow::on_clearButton_clicked()
 
 void  ChatServWindow::on_abortKillButton_clicked()
 {
+    // qDebug() << "AbortButton clicked";
     emit abortKillRequest();
 }
 
@@ -114,10 +113,9 @@ void  ChatServWindow::doLineInput()
 
 void  ChatServWindow::closeEvent( QCloseEvent* event)
 {
-    qDebug() << "Close event ChatServWindow";
+    // qDebug() << "Close event ChatServWindow";
     writeSettings();
     event->accept();
-    deleteLater();
 }
 
 

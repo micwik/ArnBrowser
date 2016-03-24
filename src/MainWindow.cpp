@@ -50,7 +50,9 @@
 #include <QLineEdit>
 #include <QSettings>
 #include <QCloseEvent>
+#include <QGraphicsColorizeEffect>
 #include <QDebug>
+#include <math.h>
 #ifdef QMLRUN
   #include "QmlRunWindow.hpp"
   #include <ArnInc/ArnQml.hpp>
@@ -80,6 +82,15 @@ MainWindow::MainWindow(QWidget *parent) :
     _curItemPathStatus->setStyleSheet("QLineEdit{background: lightgrey;}");
     _ui->statusBar->addPermanentWidget( curItemPathLabel);
     _ui->statusBar->addPermanentWidget( _curItemPathStatus);
+
+    _timerChatButEff = new QTimer( this);
+    _timerChatButEff->setInterval(20);
+    connect( _timerChatButEff, SIGNAL(timeout()), this, SLOT(doChatButtonEffect()));
+    _countChatButEff = 0;
+    _chatButEff = new QGraphicsColorizeEffect;
+    _chatButEff->setColor( QColor(254,89,6));
+    _ui->chatButton->setGraphicsEffect( _chatButEff);
+    setChatButEff( false);
 
     _appSettings = new QSettings("MicTron", "ArnBrowser");
 
@@ -136,6 +147,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect( _ui->arnView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemClicked(QModelIndex)));
 
     setConnectOffGui();
+    // Test chat button
+    //_ui->chatButton->setVisible(true);
+    //setChatButEff( true);
 }
 
 
@@ -202,6 +216,7 @@ void MainWindow::setConnectOffGui()
     _ui->connectStat->setVisible( false);
     _ui->connectButton->setEnabled( true);
     _ui->discoverButton->setEnabled( true);
+    _ui->chatButton->setVisible( false);
 
     _ui->hostEdit->setEnabled( true);
     _ui->portEdit->setEnabled( true);
@@ -241,7 +256,8 @@ void  MainWindow::on_discoverButton_clicked()
 
 void  MainWindow::on_chatButton_clicked()
 {
-    _chatServWin->setVisible( true);
+    _chatServWin->setVisible( !_chatServWin->isVisible());
+    setChatButEff( false);
 }
 
 
@@ -409,6 +425,8 @@ void MainWindow::doClientStateChanged( int status)
     _ui->connectStat->setChecked( (status == ArnClient::ConnectStat::Connected)
                               || ((status == ArnClient::ConnectStat::Negotiating) && _isLoginCancel));
     _ui->connectStat->setVisible( _wasContact);
+
+    _ui->chatButton->setVisible( _wasConnect);
 }
 
 
@@ -522,12 +540,38 @@ void MainWindow::onKillRequest()
 }
 
 
+void  MainWindow::setChatButEff( bool isOn)
+{
+    if (isOn && _chatButEff->isEnabled())  return;  // Already enabled (don't disturb cycle)
+
+    _chatButEff->setEnabled( isOn);
+    if (isOn) {
+        _timerChatButEff->start();
+    }
+    else {
+        _timerChatButEff->stop();
+    }
+    _countChatButEff = 0;
+}
+
+
+void  MainWindow::doChatButtonEffect()
+{
+    _countChatButEff = (_countChatButEff + 10) % 1000;
+    double  str = .5 + .5 * sin( 2 * M_PI * _countChatButEff / 1000);
+    _chatButEff->setStrength( str);
+}
+
+
 void  MainWindow::onChatReceived( const QString& text, int prioType)
 {
     if (prioType == 1)
         _chatServWin->addTxtPrio( text);
-    else
+    else {
         _chatServWin->addTxtNormal( text);
+        if (!_chatServWin->isVisible())
+            setChatButEff( true);
+    }
 }
 
 
@@ -561,6 +605,8 @@ void  MainWindow::closeEvent( QCloseEvent* event)
     // qDebug() << "MainWindow: Close event";
     writeSettings();
     event->accept();
+
+    _chatServWin->close();
 }
 
 

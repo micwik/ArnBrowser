@@ -39,11 +39,13 @@
 #include "Connector.hpp"
 
 class MultiDelegate;
+class ChatServWindow;
 class QSettings;
 class QCloseEvent;
 class QLabel;
 class QLineEdit;
-class ChatServWindow;
+class QGraphicsColorizeEffect;
+class QTimer;
 
 namespace Ui {
     class MainWindow;
@@ -85,6 +87,7 @@ private slots:
     void  onChatReceived( const QString& text, int prioType);
     void  doChatAdd( const QString& text);
     void  doAbortKillRequest();
+    void  doChatButtonEffect();
 
 protected:
     void changeEvent( QEvent *e);
@@ -97,9 +100,15 @@ private:
     void  setConnectOffGui();
     void  setFuncButtonOffGui();
     void  updateHiddenTree( const QModelIndex& index);
+    void  setChatButEff( bool isOn);
 
     Ui::MainWindow*  _ui;
+
     ChatServWindow*  _chatServWin;
+    QGraphicsColorizeEffect*  _chatButEff;
+    QTimer*  _timerChatButEff;
+    int  _countChatButEff;
+
     QLineEdit*  _curItemPathStatus;
     MultiDelegate*  _delegate;
     ArnModel*  _arnModel;
