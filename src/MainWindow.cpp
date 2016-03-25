@@ -42,6 +42,7 @@
 #include "ChatServWindow.hpp"
 #include "LoginDialog.hpp"
 #include "MultiDelegate.hpp"
+#include "SettingsHandler.hpp"
 #include <ArnInc/ArnClient.hpp>
 #include <ArnInc/XStringMap.hpp>
 #include <QMessageBox>
@@ -93,6 +94,8 @@ MainWindow::MainWindow(QWidget *parent) :
     setChatButEff( false);
 
     _appSettings = new QSettings("MicTron", "ArnBrowser");
+    _settings    = new SettingsHandler( _appSettings);
+    _settings->readSettings();
 
     //// Error log from Arn system
     ArnM::setConsoleError( false);
@@ -109,11 +112,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect( _arnClient, SIGNAL(replyInfo(int,QByteArray)), SLOT(doRinfo(int,QByteArray)));
     connect( _arnClient, SIGNAL(killRequested()), this, SLOT(onKillRequest()));
     connect( _arnClient, SIGNAL(chatReceived(QString,int)), this, SLOT(onChatReceived(QString,int)));
-
-    //// Setup WhoIAm
-    Arn::XStringMap  wimXsm;
-    wimXsm.add("Agent", "Arn Browser - " + ver);
-    _arnClient->setWhoIAm( wimXsm);
 
     //// Setup model
     _arnModel = new ArnModel( _connector, this);
@@ -177,6 +175,14 @@ void  MainWindow::connection( bool isConnect)
     if (isConnect) {
         connect( _arnClient, SIGNAL(tcpError(QString,QAbstractSocket::SocketError)),
                  this, SLOT(clientError(QString)));
+        //// Setup WhoIAm
+        Arn::XStringMap  wimXsm;
+        wimXsm.add("Agent", "Arn Browser - " + ver);
+        wimXsm.add("UserName", _settings->d.userName);
+        wimXsm.add("Contact",  _settings->d.contact);
+        wimXsm.add("Location", _settings->d.location);
+        _arnClient->setWhoIAm( wimXsm);
+
         _arnClient->connectToArn( _ui->hostEdit->text(), _ui->portEdit->value());
         _connector->setCurHost( _ui->hostEdit->text());
         _ui->discoverButton->setVisible( false);
@@ -319,8 +325,8 @@ void  MainWindow::on_vcsButton_clicked()
 
 void MainWindow::on_settingsButton_clicked()
 {
-    SettingsWindow*  settings = new SettingsWindow(0);
-    Q_UNUSED(settings);
+    SettingsWindow*  settingsWin = new SettingsWindow( _settings, 0);
+    Q_UNUSED(settingsWin);
 }
 
 

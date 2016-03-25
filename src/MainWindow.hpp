@@ -40,6 +40,7 @@
 
 class MultiDelegate;
 class ChatServWindow;
+class SettingsHandler;
 class QSettings;
 class QCloseEvent;
 class QLabel;
@@ -115,6 +116,7 @@ private:
     ArnClient*  _arnClient;
     Connector*  _connector;
 
+    SettingsHandler*  _settings;
     QSettings*  _appSettings;
     QString  _curItemPath;
     int  _pathWidth;

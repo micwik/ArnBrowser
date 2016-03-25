@@ -39,7 +39,8 @@ SOURCES += src/main.cpp \
     src/LogWindow.cpp \
     src/LoginDialog.cpp \
     src/SettingsWindow.cpp \
-    src/ChatServWindow.cpp
+    src/ChatServWindow.cpp \
+    src/SettingsHandler.cpp
 
 HEADERS += src/MainWindow.hpp \
     src/TermWindow.hpp \
@@ -56,7 +57,8 @@ HEADERS += src/MainWindow.hpp \
     src/LogWindow.hpp \
     src/LoginDialog.hpp \
     src/SettingsWindow.hpp \
-    src/ChatServWindow.hpp
+    src/ChatServWindow.hpp \
+    src/SettingsHandler.hpp
 
 FORMS += src/MainWindow.ui \
     src/TermWindow.ui \

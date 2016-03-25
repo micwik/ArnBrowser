@@ -35,6 +35,8 @@
 
 #include <QDialog>
 
+class SettingsHandler;
+class QSettings;
 class QCloseEvent;
 
 namespace Ui {
@@ -47,7 +49,7 @@ class SettingsWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit SettingsWindow(QWidget *parent = 0);
+    explicit SettingsWindow( SettingsHandler* settings, QWidget *parent = 0);
     ~SettingsWindow();
 
     virtual void  accept();
@@ -60,7 +62,12 @@ private slots:
     void  on_generateButton_clicked();
 
 private:
+    void  readSettings();
+    void  writeSettings();
+
     Ui::SettingsWindow *_ui;
+    SettingsHandler*  _settings;
+    QSettings*  _appSettings;
 };
 
 #endif // SETTINGSWINDOW_HPP

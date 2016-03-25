@@ -22,7 +22,7 @@
         <enum>QTabWidget::North</enum>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="toolsTab">
         <attribute name="title">
@@ -73,7 +73,7 @@
                   <item row="1" column="0">
                    <widget class="QLabel" name="hashText">
                     <property name="text">
-                     <string>Hash</string>
+                     <string>&amp;Hash</string>
                     </property>
                     <property name="buddy">
                      <cstring>hashEdit</cstring>
@@ -147,6 +147,104 @@
         <attribute name="title">
          <string>General</string>
         </attribute>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <item>
+            <spacer name="verticalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Preferred</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>10</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <item>
+              <layout class="QGridLayout" name="gridLayout_2">
+               <item row="0" column="0">
+                <widget class="QLabel" name="userNameTxt">
+                 <property name="text">
+                  <string>&amp;User name</string>
+                 </property>
+                 <property name="buddy">
+                  <cstring>userNameEdit</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="userNameEdit"/>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="contactTxt">
+                 <property name="text">
+                  <string>&amp;Contact</string>
+                 </property>
+                 <property name="buddy">
+                  <cstring>contactEdit</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLineEdit" name="contactEdit"/>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="locationTxt">
+                 <property name="text">
+                  <string>&amp;Location</string>
+                 </property>
+                 <property name="buddy">
+                  <cstring>locationEdit</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLineEdit" name="locationEdit"/>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Preferred</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </widget>
       </widget>
      </item>

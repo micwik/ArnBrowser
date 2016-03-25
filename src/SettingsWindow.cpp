@@ -32,13 +32,15 @@
 
 #include "SettingsWindow.hpp"
 #include "ui_SettingsWindow.h"
+#include "SettingsHandler.hpp"
 #include <ArnInc/ArnClient.hpp>
 #include <QDialogButtonBox>
 #include <QCloseEvent>
+#include <QSettings>
 #include <QDebug>
 
 
-SettingsWindow::SettingsWindow( QWidget* parent) :
+SettingsWindow::SettingsWindow( SettingsHandler* settings, QWidget* parent) :
     QDialog( parent),
     _ui( new Ui::SettingsWindow)
 {
@@ -46,6 +48,10 @@ SettingsWindow::SettingsWindow( QWidget* parent) :
     this->setWindowTitle( QString("Settings - ArnBrowser"));
     setModal( true);
     show();
+
+    _settings    = settings;
+    _appSettings = _settings->appSettings();
+    readSettings();
 }
 
 
@@ -72,6 +78,7 @@ void  SettingsWindow::reject()
 void  SettingsWindow::closeEvent( QCloseEvent* event)
 {
     // qDebug() << "SettingsWindow Close event";
+    writeSettings();
     event->accept();
     deleteLater();
 }
@@ -81,4 +88,30 @@ void  SettingsWindow::on_generateButton_clicked()
 {
     QString  pwHashed = ArnClient::passwordHash( _ui->passwordEdit->text());
     _ui->hashEdit->setText( pwHashed);
+}
+
+
+void  SettingsWindow::readSettings()
+{
+    QPoint  pos   = _appSettings->value("set/pos", QPoint(200, 200)).toPoint();
+    // QSize   size  = _appSettings->value("set/size", QSize(600, 500)).toSize();
+    // resize( size);
+    move( pos);
+
+    _ui->userNameEdit->setText( _settings->d.userName);
+    _ui->contactEdit->setText(  _settings->d.contact);
+    _ui->locationEdit->setText( _settings->d.location);
+}
+
+
+void  SettingsWindow::writeSettings()
+{
+    // qDebug() << "Write settings";
+    _appSettings->setValue("set/pos", pos());
+    _appSettings->setValue("set/size", size());
+
+    _settings->d.userName = _ui->userNameEdit->text();
+    _settings->d.contact  = _ui->contactEdit->text();
+    _settings->d.location = _ui->locationEdit->text();
+    _settings->writeSettings();
 }
