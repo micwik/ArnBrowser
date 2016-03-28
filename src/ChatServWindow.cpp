@@ -48,6 +48,7 @@ ChatServWindow::ChatServWindow( QSettings* appSettings, QWidget* parent)
 
     _ui->textEdit->setReadOnly( true);
     _ui->lineEdit->setFocus();
+    reset();
 
     connect( _ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(doLineInput()));
 }
@@ -56,6 +57,12 @@ ChatServWindow::ChatServWindow( QSettings* appSettings, QWidget* parent)
 ChatServWindow::~ChatServWindow()
 {
     delete _ui;
+}
+
+
+void  ChatServWindow::reset()
+{
+    _ui->textEdit->clear();
 }
 
 

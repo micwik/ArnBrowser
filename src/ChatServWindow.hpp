@@ -52,7 +52,7 @@ public:
     explicit ChatServWindow( QSettings* appSettings, QWidget* parent = 0);
     ~ChatServWindow();
 
-//public slots:
+    void  reset();
     void  addTxtNormal( const QString& text);
     void  addTxtPrio( const QString& text);
 

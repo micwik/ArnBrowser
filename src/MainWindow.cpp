@@ -420,6 +420,8 @@ void MainWindow::doClientStateChanged( int status)
         _ui->arnView->setColumnWidth(0, _pathWidth);
         _ui->arnView->setColumnWidth(1, 10);
 
+        _chatServWin->reset();
+
         _curItemPath = "/";
     }
     else if ((status == ArnClient::ConnectStat::Disconnected) && !_isConnect) {
