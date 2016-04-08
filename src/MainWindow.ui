@@ -416,7 +416,7 @@ QCheckBox::indicator:disabled:checked[class=trafic] {
           </property>
           <property name="icon">
            <iconset resource="files.qrc">
-            <normaloff>:/pic/document.png</normaloff>:/pic/document.png</iconset>
+            <normaloff>:/pic/log.png</normaloff>:/pic/log.png</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -523,7 +523,7 @@ QCheckBox::indicator:disabled:checked[class=trafic] {
           </property>
           <property name="icon">
            <iconset>
-            <normalon>:/pic/empty.png</normalon>
+            <normalon>:/pic/close.png</normalon>
            </iconset>
           </property>
           <property name="iconSize">
