@@ -40,9 +40,9 @@
 using Arn::XStringMap;
 
 
-void  ArnNode::init()
+void  ArnNode::init( ArnNode* parent)
 {
-    _parent       = 0;
+    _parent       = parent;
     _valueChild   = 0;
     _setChild     = 0;
     _propChild    = 0;
@@ -74,7 +74,7 @@ void  ArnNode::dealloc()
 void  ArnNode::reInit()
 {
     dealloc();
-    init();
+    init( _parent);
 }
 
 

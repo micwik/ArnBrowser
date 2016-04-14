@@ -311,8 +311,21 @@ void  MainWindow::on_manageButton_clicked()
 
 void  MainWindow::on_releaseButton_clicked()
 {
-    _arnModel->clear();
-    _ui->arnView->reset();
+    if (_curItemPath.isEmpty()) {
+        _arnModel->clear();
+        _ui->arnView->reset();
+    }
+    else {
+        QModelIndex  parentNodeIdx = _arnModel->parent( _ui->arnView->currentIndex());
+        ArnNode  *parentNode = _arnModel->nodeFromIndex( parentNodeIdx);
+        Q_ASSERT(parentNode);
+
+        ArnM::destroyLinkLocal( _curItemPath);
+        _arnModel->netChildFound( _curItemPath, parentNode);
+        _curItemPath = "";
+        _curItemPathStatus->setText("");
+        _ui->arnView->clearSelection();
+    }
 }
 
 
@@ -356,10 +369,20 @@ void  MainWindow::updateHiddenTree( const QModelIndex& index)
 
 void  MainWindow::itemClicked( const QModelIndex& index)
 {
-    _curItemPath = _arnModel->data( index, ArnModel::Role::Path).toString();
-    _curItemPathStatus->setText( _connector->toNormPath( _curItemPath));
-    ArnItem  arnItem( _curItemPath);
-    Arn::DataType  type = arnItem.type();
+    ArnItem  arnItem;
+    Arn::DataType  type;
+    QString  curItemPath = _arnModel->data( index, ArnModel::Role::Path).toString();
+    if (curItemPath == _curItemPath) {
+        _curItemPath = "";
+        _curItemPathStatus->setText("");
+        _ui->arnView->clearSelection();
+    }
+    else {
+        _curItemPath = curItemPath;
+        _curItemPathStatus->setText( _connector->toNormPath( _curItemPath));
+        arnItem.open( _curItemPath);
+        type = arnItem.type();
+    }
 
     // Set state for Terminal & Log button
     _ui->terminalButton->setEnabled( arnItem.isPipeMode());

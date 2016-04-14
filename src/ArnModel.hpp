@@ -54,7 +54,7 @@ public:
     ArnNode( const QString &path, QObject *qobjParent = 0);
     ArnNode( ArnNode* parent, const QString& item, int row);
     ~ArnNode();
-    void  init();
+    void  init( ArnNode* parent = 0);
     void  dealloc();
     void  reInit();
 
