@@ -311,7 +311,7 @@ void  MainWindow::on_manageButton_clicked()
 
 void  MainWindow::on_releaseButton_clicked()
 {
-    if (_curItemPath.isEmpty()) {
+    if (_curItemPath == "/") {
         _arnModel->clear();
         _ui->arnView->reset();
     }
@@ -322,7 +322,7 @@ void  MainWindow::on_releaseButton_clicked()
 
         ArnM::destroyLinkLocal( _curItemPath);
         _arnModel->netChildFound( _curItemPath, parentNode);
-        _curItemPath = "";
+        _curItemPath = "/";
         _curItemPathStatus->setText("");
         _ui->arnView->clearSelection();
     }
@@ -373,7 +373,7 @@ void  MainWindow::itemClicked( const QModelIndex& index)
     Arn::DataType  type;
     QString  curItemPath = _arnModel->data( index, ArnModel::Role::Path).toString();
     if (curItemPath == _curItemPath) {
-        _curItemPath = "";
+        _curItemPath = "/";
         _curItemPathStatus->setText("");
         _ui->arnView->clearSelection();
     }
