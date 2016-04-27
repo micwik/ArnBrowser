@@ -50,7 +50,7 @@ LogWindow::LogWindow(QSettings *appSettings, const ConnectorPath &conPath, QWidg
     _logLines = 0;
 
     QString  path = conPath.localPath();
-    QString  rqPath = Arn::providerPath( path, false);
+    QString  rqPath = Arn::providerPathIf( path, false);
 
     QString  normPath = conPath.toNormPath( rqPath);
     QString  curHost  = conPath.curHost();

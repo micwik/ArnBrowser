@@ -44,7 +44,7 @@ TermWindow::TermWindow( QSettings* appSettings, const ConnectorPath& conPath, QW
     _ui->setupUi( this);
 
     QString  path = conPath.localPath();
-    QString  rqPath = Arn::providerPath( path, false);
+    QString  rqPath = Arn::providerPathIf( path, false);
 
     QString  normPath = conPath.toNormPath( rqPath);
     QString  curHost  = conPath.curHost();
