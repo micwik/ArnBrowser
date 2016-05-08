@@ -35,6 +35,7 @@
 #include <ArnInc/ArnMonitor.hpp>
 #include <QRegExp>
 #include <QPixmap>
+#include <QBrush>
 #include <QStringList>
 
 using Arn::XStringMap;
@@ -44,6 +45,7 @@ void  ArnNode::init( ArnNode* parent)
 {
     _parent       = parent;
     _valueChild   = 0;
+    _nameChild    = 0;
     _setChild     = 0;
     _propChild    = 0;
     _infoChild    = 0;
@@ -61,6 +63,7 @@ void  ArnNode::init( ArnNode* parent)
 void  ArnNode::dealloc()
 {
     if (_valueChild)  delete _valueChild;
+    if (_nameChild)   delete _nameChild;
     if (_setChild)    delete _setChild;
     if (_propChild)   delete _propChild;
     if (_infoChild)   delete _infoChild;
@@ -277,7 +280,11 @@ QVariant  ArnModel::data(const QModelIndex &index, int role) const
             }
         }
         break;
-
+    case Qt::ForegroundRole: {
+        if ((index.column() == 1) && !node->_valueChild && node->_nameChild)
+            return QBrush( Qt::darkBlue);
+        return QVariant();
+    }
     case Role::Path:
         return node->path();
 
@@ -307,7 +314,12 @@ QVariant  ArnModel::adjustedNodeData( const ArnNode *node, int role) const
     int  prec = -1;
 
     if (node->isFolder()) {
-        if (!node->_valueChild)  return QString();
+        if (!node->_valueChild) {
+            if (node->_nameChild)
+                return node->_nameChild->toString();
+            else
+                return QString();
+        }
 
         valueNode = node->_valueChild;
 
@@ -467,12 +479,17 @@ Qt::ItemFlags  ArnModel::flags( const QModelIndex& index) const
     if (!index.isValid()) {
         return Qt::ItemIsEnabled;
     }
+
+    Qt::ItemFlags  iFlags = QAbstractItemModel::flags( index);  // Default
     if (index.column() == 1) {
-        return QAbstractItemModel::flags( index) | Qt::ItemIsEditable;
+        ArnNode*  node = nodeFromIndex( index);
+        if (!node)  return iFlags;
+
+        if (!node->isFolder() || node->_valueChild)
+            iFlags |= Qt::ItemIsEditable;
     }
-    else {
-        return QAbstractItemModel::flags( index);
-    }
+
+    return iFlags;
 }
 
 
@@ -568,6 +585,14 @@ void  ArnModel::netChildFound(QString path, ArnNode* node)
         node->_valueChild = new ArnNode( path, node);
         connect( node->_valueChild, SIGNAL(changed()), node, SIGNAL(changed()));
         connect( node->_valueChild, SIGNAL(arnLinkDestroyed()), this, SLOT(destroyNode()));
+        QModelIndex  valueIndex = createIndex( index.row(), 1, node);
+        emit dataChanged( valueIndex, valueIndex);
+    }
+    if (!node->_nameChild && (itemName == "name")) {
+        //// Peek at child item "name"
+        node->_nameChild = new ArnNode( path, node);
+        connect( node->_nameChild, SIGNAL(changed()), node, SIGNAL(changed()));
+        connect( node->_nameChild, SIGNAL(arnLinkDestroyed()), this, SLOT(destroyNode()));
         QModelIndex  valueIndex = createIndex( index.row(), 1, node);
         emit dataChanged( valueIndex, valueIndex);
     }
@@ -761,6 +786,13 @@ void  ArnModel::destroyNode()
 
     if (node == parent->_valueChild) { // Remove Value-child
         parent->_valueChild = 0;
+        QModelIndex  valueIndex = indexFromNode( parent, 1);
+        emit dataChanged( valueIndex, valueIndex);
+        node->deleteLater();
+        return;
+    }
+    if (node == parent->_nameChild) { // Remove name-child
+        parent->_nameChild = 0;
         QModelIndex  valueIndex = indexFromNode( parent, 1);
         emit dataChanged( valueIndex, valueIndex);
         node->deleteLater();

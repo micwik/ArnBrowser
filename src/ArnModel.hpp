@@ -60,6 +60,7 @@ public:
 
     ArnNode*  _parent;
     ArnNode*  _valueChild;
+    ArnNode*  _nameChild;
     ArnNode*  _setChild;
     ArnNode*  _propChild;
     ArnNode*  _infoChild;
