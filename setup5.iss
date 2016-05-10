@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ArnBrowser"
-#define MyAppVersion "2.4"
+#define MyAppVersion "3.0"
 #define MyAppPublisher "MicTron"
 #define MyAppURL "http://www.mictron.se/"
 #define MyAppExeName "ArnBrowser.exe"
