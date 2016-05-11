@@ -7,13 +7,17 @@ Major
 
 Minor
 -----
-* New symbol to diff only known properties (leaves).
 * Support for QStringList type (edit, view and as "set").
 
-Done in 3.x
+
+Done in 3.0
 -----------
 * Close and ReConnect to any Arn Server.
-* Reset button to restart view and release all synced ArnObjects.
-
-Done in 2.x
------------
+* Release button to restart view and release all synced ArnObjects.
+  Can also be used at folder to release sub tree.
+* New symbol to diff only known properties (leaves).
+* Settings with generator for hash to login system.
+* Settings with personal information to be used at server for identification (session).
+* Chat dialog to server.
+* Login dialog.
+* Create and delete folders.

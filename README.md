@@ -1,4 +1,4 @@
-    Copyright (C) 2010-2014 Michael Wiklund.
+    Copyright (C) 2010-2016 Michael Wiklund.
     All rights reserved.
     Contact: arnlib@wiklunden.se
 
@@ -12,6 +12,7 @@ All data objects are real time presented in a tree view.
 ## Installation and usage
 
 Read [Install.md](Install.md) how to build, install and use.
+This ArnBrowser depends on ArnLib 3.0 or later.
 <Br><Br>
 
 
@@ -27,6 +28,8 @@ Read [Install.md](Install.md) how to build, install and use.
 
 * Data set for conversion and combobox (ex 0=Off 1=On 2=Auto)
 
+* Data bitSet for conversion and check buttons (ex B0=Read B1=Write B2=Delete)
+
 * Editor for text documents and javascript support.
 
 * Terminal for monitoring and inserting data streams for double direction pipes.
@@ -37,5 +40,15 @@ Read [Install.md](Install.md) how to build, install and use.
 
 * ZeroConfig browsing for _arn_ services on local network.
 
+* Login dialog.
+
+* Chat to server dialog and support for server requesting disconnect.
+
 * Qml running environment with support for Arn.
   This is comparable to a web browser running an arbitrary web application.
+
+* Settings dialog.
+  Contains genertor for password hash (to login system).
+
+* Log dialog for saving a stream (pipe) to a file.
+
