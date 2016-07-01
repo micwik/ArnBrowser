@@ -339,7 +339,7 @@ QVariant  ArnModel::adjustedNodeData( const ArnNode *node, int role) const
                 }
             }
             if (role == Qt::DisplayRole)
-                return valList.join(" | ");
+                return "[ " + valList.join(" | ") + " ]";
             else
                 return valList;
         }
@@ -347,10 +347,11 @@ QVariant  ArnModel::adjustedNodeData( const ArnNode *node, int role) const
         if (node->_setMap) {
             QByteArray  itemVal = valueNode->toByteArray();
             int  index = node->_setMap->indexOf( itemVal);
+            QString  format = (role == Qt::DisplayRole) ? "< %1 >" : "%1";
             if (index >= 0)
-                return node->_setMap->valueString( index);
+                return format.arg( node->_setMap->valueString( index));
             else
-                return "[" + itemVal + "]";
+                return format.arg( QString::fromUtf8( itemVal + "?"));
         }
 
         if (node->_propMap) {
