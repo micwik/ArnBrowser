@@ -40,6 +40,8 @@
 #include <QSpinBox>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMenu>
+#include <QAction>
 #include <QSettings>
 #include <QCloseEvent>
 #include <QGraphicsColorizeEffect>
@@ -134,6 +136,8 @@ MainWindow::MainWindow(QWidget *parent) :
 #endif
 
     connect( _ui->arnView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemClicked(QModelIndex)));
+    connect( _ui->arnView, SIGNAL(customContextMenuRequested(QPoint)),
+             this, SLOT(onContextMenuRequested(QPoint)));
 
     setConnectOffGui();
     // Test chat button
@@ -313,8 +317,7 @@ void  MainWindow::on_releaseButton_clicked()
 
         ArnM::destroyLinkLocal( _curItemPath);
         _arnModel->netChildFound( _curItemPath, parentNode);
-        _curItemPath = "/";
-        _curItemPathStatus->setText("");
+        setCurItemPath();
         _ui->arnView->clearSelection();
     }
 }
@@ -347,6 +350,60 @@ void  MainWindow::on_hideBidir_clicked()
 }
 
 
+void  MainWindow::onContextMenuRequested( const QPoint& pos)
+{
+    // qDebug() << "Context menu: pos=" << pos;
+    QString  path = "/";
+    int  col = -1;  // Mark not valid
+    Q_UNUSED(col);
+    QModelIndex  index = _ui->arnView->indexAt( pos);
+    if (index.isValid()) {
+        ArnNode*  node = _arnModel->nodeFromIndex( index);
+        if (node) {
+            col  = index.column();
+            path = node->path();
+        }
+    }
+
+    setCurItemPath( path);
+    // qDebug() << "Context menu: path=" << _curItemPath << " col=" << col;
+
+    QMenu*  menu = new QMenu( this);
+    if ( _ui->terminalButton->isEnabled()) {
+        QAction*  action = new QAction( QIcon(":/pic/terminal.png"), "Terminal", this);
+        menu->addAction( action);
+        connect( action, SIGNAL(triggered()), this, SLOT(on_terminalButton_clicked()));
+    }
+    if ( _ui->logButton->isEnabled()) {
+        QAction*  action = new QAction( QIcon(":/pic/log.png"), "Log", this);
+        menu->addAction( action);
+        connect( action, SIGNAL(triggered()), this, SLOT(on_logButton_clicked()));
+    }
+    if ( _ui->editButton->isEnabled()) {
+        QAction*  action = new QAction( QIcon(":/pic/Pencil-icon.png"), "Edit", this);
+        menu->addAction( action);
+        connect( action, SIGNAL(triggered()), this, SLOT(on_editButton_clicked()));
+    }
+    if ( _ui->runButton->isEnabled()) {
+        QAction*  action = new QAction( QIcon(":/pic/Play.png"), "Run", this);
+        menu->addAction( action);
+        connect( action, SIGNAL(triggered()), this, SLOT(on_runButton_clicked()));
+    }
+    if ( _ui->manageButton->isEnabled()) {
+        QAction*  action = new QAction( QIcon(":/pic/tools-icon.png"), "Manage", this);
+        menu->addAction( action);
+        connect( action, SIGNAL(triggered()), this, SLOT(on_manageButton_clicked()));
+    }
+    {
+        QString  menuTxt = (_curItemPath == "/") ? "Release all" : "Release item(s)";
+        QAction*  action = new QAction( QIcon(":/pic/close.png"), menuTxt, this);
+        menu->addAction( action);
+        connect( action, SIGNAL(triggered()), this, SLOT(on_releaseButton_clicked()));
+    }
+    menu->popup( _ui->arnView->viewport()->mapToGlobal( pos));
+}
+
+
 void  MainWindow::updateHiddenTree( const QModelIndex& index)
 {
     _arnModel->data( index, ArnModel::Role::Hidden);  // Hidden row is updated by signal
@@ -360,38 +417,15 @@ void  MainWindow::updateHiddenTree( const QModelIndex& index)
 
 void  MainWindow::itemClicked( const QModelIndex& index)
 {
-    ArnItem  arnItem;
-    Arn::DataType  type;
     QString  curItemPath = _arnModel->data( index, ArnModel::Role::Path).toString();
+    // qDebug() << "curItem=" << curItemPath << " rect=" << _ui->arnView->visualRect( index);
     if (curItemPath == _curItemPath) {
-        _curItemPath = "/";
-        _curItemPathStatus->setText("");
+        setCurItemPath();
         _ui->arnView->clearSelection();
     }
     else {
-        _curItemPath = curItemPath;
-        _curItemPathStatus->setText( _connector->toNormPath( _curItemPath));
-        arnItem.open( _curItemPath);
-        type = arnItem.type();
+        setCurItemPath( curItemPath);
     }
-
-    // Set state for Terminal & Log button
-    _ui->terminalButton->setEnabled( arnItem.isPipeMode());
-    _ui->logButton->setEnabled( arnItem.isPipeMode());
-
-    // Set state for Edit button
-    bool  editEn = !arnItem.isFolder() && ((type == type.Null)
-                                       ||  (type == type.ByteArray)
-                                       ||  (type == type.String));
-    _ui->editButton->setEnabled( editEn);
-
-    // Set state for Run button
-#ifdef QMLRUN
-    bool  runEn = !arnItem.isFolder() && arnItem.name( Arn::NameF()).endsWith(".qml");
-    _ui->runButton->setEnabled( runEn);
-#endif
-
-    _ui->manageButton->setEnabled( true);
 }
 
 
@@ -436,7 +470,7 @@ void MainWindow::doClientStateChanged( int status)
 
         _chatServWin->reset();
 
-        _curItemPath = "/";
+        setCurItemPath();
     }
     else if ((status == ArnClient::ConnectStat::Disconnected) && !_isConnect) {
         //// Manual disconnection from user
@@ -574,6 +608,46 @@ void  MainWindow::setChatButEff( bool isOn)
         _timerChatButEff->stop();
     }
     _countChatButEff = 0;
+}
+
+
+void  MainWindow::setCurItemPath( const QString& path)
+{
+    ArnItem  arnItem;
+    Arn::DataType  type;
+
+    if (path.isEmpty() || (path == "/")) {  // Not selected item
+        _curItemPath = "/";
+        _curItemPathStatus->setText("");
+    }
+    else {  // Selected item
+        _curItemPath = path;
+        _curItemPathStatus->setText( _connector->toNormPath( _curItemPath));
+
+        arnItem.open( _curItemPath);
+        type = arnItem.type();
+    }
+
+    // Set state for Terminal & Log button
+    _ui->terminalButton->setEnabled( arnItem.isPipeMode());
+    _ui->logButton->setEnabled( arnItem.isPipeMode());
+
+    // Set state for Edit button
+    bool  editEn =  arnItem.isOpen()
+                && !arnItem.isFolder()
+                && ((type == type.Null)
+                 || (type == type.ByteArray)
+                 || (type == type.String));
+    _ui->editButton->setEnabled( editEn);
+
+    // Set state for Run button
+#ifdef QMLRUN
+    bool  runEn = !arnItem.isFolder() && arnItem.name( Arn::NameF()).endsWith(".qml");
+    _ui->runButton->setEnabled( runEn);
+#endif
+
+    bool  manageEn = arnItem.isOpen();
+    _ui->manageButton->setEnabled( manageEn);
 }
 
 

@@ -37,6 +37,7 @@ class QCloseEvent;
 class QLabel;
 class QLineEdit;
 class QGraphicsColorizeEffect;
+class QPoint;
 class QTimer;
 
 namespace Ui {
@@ -70,6 +71,7 @@ private slots:
     void  on_settingsButton_clicked();
     void  on_viewHidden_clicked();
     void  on_hideBidir_clicked();
+    void  onContextMenuRequested( const QPoint& pos);
     void  errorLog( QString errText);
     void  readSettings();
     void  writeSettings();
@@ -93,6 +95,7 @@ private:
     void  setFuncButtonOffGui();
     void  updateHiddenTree( const QModelIndex& index);
     void  setChatButEff( bool isOn);
+    void  setCurItemPath( const QString& path = QString());
 
     Ui::MainWindow*  _ui;
 
