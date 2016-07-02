@@ -51,6 +51,7 @@ private slots:
     void  doPipeInputPv( QString text);
     void  doLineInputRq();
     void  doLineInputPv();
+    void  on_clearButton_clicked();
     void  readSettings();
     void  writeSettings();
 

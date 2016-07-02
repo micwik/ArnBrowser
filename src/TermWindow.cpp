@@ -70,6 +70,7 @@ TermWindow::TermWindow( QSettings* appSettings, const ConnectorPath& conPath, QW
     _ui->pipePath->setText( normPath);
     _ui->pipePath->setReadOnly( true);
     _ui->textEdit->setReadOnly( true);
+    _ui->clearButton->clearFocus();
     _ui->lineEditRq->setFocus();
 
     connect( &_pipeRq, SIGNAL(arnLinkDestroyed()), this, SLOT(deleteLater()));
@@ -117,6 +118,13 @@ void  TermWindow::doLineInputPv()
     _pipePv = text;
 
     _historyPv.addEntry( text);
+}
+
+
+void  TermWindow::on_clearButton_clicked()
+{
+    // qDebug() << "ClearButton!";
+    _ui->textEdit->clear();
 }
 
 
