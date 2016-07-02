@@ -15,6 +15,7 @@ Done in 3.1
 -----------
 * Context menu.
 * Consistent display of "set" and "bitSet" values.
+* Terminal history (redo) & search text window.
 
 
 Done in 3.0

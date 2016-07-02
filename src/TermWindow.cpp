@@ -23,8 +23,10 @@
 
 #include "TermWindow.hpp"
 #include "ui_TermWindow.h"
+#include <QInputDialog>
 #include <QSettings>
 #include <QKeyEvent>
+#include <QKeySequence>
 #include <QCloseEvent>
 #include <QApplication>
 #include <QDebug>
@@ -133,7 +135,7 @@ void  TermWindow::keyPressEvent( QKeyEvent* ev)
     // qDebug() << "KeyPressEvent: keyCode=" << ev->key();
     QWidget*  widget = QApplication::focusWidget();
 
-    switch (ev->key()) {
+    switch (ev->key() | ev->modifiers()) {
     case Qt::Key_Up:
     {
         // qDebug() << "KeyPressEvent: key=Up";
@@ -141,6 +143,7 @@ void  TermWindow::keyPressEvent( QKeyEvent* ev)
 
         History*  hi = selHistory( widget);
         if (hi && (hi->cur + 1 < hi->list.size())) {
+            //// History backwards (older)
             ++hi->cur;
 
             QLineEdit*  lineEdit = qobject_cast<QLineEdit*>( widget);
@@ -148,7 +151,6 @@ void  TermWindow::keyPressEvent( QKeyEvent* ev)
             lineEdit->setText( hi->list.at( hi->cur));
             break;
         }
-
         break;
     }
     case Qt::Key_Down:
@@ -158,6 +160,7 @@ void  TermWindow::keyPressEvent( QKeyEvent* ev)
 
         History*  hi = selHistory( widget);
         if (hi && (hi->cur - 1 >= -1)) {
+            //// History forwards (newer)
             --hi->cur;
 
             QLineEdit*  lineEdit = qobject_cast<QLineEdit*>( widget);
@@ -166,7 +169,44 @@ void  TermWindow::keyPressEvent( QKeyEvent* ev)
             lineEdit->setText( text);
             break;
         }
+        break;
+    }
+    case Qt::ControlModifier + Qt::Key_F:
+    {   //// Find
+        // qDebug() << "KeyPressEvent: key=Ctrl-F";
+        ev->accept();
 
+        bool isOk;
+        QString  text = QInputDialog::getText(this, "Find", "Text:", QLineEdit::Normal, QString(), &isOk);
+        if (isOk && !text.isEmpty()) {
+            _lastFind = text;
+            if (!_ui->textEdit->find( _lastFind)) {
+                _ui->textEdit->moveCursor( QTextCursor::Start);
+                _ui->textEdit->find( _lastFind);
+            }
+        }
+        break;
+    }
+    case Qt::Key_F3:
+    {   //// Find next
+        // qDebug() << "KeyPressEvent: key=F3";
+        ev->accept();
+
+        if (!_ui->textEdit->find( _lastFind)) {
+            _ui->textEdit->moveCursor( QTextCursor::Start);
+            _ui->textEdit->find( _lastFind);
+        }
+        break;
+    }
+    case Qt::ShiftModifier + Qt::Key_F3:
+    {   //// Find previous
+        // qDebug() << "KeyPressEvent: key=Shift-F3";
+        ev->accept();
+
+        if (!_ui->textEdit->find( _lastFind, QTextDocument::FindBackward)) {
+            _ui->textEdit->moveCursor( QTextCursor::End);
+            _ui->textEdit->find( _lastFind, QTextDocument::FindBackward);
+        }
         break;
     }
     default:

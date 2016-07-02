@@ -75,6 +75,7 @@ private:
     ArnItem  _pipePv;
     History  _historyRq;
     History  _historyPv;
+    QString  _lastFind;
     QSettings*  _appSettings;
 };
 
