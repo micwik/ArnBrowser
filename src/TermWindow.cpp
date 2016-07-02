@@ -24,8 +24,28 @@
 #include "TermWindow.hpp"
 #include "ui_TermWindow.h"
 #include <QSettings>
+#include <QKeyEvent>
 #include <QCloseEvent>
+#include <QApplication>
 #include <QDebug>
+
+
+TermWindow::History::History()
+{
+    cur = -1;
+}
+
+
+void  TermWindow::History::addEntry( const QString& text)
+{
+    if (!text.isEmpty()) {
+        if (list.isEmpty() || (text != list.first())) {
+            list.prepend( text);
+        }
+    }
+    cur = -1;
+}
+
 
 
 TermWindow::TermWindow( QSettings* appSettings, const ConnectorPath& conPath, QWidget* parent)
@@ -85,6 +105,8 @@ void  TermWindow::doLineInputRq()
     QString  text = _ui->lineEditRq->text();
     _ui->lineEditRq->clear();
     _pipeRq = text;
+
+    _historyRq.addEntry( text);
 }
 
 
@@ -93,6 +115,56 @@ void  TermWindow::doLineInputPv()
     QString  text = _ui->lineEditPv->text();
     _ui->lineEditPv->clear();
     _pipePv = text;
+
+    _historyPv.addEntry( text);
+}
+
+
+void  TermWindow::keyPressEvent( QKeyEvent* ev)
+{
+    // qDebug() << "KeyPressEvent: keyCode=" << ev->key();
+    QWidget*  widget = QApplication::focusWidget();
+
+    switch (ev->key()) {
+    case Qt::Key_Up:
+    {
+        // qDebug() << "KeyPressEvent: key=Up";
+        ev->accept();
+
+        History*  hi = selHistory( widget);
+        if (hi && (hi->cur + 1 < hi->list.size())) {
+            ++hi->cur;
+
+            QLineEdit*  lineEdit = qobject_cast<QLineEdit*>( widget);
+            Q_ASSERT(lineEdit);
+            lineEdit->setText( hi->list.at( hi->cur));
+            break;
+        }
+
+        break;
+    }
+    case Qt::Key_Down:
+    {
+        // qDebug() << "KeyPressEvent: key=Down";
+        ev->accept();
+
+        History*  hi = selHistory( widget);
+        if (hi && (hi->cur - 1 >= -1)) {
+            --hi->cur;
+
+            QLineEdit*  lineEdit = qobject_cast<QLineEdit*>( widget);
+            Q_ASSERT(lineEdit);
+            QString  text = hi->cur < 0 ? QString() : hi->list.at( hi->cur);
+            lineEdit->setText( text);
+            break;
+        }
+
+        break;
+    }
+    default:
+        QDialog::keyPressEvent( ev);
+        break;
+    }
 }
 
 
@@ -121,3 +193,11 @@ void  TermWindow::writeSettings()
     _appSettings->setValue("term/size", size());
 }
 
+
+TermWindow::History*  TermWindow::selHistory( const QWidget* widget)
+{
+    if (widget == _ui->lineEditRq)  return &_historyRq;
+    if (widget == _ui->lineEditPv)  return &_historyPv;
+
+    return 0;
+}

@@ -27,9 +27,11 @@
 #include "Connector.hpp"
 #include <ArnInc/ArnItem.hpp>
 #include <QDialog>
+#include <QStringList>
 
 class QSettings;
 class QCloseEvent;
+class QKeyEvent;
 
 namespace Ui {
     class TermWindow;
@@ -53,12 +55,25 @@ private slots:
     void  writeSettings();
 
 protected:
-    void closeEvent( QCloseEvent *event);
+    virtual void  keyPressEvent( QKeyEvent* ev);
+    virtual void  closeEvent( QCloseEvent* event);
 
 private:
-    Ui::TermWindow *_ui;
+    struct History {
+        QStringList  list;
+        int  cur;
+
+        History();
+        void  addEntry( const QString& text);
+    };
+
+    History*  selHistory( const QWidget* widget);
+
+    Ui::TermWindow*  _ui;
     ArnItem  _pipeRq;
     ArnItem  _pipePv;
+    History  _historyRq;
+    History  _historyPv;
     QSettings*  _appSettings;
 };
 
