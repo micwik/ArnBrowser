@@ -176,8 +176,10 @@ void  TermWindow::keyPressEvent( QKeyEvent* ev)
         // qDebug() << "KeyPressEvent: key=Ctrl-F";
         ev->accept();
 
-        bool isOk;
-        QString  text = QInputDialog::getText(this, "Find", "Text:", QLineEdit::Normal, QString(), &isOk);
+        QTextCursor  textCursor = _ui->textEdit->textCursor();
+        QString  text = textCursor.selectedText();
+        bool  isOk;
+        text = QInputDialog::getText(this, "Find", "Text:", QLineEdit::Normal, text, &isOk);
         if (isOk && !text.isEmpty()) {
             _lastFind = text;
             if (!_ui->textEdit->find( _lastFind)) {

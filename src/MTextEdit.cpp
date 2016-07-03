@@ -37,6 +37,17 @@ MTextEdit::MTextEdit( QWidget* parent)
 }
 
 
+QString  MTextEdit::selectedText()
+{
+#ifdef QSCINTILLA
+    return QString();  // TODO: fixme
+#else
+    QTextCursor  textCursor = _textEdit->textCursor();
+    return textCursor.selectedText();
+#endif
+}
+
+
 bool  MTextEdit::findFirst( QString text)
 {
     setCurrentIndex(0);
@@ -44,7 +55,11 @@ bool  MTextEdit::findFirst( QString text)
 #ifdef QSCINTILLA
     return _textEdit->findFirst( text, false, false, false, true);
 #else
-    return _textEdit->find( text);
+    if (!_textEdit->find( _lastFind)) {
+        _textEdit->moveCursor( QTextCursor::Start);
+        return _textEdit->find( _lastFind);
+    }
+    return true;
 #endif
 }
 
@@ -55,7 +70,26 @@ bool  MTextEdit::findNext()
 #ifdef QSCINTILLA
     return _textEdit->findNext();
 #else
-    return _textEdit->find( _lastFind);
+    if (!_textEdit->find( _lastFind)) {
+        _textEdit->moveCursor( QTextCursor::Start);
+        return _textEdit->find( _lastFind);
+    }
+    return true;
+#endif
+}
+
+
+bool  MTextEdit::findPrevious()
+{
+    setCurrentIndex(0);
+#ifdef QSCINTILLA
+    return false;  // TODO: fixme
+#else
+    if (!_textEdit->find( _lastFind, QTextDocument::FindBackward)) {
+        _textEdit->moveCursor( QTextCursor::End);
+        return _textEdit->find( _lastFind, QTextDocument::FindBackward);
+    }
+    return true;
 #endif
 }
 

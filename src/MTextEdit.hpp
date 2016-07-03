@@ -43,8 +43,10 @@ class MTextEdit : public QStackedWidget
 {
 public:
     MTextEdit( QWidget *parent = 0);
+    QString  selectedText();
     bool  findFirst( QString text);
     bool  findNext();
+    bool  findPrevious();
     void  setPlainText( const QString& text);
     void  setHtml( const QString& text);
     QString  text()  const;

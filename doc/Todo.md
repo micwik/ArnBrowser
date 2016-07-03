@@ -3,23 +3,29 @@ ArnBrowser Todo
 
 Major
 -----
+
 * Markdown editor.
+
 
 Minor
 -----
+
 * Support for QStringList type (edit, view and as "set").
 
 
 
 Done in 3.1
 -----------
+
 * Context menu.
 * Consistent display of "set" and "bitSet" values.
 * Terminal history (redo) & search text window.
+* Code edit search by key (Ctrl-F ...)
 
 
 Done in 3.0
 -----------
+
 * Close and ReConnect to any Arn Server.
 * Release button to restart view and release all synced ArnObjects.
   Can also be used at folder to release sub tree.

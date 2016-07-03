@@ -216,6 +216,49 @@ QString  CodeWindow::getText()  const
 }
 
 
+void  CodeWindow::keyPressEvent( QKeyEvent* ev)
+{
+    // qDebug() << "KeyPressEvent: keyCode=" << ev->key();
+    QWidget*  widget = QApplication::focusWidget();
+    Q_UNUSED(widget);
+
+    switch (ev->key() | ev->modifiers()) {
+    case Qt::ControlModifier + Qt::Key_F:
+    {   //// Find
+        // qDebug() << "KeyPressEvent: key=Ctrl-F";
+        ev->accept();
+
+        QString  text = _ui->textEdit->selectedText();
+        bool  isOk;
+        text = QInputDialog::getText(this, "Find", "Text:", QLineEdit::Normal, text, &isOk);
+        if (isOk && !text.isEmpty()) {
+            _ui->textEdit->findFirst( text);
+        }
+        break;
+    }
+    case Qt::Key_F3:
+    {   //// Find next
+        // qDebug() << "KeyPressEvent: key=F3";
+        ev->accept();
+
+        _ui->textEdit->findNext();
+        break;
+    }
+    case Qt::ShiftModifier + Qt::Key_F3:
+    {   //// Find previous
+        // qDebug() << "KeyPressEvent: key=Shift-F3";
+        ev->accept();
+
+        _ui->textEdit->findPrevious();
+        break;
+    }
+    default:
+        QDialog::keyPressEvent( ev);
+        break;
+    }
+}
+
+
 void  CodeWindow::closeEvent( QCloseEvent* event)
 {
     // qDebug() << "Close event";

@@ -62,7 +62,8 @@ private slots:
     void  writeSettings();
 
 protected:
-    void closeEvent( QCloseEvent *event);
+    virtual void  keyPressEvent( QKeyEvent* ev);
+    virtual void closeEvent( QCloseEvent *event);
 
 private:
     Ui::CodeWindow*  _ui;    
