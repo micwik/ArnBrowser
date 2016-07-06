@@ -11,7 +11,9 @@ CONFIG += QmlRun
 # CONFIG += qscintilla
 
 # Usage of internal mDNS code (no external dependency)
-CONFIG += mDnsIntern
+win32 {
+    CONFIG += mDnsIntern
+}
 
 QT += core gui
 QT += network
