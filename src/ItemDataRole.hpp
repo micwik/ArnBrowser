@@ -43,6 +43,7 @@ struct ItemDataRole
     enum E  {
         User_0   = Qt::UserRole,
         EnumList,
+        Path,
         User_N,
         UserApp  = Qt::UserRole + 100
     };

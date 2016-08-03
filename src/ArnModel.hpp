@@ -85,8 +85,8 @@ public:
     struct Role
     {
         enum E  {
-            Path  = ItemDataRole::UserApp,
-            Hidden
+            Path   = ItemDataRole::Path,
+            Hidden = ItemDataRole::UserApp
         };
         E  e;
         Role( E v_ = E(0)) : e( v_)  {}

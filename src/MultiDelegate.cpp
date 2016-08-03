@@ -157,7 +157,8 @@ QWidget*  MultiDelegate::createEditor( QWidget* parent,
                                      const QStyleOptionViewItem& option,
                                      const QModelIndex& index)  const
 {
-    QVariant  value = index.model()->data( index, Qt::EditRole);
+    const QAbstractItemModel*  model = index.model();
+    QVariant  value = model->data( index, Qt::EditRole);
     switch (value.type()) {
     case QMetaType::QTime:
     {
@@ -220,6 +221,11 @@ QWidget*  MultiDelegate::createEditor( QWidget* parent,
         return editor;
     }
     default:;
+    }
+
+    if (index.column() == 0) {
+        emit itemEditTrigged( index);
+        return 0;  // No inline editor
     }
 
     return QItemDelegate::createEditor( parent, option, index);

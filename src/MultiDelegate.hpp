@@ -62,18 +62,20 @@ class MultiDelegate : public QItemDelegate
 public:
     MultiDelegate( QObject* parent = 0);
     QWidget*  createEditor( QWidget* parent, const QStyleOptionViewItem& option,
-                          const QModelIndex& index)  const;
+                            const QModelIndex& index)  const;
     void  setupCalenderWidget( QDateTimeEdit* editor)  const;
 
     void  setEditorData( QWidget* editor, const QModelIndex& index)  const;
     void  setModelData( QWidget* editor, QAbstractItemModel* model,
-                      const QModelIndex& index)  const;
+                        const QModelIndex& index)  const;
     void  updateEditorGeometry( QWidget* editor,
-                              const QStyleOptionViewItem& option, const QModelIndex& index)  const;
+                                const QStyleOptionViewItem& option, const QModelIndex& index)  const;
     void  paint( QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index )  const;
     void  paintPixmap( QPainter* painter, const QStyleOptionViewItem& option, const QPixmap& pixmap )  const;
-    QSize  sizeHint( const QStyleOptionViewItem& option, const QModelIndex& index)  const ;
+    QSize  sizeHint( const QStyleOptionViewItem& option, const QModelIndex& index)  const;
+
 signals:
+    void  itemEditTrigged( const QModelIndex& index)  const;
 
 private slots:
     void  closeEmittingEditor();

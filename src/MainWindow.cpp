@@ -135,7 +135,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _ui->portEdit->setRange( 1, 1065535);  // Fix early Qt5 layout bug giving to little space
 #endif
 
-    connect( _ui->arnView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemClicked(QModelIndex)));
+    connect( _ui->arnView, SIGNAL(clicked(QModelIndex)), this, SLOT(onItemClick(QModelIndex)));
     connect( _ui->arnView, SIGNAL(customContextMenuRequested(QPoint)),
              this, SLOT(onContextMenuRequested(QPoint)));
 
@@ -415,7 +415,7 @@ void  MainWindow::updateHiddenTree( const QModelIndex& index)
 }
 
 
-void  MainWindow::itemClicked( const QModelIndex& index)
+void  MainWindow::onItemClick( const QModelIndex& index)
 {
     QString  curItemPath = _arnModel->data( index, ArnModel::Role::Path).toString();
     // qDebug() << "curItem=" << curItemPath << " rect=" << _ui->arnView->visualRect( index);
@@ -425,6 +425,22 @@ void  MainWindow::itemClicked( const QModelIndex& index)
     }
     else {
         setCurItemPath( curItemPath);
+    }
+}
+
+
+void  MainWindow::onItemEditTrigg( const QModelIndex& index)
+{
+    QString  itemPath = _arnModel->data( index, ArnModel::Role::Path).toString();
+    // qDebug() << "EditItem=" << itemPath << " rect=" << _ui->arnView->visualRect( index);
+    if (itemPath.isEmpty())  return;
+
+    setCurItemPath( itemPath);
+    if ( _ui->terminalButton->isEnabled()) {
+        on_terminalButton_clicked();
+    }
+    else if ( _ui->editButton->isEnabled()) {
+        on_editButton_clicked();
     }
 }
 
@@ -461,8 +477,11 @@ void MainWindow::doClientStateChanged( int status)
         _ui->manageButton->setEnabled( true);
 
         _delegate = qobject_cast<MultiDelegate*>( _ui->arnView->itemDelegate());
-        if (!_delegate)
+        if (!_delegate) {
             _delegate = new MultiDelegate;
+            connect( _delegate, SIGNAL(itemEditTrigged(QModelIndex)),
+                     this, SLOT(onItemEditTrigg(QModelIndex)));
+        }
         _ui->arnView->setItemDelegate( _delegate);
         _ui->arnView->setEnabled( true);
         _ui->arnView->setColumnWidth(0, _pathWidth);

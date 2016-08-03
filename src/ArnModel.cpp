@@ -483,11 +483,15 @@ Qt::ItemFlags  ArnModel::flags( const QModelIndex& index) const
     }
 
     Qt::ItemFlags  iFlags = QAbstractItemModel::flags( index);  // Default
-    if (index.column() == 1) {
-        ArnNode*  node = nodeFromIndex( index);
-        if (!node)  return iFlags;
+    ArnNode*  node = nodeFromIndex( index);
+    if (!node)  return iFlags;
 
+    if (index.column() == 1) {
         if (!node->isFolder() || node->_valueChild)
+            iFlags |= Qt::ItemIsEditable;
+    }
+    else {
+        if (!node->isFolder())
             iFlags |= Qt::ItemIsEditable;
     }
 

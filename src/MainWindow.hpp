@@ -52,7 +52,8 @@ public:
     ~MainWindow();
 
 private slots:
-    void  itemClicked( const QModelIndex &index);
+    void  onItemClick( const QModelIndex &index);
+    void  onItemEditTrigg( const QModelIndex& index);
     void  doClientStateChanged( int status);
     void  doStartLogin( int contextCode);
     void  doEndLogin( int resultCode);
