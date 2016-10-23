@@ -62,12 +62,6 @@ PixmapViewer::PixmapViewer( QWidget* parent)
     QGridLayout*  imgLayout = new QGridLayout;
     imgLayout->addWidget( _img, 0, 0);
 
-    //QFrame*  frame = new QFrame;
-    //frame->setLayout( imgLayout);
-    //QVBoxLayout*  vLayout = new QVBoxLayout;
-    //vLayout->addWidget( frame);
-    //this->setLayout( vLayout);
-
     this->setLayout( imgLayout);
     this->resize(0, 0);  // Minimize size of viewer
     this->setWindowTitle("Image Viewer");
@@ -164,6 +158,9 @@ QWidget*  MultiDelegate::createEditor( QWidget* parent,
     {
         QTimeEdit*  editor = new QTimeEdit( parent);
         editor->setMaximumWidth( editor->sizeHint().width());
+
+        //// Get value snapshot into editor
+        editor->setTime( value.toTime());
         return editor;
     }
     case QMetaType::QDate:
@@ -171,6 +168,9 @@ QWidget*  MultiDelegate::createEditor( QWidget* parent,
         QDateEdit*  editor = new QDateEdit( parent);
         setupCalenderWidget( editor);
         editor->setMaximumWidth( editor->sizeHint().width());
+
+        //// Get value snapshot into editor
+        editor->setDate( value.toDate());
         return editor;
     }
     case QMetaType::QDateTime:
@@ -178,6 +178,8 @@ QWidget*  MultiDelegate::createEditor( QWidget* parent,
         QDateTimeEdit*  editor = new QDateTimeEdit( parent);
         setupCalenderWidget( editor);
         editor->setMaximumWidth( editor->sizeHint().width());
+
+        editor->setDateTime( value.toDateTime());
         return editor;
     }
     case QMetaType::QImage:
@@ -207,6 +209,15 @@ QWidget*  MultiDelegate::createEditor( QWidget* parent,
         editor->setMaximumWidth( width);
         editor->setMinimumHeight( height);
         editor->setMaximumHeight( height);
+
+        //// Get value snapshot into editor
+        QStringList  valList = value.toStringList();
+        int  itemCount = editor->count();
+        for (int i = 0; i < itemCount; ++i) {
+            QListWidgetItem*  bitItem = editor->item(i);
+            bool  isActive = valList.contains( bitItem->text());
+            bitItem->setCheckState( isActive ? Qt::Checked : Qt::Unchecked);
+        }
         return editor;
     }
     case QMetaType::QString:
@@ -218,6 +229,9 @@ QWidget*  MultiDelegate::createEditor( QWidget* parent,
         editor->setSizeAdjustPolicy(QComboBox::AdjustToContents);
         editor->addItems( varList.toStringList());
         editor->setMaximumWidth( editor->minimumSizeHint().width());
+
+        //// Get value snapshot into editor
+        editor->setCurrentIndex( editor->findText( value.toString()));
         return editor;
     }
     default:;
@@ -228,14 +242,17 @@ QWidget*  MultiDelegate::createEditor( QWidget* parent,
         return 0;  // No inline editor
     }
 
-    return QItemDelegate::createEditor( parent, option, index);
+    QWidget*  editor = QItemDelegate::createEditor( parent, option, index);
+
+    //// Get value snapshot into editor
+    QItemDelegate::setEditorData( editor, index);
+    return editor;
 }
 
 
 void  MultiDelegate::setupCalenderWidget( QDateTimeEdit* editor)  const
 {
     editor->setCalendarPopup(true);
-    // editor->setMinimumDate( QDate::currentDate());  // MW: Kolla ...
     QCalendarWidget*  calendar = editor->calendarWidget();
     if (calendar) {
         calendar->setFirstDayOfWeek(Qt::Monday);
@@ -251,19 +268,10 @@ void  MultiDelegate::setEditorData( QWidget* editor,
 
     QString  className = editor->metaObject()->className();
     if (className == "QTimeEdit") {
-        QTimeEdit*  ed = qobject_cast<QTimeEdit*>(editor);
-        Q_ASSERT( ed);
-        ed->setTime( value.toTime());
     }
     else if (className == "QDateEdit") {
-        QDateEdit*  ed = qobject_cast<QDateEdit*>(editor);
-        Q_ASSERT( ed);
-        ed->setDate( value.toDate());
     }
     else if (className == "QDateTimeEdit") {
-        QDateTimeEdit*  ed = qobject_cast<QDateTimeEdit*>(editor);
-        Q_ASSERT( ed);
-        ed->setDateTime( value.toDateTime());
     }
     else if (className == "PixmapViewer") {
         PixmapViewer*  ed = qobject_cast<PixmapViewer*>(editor);
@@ -282,29 +290,13 @@ void  MultiDelegate::setEditorData( QWidget* editor,
         ed->setPixmap( pixmap);
     }
     else if (className == "QComboBox") {
-        QComboBox*  ed = qobject_cast<QComboBox*>(editor);
-        Q_ASSERT( ed);
-        ed->setCurrentIndex( ed->findText( value.toString()));
     }
     else if (className == "QListWidget") {
-        QListWidget*  ed = qobject_cast<QListWidget*>(editor);
-        Q_ASSERT( ed);
-        QStringList  valList = value.toStringList();
-        int  itemCount = ed->count();
-        for (int i = 0; i < itemCount; ++i) {
-            QListWidgetItem*  bitItem = ed->item(i);
-            bool  isActive = valList.contains( bitItem->text());
-            bitItem->setCheckState( isActive ? Qt::Checked : Qt::Unchecked);
-        }
     }
     else if (className == "QCheckBox") {
         QCheckBox*  ed = qobject_cast<QCheckBox*>(editor);
         Q_ASSERT( ed);
         ed->setChecked( value.Bool);
-    }
-    else {
-        QItemDelegate::setEditorData( editor, index);
-        return;
     }
 }
 
@@ -377,6 +369,6 @@ void MultiDelegate::closeEmittingEditor()
 {
     QWidget*  ed = qobject_cast<QWidget*>( sender());
     Q_ASSERT(ed);
-    qDebug() << "Closing editor: type=" << ed->metaObject()->className();
+    // qDebug() << "Closing editor: type=" << ed->metaObject()->className();
     emit closeEditor( ed);
 }
