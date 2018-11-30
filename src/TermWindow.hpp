@@ -54,6 +54,7 @@ private slots:
     void  on_clearButton_clicked();
     void  readSettings();
     void  writeSettings();
+    void  appendText( QString text);
 
 protected:
     virtual void  keyPressEvent( QKeyEvent* ev);
@@ -77,6 +78,8 @@ private:
     History  _historyPv;
     QString  _lastFind;
     QSettings*  _appSettings;
+    int _nrRows { 0 };
+    int _maxRows { 0 };
 };
 
 #endif // TERMWINDOW_HPP

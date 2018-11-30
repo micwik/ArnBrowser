@@ -92,14 +92,14 @@ TermWindow::~TermWindow()
 void  TermWindow::doPipeInputRq( QString text)
 {
     _ui->textEdit->setTextColor( Qt::blue);
-    _ui->textEdit->append( text);
+    appendText(text);
 }
 
 
 void  TermWindow::doPipeInputPv( QString text)
 {
     _ui->textEdit->setTextColor( Qt::black);
-    _ui->textEdit->append( text);
+    appendText(text);
 }
 
 
@@ -108,7 +108,6 @@ void  TermWindow::doLineInputRq()
     QString  text = _ui->lineEditRq->text();
     _ui->lineEditRq->clear();
     _pipeRq = text;
-
     _historyRq.addEntry( text);
 }
 
@@ -118,7 +117,6 @@ void  TermWindow::doLineInputPv()
     QString  text = _ui->lineEditPv->text();
     _ui->lineEditPv->clear();
     _pipePv = text;
-
     _historyPv.addEntry( text);
 }
 
@@ -127,6 +125,7 @@ void  TermWindow::on_clearButton_clicked()
 {
     // qDebug() << "ClearButton!";
     _ui->textEdit->clear();
+    _nrRows = 0;
 }
 
 
@@ -204,7 +203,6 @@ void  TermWindow::keyPressEvent( QKeyEvent* ev)
     {   //// Find previous
         // qDebug() << "KeyPressEvent: key=Shift-F3";
         ev->accept();
-
         if (!_ui->textEdit->find( _lastFind, QTextDocument::FindBackward)) {
             _ui->textEdit->moveCursor( QTextCursor::End);
             _ui->textEdit->find( _lastFind, QTextDocument::FindBackward);
@@ -231,6 +229,7 @@ void  TermWindow::readSettings()
 {
     QPoint  pos = _appSettings->value("term/pos", QPoint(200, 200)).toPoint();
     QSize  size = _appSettings->value("term/size", QSize(400, 400)).toSize();
+    _maxRows = _appSettings->value("set/maxRows", QVariant()).toInt();
     resize( size);
     move( pos);
 }
@@ -241,6 +240,26 @@ void  TermWindow::writeSettings()
     // qDebug() << "Write term settings";
     _appSettings->setValue("term/pos", pos());
     _appSettings->setValue("term/size", size());
+}
+
+
+void TermWindow::appendText(QString text)
+{
+    QTextCursor cursor;
+    if (_nrRows > _maxRows) {
+        _ui->textEdit->setReadOnly( false);
+        cursor = _ui->textEdit->textCursor();
+        cursor.movePosition( QTextCursor::Start );
+        cursor.movePosition( QTextCursor::Down, QTextCursor::KeepAnchor, _maxRows / 10 );
+        _nrRows = _nrRows - _maxRows / 10;
+        cursor.removeSelectedText();
+        cursor.movePosition( QTextCursor::End );
+        _ui->textEdit->setTextCursor(cursor);
+        _ui->textEdit->setReadOnly( true);
+    }
+    _ui->textEdit->append( text);
+    _nrRows++;
+    _ui->rowsLabel->setText(QString::number(_nrRows));
 }
 
 
