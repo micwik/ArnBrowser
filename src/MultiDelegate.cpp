@@ -148,8 +148,8 @@ QSize  MultiDelegate::sizeHint( const QStyleOptionViewItem& option, const QModel
 
 
 QWidget*  MultiDelegate::createEditor( QWidget* parent,
-                                     const QStyleOptionViewItem& option,
-                                     const QModelIndex& index)  const
+                                       const QStyleOptionViewItem& option,
+                                       const QModelIndex& index)  const
 {
     const QAbstractItemModel*  model = index.model();
     QVariant  value = model->data( index, Qt::EditRole);
@@ -205,10 +205,14 @@ QWidget*  MultiDelegate::createEditor( QWidget* parent,
         }
         int width  = editor->sizeHintForColumn(0) + 25;
         int height = editor->sizeHintForRow(0) * editor->count() + 10;
+        int maxHeight = editor->sizeHintForRow(0) * 10 + 10;
+        if (height > maxHeight) {
+            height = maxHeight;
+        }
         editor->setMinimumWidth( width);
         editor->setMaximumWidth( width);
-        editor->setMinimumHeight( height);
-        editor->setMaximumHeight( height);
+        editor->setMinimumHeight( height );
+        editor->setMaximumHeight( maxHeight );
 
         //// Get value snapshot into editor
         QStringList  valList = value.toStringList();
