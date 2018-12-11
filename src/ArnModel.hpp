@@ -116,6 +116,7 @@ public:
 
 signals:
     void  hiddenRow( int row, QModelIndex parent, bool isHidden)  const;
+    void  rowInserted( QModelIndex index, int row)  const;
 
 public slots:
     void  netChildFound( QString path, ArnNode* node = 0);

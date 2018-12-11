@@ -685,6 +685,7 @@ void  ArnModel::doInsertItem( const QModelIndex& index, ArnNode* node, QString p
     this->endInsertRows();
 
     submitRowHidden( insRow, index, itemName);
+    emit rowInserted( index, insRow);
 
     if (child->isFolder()) {
         // qDebug() << "arnModel netChildFound: Monitor path=" << child->path();

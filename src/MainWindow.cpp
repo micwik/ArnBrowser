@@ -68,14 +68,11 @@ MainWindow::MainWindow(QWidget *parent) :
     _runPostLoginCancel = false;
     _isLoginDialog      = false;
     _loginContextCode   = 0;
-
-    QLabel*  curItemPathLabel = new QLabel;
-    curItemPathLabel->setText("Path:");
-    _curItemPathStatus = new QLineEdit;
-    _curItemPathStatus->setReadOnly( true);
-    _curItemPathStatus->setStyleSheet("QLineEdit{background: lightgrey;}");
-    _ui->statusBar->addPermanentWidget( curItemPathLabel);
-    _ui->statusBar->addPermanentWidget( _curItemPathStatus);
+    _filterSearchPaths  = QStringList();
+    _filterMatchPaths   = QStringList();
+    _curIndexRowNr      = 0;
+    _nrIndexRows        = 0;
+    _filterState        = FilterState::Init;
 
     _timerChatButEff = new QTimer( this);
     _timerChatButEff->setInterval(20);
@@ -85,6 +82,10 @@ MainWindow::MainWindow(QWidget *parent) :
     _chatButEff->setColor( QColor(254,89,6));
     _ui->chatButton->setGraphicsEffect( _chatButEff);
     setChatButEff( false);
+
+    _timerStopFiltering = new QTimer( this);
+    _timerStopFiltering->setInterval( 3000);
+    connect( _timerStopFiltering, SIGNAL(timeout()), this, SLOT(stopFiltering()));
 
     _appSettings = new QSettings("MicTron", "ArnBrowser");
     _settings    = new SettingsHandler( _appSettings);
@@ -105,6 +106,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect( _arnClient, SIGNAL(replyInfo(int,QByteArray)), SLOT(doRinfo(int,QByteArray)));
     connect( _arnClient, SIGNAL(killRequested()), this, SLOT(onKillRequest()));
     connect( _arnClient, SIGNAL(chatReceived(QString,int)), this, SLOT(onChatReceived(QString,int)));
+    connect( _arnClient, SIGNAL(replyLs(QStringList,QString)), this, SLOT(commandLsReply(QStringList)));
 
     //// Setup model
     _arnModel = new ArnModel( _connector, this);
@@ -112,7 +114,8 @@ MainWindow::MainWindow(QWidget *parent) :
     _arnModel->start();
     connect( _arnModel, SIGNAL(hiddenRow(int,QModelIndex,bool)),
              this, SLOT(updateHidden(int,QModelIndex,bool)));
-
+    connect( _arnModel, SIGNAL(rowInserted(QModelIndex,int)),
+             this, SLOT(rowInserted(QModelIndex,int)));
     setWindowTitle(tr("Arn Browser  ") + ver);
     _ui->arnView->setEnabled( false);
 
@@ -138,11 +141,14 @@ MainWindow::MainWindow(QWidget *parent) :
     connect( _ui->arnView, SIGNAL(clicked(QModelIndex)), this, SLOT(onItemClick(QModelIndex)));
     connect( _ui->arnView, SIGNAL(customContextMenuRequested(QPoint)),
              this, SLOT(onContextMenuRequested(QPoint)));
+    connect( _ui->arnView, SIGNAL(expanded(QModelIndex)), this, SLOT(expandedReply(QModelIndex)));
 
     setConnectOffGui();
     // Test chat button
     //_ui->chatButton->setVisible(true);
     //setChatButEff( true);
+
+    connect( _ui->filterEdit, SIGNAL(returnPressed()), this, SLOT(startFiltering()));
 }
 
 
@@ -185,6 +191,8 @@ void  MainWindow::connection( bool isConnect)
         _ui->portEdit->setEnabled( false);
     }
     else if (wasConnect) {
+        doEmptyFiltering();
+        setFilterText("");
         _arnModel->clear();
         ArnClient::ConnectStat  stat = _arnClient->connectStatus();
         if ((stat != ArnClient::ConnectStat::Connected)  // No contact with server
@@ -415,6 +423,239 @@ void  MainWindow::updateHiddenTree( const QModelIndex& index)
 }
 
 
+void MainWindow::commandLsReply( const QStringList& itemList )
+{
+    QString prefixPath = _filterSearchPaths.first();
+    _filterSearchPaths.removeFirst();
+    foreach ( QString item, itemList ) {
+        QString path = prefixPath + item;
+        item = Arn::convertPath( item, Arn::NameF::EmptyOk );
+        if ( matchesFilter( item)) {
+            path = Arn::convertPath( path, Arn::NameF::EmptyOk);
+            _filterMatchPaths.append( path);
+        }
+        else if ( !ArnM::isLeaf( "/@host" + path )) {
+            _filterSearchPaths.append( path);
+        }
+    }
+    if ( _filterSearchPaths.isEmpty() ) {
+        _filterState = FilterState::ExpandNextMatch;
+    }
+    handleFiltering();
+}
+
+
+bool MainWindow::matchesFilter(const QString& string)
+{
+    return string.contains( QRegExp(_curFilterText, Qt::CaseSensitive, QRegExp::PatternSyntax::RegExp2));
+}
+
+
+void MainWindow::setFilterText( const QString& filterText)
+{
+    _ui->filterEdit->setText( filterText);
+    _curFilterText = filterText;
+}
+
+
+void MainWindow::doEmptyFiltering()
+{
+    _curFilterText = "";
+    doFiltering();
+}
+
+
+void MainWindow::doFiltering()
+{
+    if (_curFilterText == "" ) {
+        _filterState = FilterState::FilterTree;
+        _ui->arnView->collapseAll();
+    }
+    else {
+        _filterState = FilterState::Init;
+    }
+    handleFiltering();
+}
+
+
+void MainWindow::stopFiltering()
+{
+    _timerStopFiltering->stop();
+    _filterState = FilterState::Init;
+}
+
+
+void MainWindow::startFiltering()
+{
+    doEmptyFiltering();
+    setFilterText( _ui->filterEdit->text());
+    doFiltering();
+}
+
+
+void MainWindow::expandedReply(QModelIndex index)
+{
+    if ( _arnModel->rowCount( index) > 0) {
+        expandNextFolder();
+    }
+}
+
+
+void MainWindow::rowInserted(QModelIndex index, int row)
+{
+    QString newPath = _connector->toNormPath( _arnModel->data( _arnModel->index(row, 0, index),
+                                                               ArnModel::Role::Path).toString() );
+    QString curIndexPath = "";
+    if (_lastIndexMatch != QModelIndex()) {
+        curIndexPath = _connector->toNormPath( _arnModel->data( _lastIndexMatch,
+                                                                ArnModel::Role::Path).toString() );
+    }
+    if (_filterState == FilterState::FilterTree) {
+        filterTree( index);
+        _timerStopFiltering->start();
+    }
+    else if ( newPath.contains( curIndexPath)) {
+        expandNextFolder( row);
+    }
+}
+
+
+void MainWindow::expandNextFolder( const int row)
+{
+    if ( _filterState == FilterState::WaitingForExpand) {
+        _curIndexRowNr = row;
+        _filterState = FilterState::ExpandNextFolder;
+        handleFiltering();
+    }
+}
+
+
+void MainWindow::handleFiltering()
+{
+    if ( _filterState == FilterState::Init) {
+        _filterMatchPaths  = QStringList();
+        _filterSearchPaths = QStringList();
+        _filterSearchPaths.append( "/" );
+        _filterState = FilterState::FindMatches;
+        handleFiltering();
+    }
+    else if ( _filterState == FilterState::FindMatches) {
+        _arnClient->commandLs( _filterSearchPaths.first());
+    }
+    else if ( _filterState == FilterState::ExpandNextMatch) {
+        if ( !_filterMatchPaths.isEmpty() ) {
+            QString nextMatchPath = _filterMatchPaths.first();
+            _filterMatchPaths.removeFirst();
+            expandPath( nextMatchPath );
+        }
+        else {
+            _filterState = FilterState::FilterTree;
+            handleFiltering();
+        }
+    }
+    else if ( _filterState == FilterState::ExpandNextFolder) {
+        if ( !_foldersToExpand.isEmpty() ) {
+            _nrIndexRows = _arnModel->rowCount( _lastIndexMatch);
+            if (_curIndexRowNr < _nrIndexRows) {
+                expandIndexIfMatchingFilter( _arnModel->index(_curIndexRowNr, 0, _lastIndexMatch) );
+            }
+            else {
+                qCritical() << "ERROR: List of folders to expand is not empty but current row nr "
+                               "is higher than the nr of available rows. Not supposed to ever happen.";
+            }
+        }
+        else {
+            _filterState = FilterState::ExpandNextMatch;
+            handleFiltering();
+        }
+    }
+    else if ( _filterState == FilterState::FilterTree) {
+        filterTree( _ui->arnView->rootIndex() );
+        _timerStopFiltering->start();
+    }
+}
+
+
+void MainWindow::expandPath( const QString& path )
+{
+    QString curPath = path.left( path.size() - 1 );
+    _foldersToExpand = curPath.split("/");
+    for ( int i = 0; i < _foldersToExpand.size(); i++) {
+        if (_foldersToExpand[i] == "") {
+            _foldersToExpand[i] = "/";
+        }
+    }
+    if ( !_foldersToExpand.isEmpty() ) {
+        expandIndexIfMatchingFilter( _ui->arnView->rootIndex() );
+    }
+}
+
+
+void MainWindow::expandIndexIfMatchingFilter( const QModelIndex index )
+{
+    QString curFolder = _foldersToExpand.first();
+    QString curIndexHasPath = _connector->toNormPath( _arnModel->data( index, ArnModel::Role::Path).toString() );
+    if ( curIndexHasPath.contains( curFolder ) ) {
+        _filterState = FilterState::ExpandNextFolder;
+        _lastIndexMatch = index;
+        _foldersToExpand.removeFirst();
+        _curIndexRowNr = 0;
+        if (!_ui->arnView->isExpanded( _lastIndexMatch) && curIndexHasPath != "/" && !_foldersToExpand.isEmpty() ) {
+            _filterState = FilterState::WaitingForExpand;
+            _ui->arnView->expand( _lastIndexMatch);
+            return;
+        }
+    }
+    else if (_curIndexRowNr + 1 < _nrIndexRows) {
+        _curIndexRowNr++;
+    }
+    else {
+        _filterState = FilterState::WaitingForExpand;
+    }
+    if (_filterState != FilterState::FilterTree) {
+        handleFiltering();
+    }
+}
+
+
+void MainWindow::filterTree( const QModelIndex& index)
+{
+    updateFilterIndex( index );
+
+    int  rows = _arnModel->rowCount( index);
+    for (int i = 0; i < rows; ++i) {
+        filterTree( _arnModel->index(i, 0, index));
+    }
+}
+
+
+void MainWindow::updateFilterIndex(QModelIndex index)
+{
+    QString path = _connector->toNormPath( _arnModel->data( index, ArnModel::Role::Path).toString() );
+    bool hideRow = false;
+    QModelIndex parentIndex = _arnModel->parent( index);
+    // Never hide root aka '//':
+    if ( _curFilterText != "" && !matchesFilter( path) && path.length() > 2 ) {
+        hideRow = true;
+    }
+    _ui->arnView->setRowHidden( index.row(), parentIndex, hideRow );
+
+    // Show all parents of a child that is matching with filter
+    if (hideRow == false) {
+        int curRow = parentIndex.row();
+        parentIndex = _arnModel->parent( parentIndex);
+        while (parentIndex != QModelIndex()) {
+            _ui->arnView->setRowHidden( curRow, parentIndex, hideRow );
+            curRow = parentIndex.row();
+            parentIndex = _arnModel->parent( parentIndex);
+        }
+    }
+
+    // Make sure that hidden rows stay hidden when filter is empty
+    _arnModel->data( index, ArnModel::Role::Hidden);
+}
+
+
 void  MainWindow::onItemClick( const QModelIndex& index)
 {
     QString  curItemPath = _arnModel->data( index, ArnModel::Role::Path).toString();
@@ -637,12 +878,11 @@ void  MainWindow::setCurItemPath( const QString& path)
 
     if (path.isEmpty() || (path == "/")) {  // Not selected item
         _curItemPath = "/";
-        _curItemPathStatus->setText("");
+        _ui->pathEdit->setText("");
     }
-    else {  // Selected item
+    else {
         _curItemPath = path;
-        _curItemPathStatus->setText( _connector->toNormPath( _curItemPath));
-
+        _ui->pathEdit->setText( _connector->toNormPath( _curItemPath));
         arnItem.open( _curItemPath);
         type = arnItem.type();
     }

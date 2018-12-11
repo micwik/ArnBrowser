@@ -45,8 +45,19 @@ namespace Ui {
 }
 
 
-class MainWindow : public QMainWindow {
+class MainWindow : public QMainWindow
+{
     Q_OBJECT
+
+    enum FilterState {
+        Init,
+        FindMatches,
+        ExpandNextMatch,
+        ExpandNextFolder,
+        WaitingForExpand,
+        FilterTree
+    };
+
 public:
     MainWindow( QWidget* parent = 0);
     ~MainWindow();
@@ -78,11 +89,17 @@ private slots:
     void  writeSettings();
     //void  dataChanged( const QModelIndex& topLeft, const QModelIndex& bottomRight);
     void  updateHidden( int row, QModelIndex parent, bool isHidden);
+    void  updateFilterIndex( QModelIndex index);
     void  onKillRequest();
     void  onChatReceived( const QString& text, int prioType);
     void  doChatAdd( const QString& text);
     void  doAbortKillRequest();
     void  doChatButtonEffect();
+    void  commandLsReply( const QStringList& subItems);
+    void  stopFiltering();
+    void  startFiltering();
+    void  expandedReply( QModelIndex index);
+    void  rowInserted( QModelIndex index, int row);
 
 protected:
     void changeEvent( QEvent *e);
@@ -95,6 +112,15 @@ private:
     void  setConnectOffGui();
     void  setFuncButtonOffGui();
     void  updateHiddenTree( const QModelIndex& index);
+    bool  matchesFilter( const QString& string);
+    void  setFilterText( const QString& filterText = "");
+    void  doEmptyFiltering();
+    void  doFiltering();
+    void  expandNextFolder(const int row = 0 );
+    void  handleFiltering();
+    void  expandPath( const QString& path );
+    void  expandIndexIfMatchingFilter(const QModelIndex index);
+    void  filterTree( const QModelIndex& index);
     void  setChatButEff( bool isOn);
     void  setCurItemPath( const QString& path = QString());
 
@@ -103,9 +129,9 @@ private:
     ChatServWindow*  _chatServWin;
     QGraphicsColorizeEffect*  _chatButEff;
     QTimer*  _timerChatButEff;
+    QTimer*  _timerStopFiltering;
     int  _countChatButEff;
 
-    QLineEdit*  _curItemPathStatus;
     MultiDelegate*  _delegate;
     ArnModel*  _arnModel;
     ArnClient*  _arnClient;
@@ -114,6 +140,14 @@ private:
     SettingsHandler*  _settings;
     QSettings*  _appSettings;
     QString  _curItemPath;
+    QString  _curFilterText;
+    QStringList _filterSearchPaths;
+    QStringList _filterMatchPaths;
+    QStringList _foldersToExpand;
+    FilterState _filterState;
+    QModelIndex  _lastIndexMatch;
+    int  _curIndexRowNr;
+    int  _nrIndexRows;
     int  _pathWidth;
     bool  _isConnect;
     bool  _wasContact;
