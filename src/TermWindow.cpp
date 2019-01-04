@@ -65,6 +65,7 @@ TermWindow::TermWindow( QSettings* appSettings, const ConnectorPath& conPath, QW
     this->setWindowTitle( QString("Terminal ") + normPath + " @ " + curHost + ":" + curPort );
 
     _appSettings = appSettings;
+    _settings    = new SettingsHandler( _appSettings);
     readSettings();
 
     _pipeRq.open( rqPath);
@@ -232,9 +233,10 @@ void  TermWindow::closeEvent( QCloseEvent* event)
 
 void  TermWindow::readSettings()
 {
+    _settings->readSettings();
     QPoint  pos = _appSettings->value("term/pos", QPoint(200, 200)).toPoint();
     QSize  size = _appSettings->value("term/size", QSize(400, 400)).toSize();
-    _maxRows = _appSettings->value("set/maxRows", QVariant()).toInt();
+    _maxRows = _settings->d.maxRows;
     resize( size);
     move( pos);
 }

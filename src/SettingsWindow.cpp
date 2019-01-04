@@ -92,7 +92,7 @@ void  SettingsWindow::readSettings()
     _ui->userNameEdit->setText( _settings->d.userName);
     _ui->contactEdit->setText(  _settings->d.contact);
     _ui->locationEdit->setText( _settings->d.location);
-    _ui->rowsEdit->setText(     _settings->d.maxRows);
+    _ui->rowsEdit->setText( QString::number(_settings->d.maxRows) );
 }
 
 
@@ -105,6 +105,6 @@ void  SettingsWindow::writeSettings()
     _settings->d.userName = _ui->userNameEdit->text();
     _settings->d.contact  = _ui->contactEdit->text();
     _settings->d.location = _ui->locationEdit->text();
-    _settings->d.maxRows  = _ui->rowsEdit->text();
+    _settings->d.maxRows  = _ui->rowsEdit->text().toInt();
     _settings->writeSettings();
 }

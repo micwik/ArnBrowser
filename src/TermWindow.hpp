@@ -28,6 +28,7 @@
 #include <ArnInc/ArnItem.hpp>
 #include <QDialog>
 #include <QStringList>
+#include <SettingsHandler.hpp>
 
 class QSettings;
 class QCloseEvent;
@@ -72,6 +73,8 @@ private:
     History*  selHistory( const QWidget* widget);
 
     Ui::TermWindow*  _ui;
+    SettingsHandler*  _settings;
+
     ArnItem  _pipeRq;
     ArnItem  _pipePv;
     History  _historyRq;
