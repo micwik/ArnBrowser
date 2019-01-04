@@ -31,7 +31,7 @@
     const QString QtVerTxt = "(Qt4)";
 #endif
 
-    extern const QString ver = "3.1.5 " + QtVerTxt;  // Don't forget to change in setup.iss -files
+    extern const QString ver = "3.1.10 " + QtVerTxt;  // Don't forget to change in setup.iss -files
 
 
 int main(int argc, char *argv[])
