@@ -186,6 +186,7 @@ void  MainWindow::connection( bool isConnect)
 
         _arnClient->connectToArn( _ui->hostEdit->text(), _ui->portEdit->value());
         _connector->setCurHost( _ui->hostEdit->text());
+        _connector->setCurPort( _ui->portEdit->text());
         _ui->discoverButton->setVisible( false);
         _ui->hostEdit->setEnabled( false);
         _ui->portEdit->setEnabled( false);

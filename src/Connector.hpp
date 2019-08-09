@@ -50,10 +50,13 @@ public:
 
     QString curHost() const;
     void setCurHost(const QString &curHost);
+    QString curPort() const;
+    void setCurPort(const QString &curPort);
 
 private:
     const QString  _hostRootPath;
     QString _curHost;
+    QString _curPort;
 };
 
 
@@ -67,6 +70,7 @@ public:
     QString  toNormPath( const QString& path)  const;  // Normal path, also as remote path and viewed path
     QString  toLocalPath( const QString& path)  const;
     QString  curHost()  const;
+    QString  curPort()  const;
 
 private:
     QPointer<Connector>  _connector;

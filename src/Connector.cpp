@@ -69,6 +69,18 @@ void Connector::setCurHost(const QString &curHost)
 }
 
 
+QString Connector::curPort() const
+{
+    return _curPort;
+}
+
+
+void Connector::setCurPort(const QString& curPort)
+{
+    _curPort = curPort;
+}
+
+
 
 //////////////// ConnectorPath
 
@@ -109,4 +121,10 @@ QString  ConnectorPath::toLocalPath( const QString& path)  const
 QString ConnectorPath::curHost() const
 {
     return _connector ? _connector->curHost() : QString();
+}
+
+
+QString ConnectorPath::curPort() const
+{
+    return _connector ? _connector->curPort() : QString();
 }
