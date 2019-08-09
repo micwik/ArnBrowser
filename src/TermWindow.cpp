@@ -76,6 +76,7 @@ TermWindow::TermWindow( QSettings* appSettings, const ConnectorPath& conPath, QW
     _ui->textEdit->setReadOnly( true);
     _ui->clearButton->clearFocus();
     _ui->lineEditRq->setFocus();
+    _ui->rowsLabel->setText(QString::number(_nrRows));
 
     connect( &_pipeRq, SIGNAL(arnLinkDestroyed()), this, SLOT(deleteLater()));
     connect( &_pipeRq, SIGNAL(changed(QString)), this, SLOT(doPipeInputRq(QString)));
@@ -128,6 +129,7 @@ void  TermWindow::on_clearButton_clicked()
     // qDebug() << "ClearButton!";
     _ui->textEdit->clear();
     _nrRows = 0;
+    _ui->rowsLabel->setText(QString::number(_nrRows));
 }
 
 
