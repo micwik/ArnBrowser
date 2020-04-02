@@ -86,11 +86,6 @@ QCheckBox::indicator:disabled:checked[class=trafic] {
           <height>0</height>
          </size>
         </property>
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
         <property name="text">
          <string/>
         </property>
@@ -125,11 +120,6 @@ QCheckBox::indicator:disabled:checked[class=trafic] {
           <width>0</width>
           <height>0</height>
          </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
         </property>
         <property name="minimum">
          <number>1</number>
@@ -171,11 +161,6 @@ QCheckBox::indicator:disabled:checked[class=trafic] {
           <width>122</width>
           <height>0</height>
          </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>9</pointsize>
-         </font>
         </property>
         <property name="text">
          <string>Connection</string>
@@ -269,11 +254,6 @@ QCheckBox::indicator:disabled:checked[class=trafic] {
           <width>140</width>
           <height>0</height>
          </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>9</pointsize>
-         </font>
         </property>
         <property name="text">
          <string>Discover ARN</string>

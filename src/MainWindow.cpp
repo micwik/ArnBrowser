@@ -47,6 +47,7 @@
 #include <QGraphicsColorizeEffect>
 #include <QDebug>
 #include <math.h>
+
 #ifdef QMLRUN
   #include "QmlRunWindow.hpp"
   #include <ArnInc/ArnQml.hpp>
@@ -59,6 +60,14 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     _ui( new Ui::MainWindow)
 {
+    _appSettings = new QSettings("MicTron", "ArnBrowser");
+    _settings    = new SettingsHandler( _appSettings);
+    _settings->readSettings();
+
+    QFont currentFont;
+    currentFont.fromString( _settings->d.font );
+    QApplication::setFont( currentFont );
+
     _ui->setupUi( this);
 
     _isConnect          = false;
@@ -86,10 +95,6 @@ MainWindow::MainWindow(QWidget *parent) :
     _timerStopFiltering = new QTimer( this);
     _timerStopFiltering->setInterval( 3000);
     connect( _timerStopFiltering, SIGNAL(timeout()), this, SLOT(stopFiltering()));
-
-    _appSettings = new QSettings("MicTron", "ArnBrowser");
-    _settings    = new SettingsHandler( _appSettings);
-    _settings->readSettings();
 
     //// Error log from Arn system
     ArnM::setConsoleError( false);

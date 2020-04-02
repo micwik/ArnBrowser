@@ -51,6 +51,7 @@ protected:
 
 private slots:
     void  on_generateButton_clicked();
+    void on_fontButton_clicked();
 
 private:
     void  readSettings();

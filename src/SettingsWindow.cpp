@@ -29,6 +29,7 @@
 #include <QCloseEvent>
 #include <QSettings>
 #include <QDebug>
+#include <QFontDialog>
 
 
 SettingsWindow::SettingsWindow( SettingsHandler* settings, QWidget* parent) :
@@ -79,6 +80,16 @@ void  SettingsWindow::on_generateButton_clicked()
 {
     QString  pwHashed = ArnClient::passwordHash( _ui->passwordEdit->text());
     _ui->hashEdit->setText( pwHashed);
+}
+
+void SettingsWindow::on_fontButton_clicked()
+{
+    bool ok = false;
+    QFont currentFont;
+    currentFont.fromString( _settings->d.font );
+    QFont font = QFontDialog::getFont( &ok, currentFont, this);
+    _settings->d.font = font.toString();
+    return;
 }
 
 
