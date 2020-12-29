@@ -11,6 +11,7 @@
 *.dylib
 *.exe
 *.dll
+tmp
 ArnBrowser
 
 
@@ -21,6 +22,7 @@ moc_*.cpp
 qrc_*.cpp
 ui_*.h
 *.log
+.qmake.stash
 Makefile
 Makefile.*
 *-build-*

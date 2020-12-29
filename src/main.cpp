@@ -25,13 +25,8 @@
 #include "MainWindow.hpp"
 #include <QIcon>
 
-#if QT_VERSION >= 0x050000
-    const QString QtVerTxt = "(Qt5)";
-#else
-    const QString QtVerTxt = "(Qt4)";
-#endif
-
-    extern const QString ver = "3.1.11 " + QtVerTxt;  // Don't forget to change in setup.iss -files
+const QString QtVerTxt = "(Qt" QT_VERSION_STR ")";
+extern const QString ver = "3.2  " + QtVerTxt;  // Don't forget to change in setup.iss -file
 
 
 int main(int argc, char *argv[])

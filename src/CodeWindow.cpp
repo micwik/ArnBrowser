@@ -79,8 +79,14 @@ CodeWindow::CodeWindow( QSettings* appSettings, const ConnectorPath& conPath, QW
     textEdit->editor()->setMatchedBraceForegroundColor( Qt::red);
 #else
     QFontMetrics fm( _font);
+#if QT_VERSION >= 0x060000
+    int  tabWidthInPixels = fm.size( Qt::TextSingleLine, "    ").width();
+    textEdit->editor()->setTabStopDistance( qreal( tabWidthInPixels));
+#else
     int  tabWidthInPixels = fm.width("    ");
     textEdit->editor()->setTabStopWidth( tabWidthInPixels);
+#endif
+
     textEdit->editor()->setCurrentFont( _font);
 #endif
 

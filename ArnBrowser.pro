@@ -15,9 +15,12 @@ win32 {
     CONFIG += mDnsIntern
 }
 
+QMAKE_CXXFLAGS_WARN_ON = -Wall -Wno-deprecated-declarations
+
 QT += core gui
 QT += network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 5): QT += core5compat
 
 TARGET = ArnBrowser
 TEMPLATE = app
@@ -98,10 +101,14 @@ QmlRun {
 
 INCLUDEPATH += src $$PWD/.. $$PWD/../include
 
-greaterThan(QT_MAJOR_VERSION, 4) {
-    ARNLIB = Arn5
+greaterThan(QT_MAJOR_VERSION, 5) {
+    ARNLIB = Arn6
 } else {
-    ARNLIB = Arn4
+    greaterThan(QT_MAJOR_VERSION, 4) {
+        ARNLIB = Arn5
+    } else {
+        ARNLIB = Arn4
+    }
 }
 
 ArnLibCompile {

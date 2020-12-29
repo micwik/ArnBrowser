@@ -23,10 +23,10 @@
 
 #include "ManageWindow.hpp"
 #include "ArnModel.hpp"
+#include "ArnInc/ArnCompat.hpp"
 #include "ui_ManageWindow.h"
 #include <QCloseEvent>
 #include <QSettings>
-#include <QRegExpValidator>
 #include <QDebug>
 
 
@@ -46,8 +46,8 @@ ManageWindow::ManageWindow( QSettings* appSettings, const ConnectorPath& conPath
     _isPersistFile = false;
     _isMandatory   = false;
 
-    QRegExp  rx("^[^/ ][^ ]*$");
-    QRegExpValidator*  validator = new QRegExpValidator( rx, this);
+    ARN_RegExp  rx("^[^/ ][^ ]*$");
+    ARN_RegExpValidator*  validator = new ARN_RegExpValidator( rx, this);
     _ui->itemEdit->setValidator( validator);
 
     //// Logics

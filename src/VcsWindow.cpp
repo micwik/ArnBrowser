@@ -268,10 +268,10 @@ void  VcsWindow::doCloseTagWindow(QString tagName)
 {
     if (tagName.isEmpty())  return;
 
-    QRegExp  rx("[^ \\/\\\\]+");
-    QRegExpValidator*  validator = new QRegExpValidator( rx, this);
+    ARN_RegExp  rx("[^ \\/\\\\]+");
+    ARN_RegExpValidator*  validator = new ARN_RegExpValidator( rx, this);
     int pos = 0;
-    if (validator->validate(tagName, pos) != QRegExpValidator::Acceptable) {
+    if (validator->validate(tagName, pos) != ARN_RegExpValidator::Acceptable) {
         _ui->textView->setText("Invalid tagname, not used!");
         return;
     }
