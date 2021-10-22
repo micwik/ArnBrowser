@@ -293,14 +293,23 @@ QVariant  ArnModel::data(const QModelIndex &index, int role) const
         QString  name = node->name( Arn::NameF::NoFolderMark);
         return submitRowHidden( index.row(), parent( index), name);
     }
-    case ItemDataRole::EnumList:
+    case ItemDataRole::EnumList: {
         if (index.column() < 1)  return QVariant();
 
         if (node->isFolder() && node->_setMap && node->_valueChild) {
             // qDebug() << "EnumList: " << node->_setMap->values();
-            return node->_setMap->values();
+            QStringList retVal;
+            const XStringMap& xsm = *node->_setMap;
+            int xsmSize = xsm.size();
+            for (int i = 0; i < xsmSize; ++i) {
+                const QByteArray& key = xsm.keyRef( i);
+                if (node->_isBitSet && !key.startsWith( "B"))  continue;
+                retVal += xsm.valueString( i);
+            }
+            return retVal;
         }
         break;
+    }
     }
     return QVariant();
 }
