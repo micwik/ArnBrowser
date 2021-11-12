@@ -41,6 +41,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QMenu>
+#include <QFileDialog>
 #include <QAction>
 #include <QSettings>
 #include <QCloseEvent>
@@ -364,6 +365,24 @@ void  MainWindow::on_hideBidir_clicked()
 }
 
 
+void MainWindow::on_loadBinfile()
+{
+    QString  fileName = QFileDialog::getOpenFileName( this);
+    if (!fileName.isEmpty())
+        ArnM::loadFromFile( _curItemPath, fileName, Arn::Coding::Binary);
+        //loadBinFile( fileName);
+}
+
+
+void MainWindow::on_saveBinfile()
+{
+    QString  fileName = QFileDialog::getSaveFileName( this);
+    if (!fileName.isEmpty())
+        ArnM::saveToFile( _curItemPath, fileName, Arn::Coding::Binary);
+        //saveBinFile( fileName);
+}
+
+
 void  MainWindow::onContextMenuRequested( const QPoint& pos)
 {
     // qDebug() << "Context menu: pos=" << pos;
@@ -397,6 +416,14 @@ void  MainWindow::onContextMenuRequested( const QPoint& pos)
         QAction*  action = new QAction( QIcon(":/pic/Pencil-icon.png"), "Edit", this);
         menu->addAction( action);
         connect( action, SIGNAL(triggered()), this, SLOT(on_editButton_clicked()));
+
+        action = new QAction( QIcon(), "Load binfile", this);
+        menu->addAction( action);
+        connect( action, SIGNAL(triggered()), this, SLOT(on_loadBinfile()));
+
+        action = new QAction( QIcon(), "Save binfile", this);
+        menu->addAction( action);
+        connect( action, SIGNAL(triggered()), this, SLOT(on_saveBinfile()));
     }
     if ( _ui->runButton->isEnabled()) {
         QAction*  action = new QAction( QIcon(":/pic/Play.png"), "Run", this);

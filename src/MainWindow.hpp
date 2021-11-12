@@ -83,6 +83,8 @@ private slots:
     void  on_settingsButton_clicked();
     void  on_viewHidden_clicked();
     void  on_hideBidir_clicked();
+    void  on_loadBinfile();
+    void  on_saveBinfile();
     void  onContextMenuRequested( const QPoint& pos);
     void  errorLog( QString errText);
     void  readSettings();
