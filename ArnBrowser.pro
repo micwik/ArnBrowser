@@ -2,6 +2,7 @@
 # Project created by QtCreator 2010-08-12T21:08:40
 # -------------------------------------------------
 
+# CONFIG += mDnsIntern    # Usage of internal mDNS code (no external dependency)
 CONFIG += ArnLibCompile
 
 # Usage of running qml script in Arn
@@ -10,9 +11,9 @@ CONFIG += QmlRun
 # Usage of js aware code editor
 # CONFIG += qscintilla
 
-# Usage of internal mDNS code (no external dependency)
 win32 {
     CONFIG += mDnsIntern
+    CONFIG += ArnLibCompile
 }
 
 QMAKE_CXXFLAGS_WARN_ON = -Wall -Wno-deprecated-declarations
@@ -24,10 +25,10 @@ greaterThan(QT_MAJOR_VERSION, 5): QT += core5compat
 
 TARGET = ArnBrowser
 TEMPLATE = app
-OBJECTS_DIR = tmp
-MOC_DIR = tmp
-RCC_DIR = tmp
-UI_DIR = tmp
+OBJECTS_DIR = build
+MOC_DIR = build
+RCC_DIR = build
+UI_DIR = build
 
 SOURCES += src/main.cpp \
     src/MainWindow.cpp \
