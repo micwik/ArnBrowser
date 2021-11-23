@@ -174,7 +174,7 @@ void  TermWindow::keyPressEvent( QKeyEvent* ev)
         }
         break;
     }
-    case Qt::ControlModifier + Qt::Key_F:
+    case Qt::ControlModifier | Qt::Key_F:
     {   //// Find
         // qDebug() << "KeyPressEvent: key=Ctrl-F";
         ev->accept();
@@ -192,7 +192,7 @@ void  TermWindow::keyPressEvent( QKeyEvent* ev)
         }
         break;
     }
-    case Qt::ControlModifier + Qt::Key_G:
+    case Qt::ControlModifier | Qt::Key_G:
         // Fall through
     case Qt::Key_F3:
     {   //// Find next
@@ -205,9 +205,9 @@ void  TermWindow::keyPressEvent( QKeyEvent* ev)
         }
         break;
     }
-    case Qt::ShiftModifier + Qt::ControlModifier + Qt::Key_G:
+    case Qt::ShiftModifier | Qt::ControlModifier | Qt::Key_G:
         // Fall through
-    case Qt::ShiftModifier + Qt::Key_F3:
+    case Qt::ShiftModifier | Qt::Key_F3:
     {   //// Find previous
         // qDebug() << "KeyPressEvent: key=Shift-F3";
         ev->accept();

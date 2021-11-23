@@ -36,6 +36,7 @@
 #include "SettingsHandler.hpp"
 #include <ArnInc/ArnClient.hpp>
 #include <ArnInc/XStringMap.hpp>
+#include <ArnInc/ArnCompat.hpp>
 #include <QMessageBox>
 #include <QSpinBox>
 #include <QLabel>
@@ -46,6 +47,7 @@
 #include <QSettings>
 #include <QCloseEvent>
 #include <QGraphicsColorizeEffect>
+#include <QRegExp>
 #include <QDebug>
 #include <math.h>
 
@@ -480,7 +482,11 @@ void MainWindow::commandLsReply( const QStringList& itemList )
 
 bool MainWindow::matchesFilter(const QString& string)
 {
+#if QT_VERSION >= 0x060000
+    return string.contains( QRegularExpression(_curFilterText));
+#else
     return string.contains( QRegExp(_curFilterText, Qt::CaseSensitive, QRegExp::PatternSyntax::RegExp2));
+#endif
 }
 
 
