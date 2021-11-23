@@ -107,6 +107,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //// Prepare connect to Arn server
     _connector = new Connector( this);
     _arnClient = new ArnClient( this);
+    _arnClient->setSyncMode( ArnClient::SyncMode::ExplicitMaster);
     _arnClient->setDemandLogin( false);
     // _arnClient->setReceiveTimeout(5);  // Base time for receiver timeout
     connect( _arnClient, SIGNAL(connectionStatusChanged(int,int)), this, SLOT(doClientStateChanged(int)));
