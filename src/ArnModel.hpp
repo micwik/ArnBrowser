@@ -39,6 +39,7 @@
 #include <QAbstractItemModel>
 #include <ArnInc/ArnItem.hpp>
 #include <ArnInc/ArnClient.hpp>
+#include <ArnInc/MQFlags.hpp>
 
 class ArnMonitor;
 
@@ -68,8 +69,10 @@ public:
     ArnMonitor*  _arnMon;
     typedef Arn::XStringMap  SetMap;
     typedef Arn::XStringMap  PropMap;
+    typedef Arn::EnumTxt  EnumTxt;
     SetMap*  _setMap;
     SetMap*  _propMap;
+    EnumTxt*  _enumTxt;
     int  _folderChildN;  // -1 = Has been at least one,  >= 0 Actual number so far
     int  _leafChildN;    // -1 = Has been at least one,  >= 0 Actual number so far
     bool  _isExpanded;

@@ -64,6 +64,7 @@ public:
     QWidget*  createEditor( QWidget* parent, const QStyleOptionViewItem& option,
                             const QModelIndex& index)  const;
     void  setupCalenderWidget( QDateTimeEdit* editor)  const;
+    QWidget*  createBitSetEditor( QWidget* parent, const QModelIndex& index, const QVariant& value)  const;
 
     void  setEditorData( QWidget* editor, const QModelIndex& index)  const;
     void  setModelData( QWidget* editor, QAbstractItemModel* model,

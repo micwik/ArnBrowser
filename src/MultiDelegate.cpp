@@ -52,6 +52,9 @@
 #include <QRect>
 #include <QGridLayout>
 #include <QVBoxLayout>
+#include <QScrollArea>
+#include <QScrollBar>
+#include <QApplication>
 #include <QDebug>
 
 
@@ -194,34 +197,8 @@ QWidget*  MultiDelegate::createEditor( QWidget* parent,
     }
     case QMetaType::QStringList:
     {
-        QVariant  varList = index.model()->data( index, ItemDataRole::EnumList);
-        if (varList.isNull())  break;  // Not a enum-list, fall to std
-
-        QListWidget*  editor = new QListWidget( parent);
-        foreach (const QString& bitItemText, varList.toStringList()) {
-            QListWidgetItem* bitItem = new QListWidgetItem( bitItemText, editor);
-            bitItem->setFlags(bitItem->flags() | Qt::ItemIsUserCheckable);
-            bitItem->setCheckState(Qt::Unchecked);
-        }
-        int width  = editor->sizeHintForColumn(0) + 25;
-        int height = editor->sizeHintForRow(0) * editor->count() + 10;
-        int maxHeight = editor->sizeHintForRow(0) * 10 + 10;
-        if (height > maxHeight) {
-            height = maxHeight;
-        }
-        editor->setMinimumWidth( width);
-        editor->setMaximumWidth( width);
-        editor->setMinimumHeight( height );
-        editor->setMaximumHeight( maxHeight );
-
-        //// Get value snapshot into editor
-        QStringList  valList = value.toStringList();
-        int  itemCount = editor->count();
-        for (int i = 0; i < itemCount; ++i) {
-            QListWidgetItem*  bitItem = editor->item(i);
-            bool  isActive = valList.contains( bitItem->text());
-            bitItem->setCheckState( isActive ? Qt::Checked : Qt::Unchecked);
-        }
+        QWidget*  editor = createBitSetEditor( parent, index, value);
+        if (!editor)  break;
         return editor;
     }
     case QMetaType::QString:
@@ -262,6 +239,110 @@ void  MultiDelegate::setupCalenderWidget( QDateTimeEdit* editor)  const
         calendar->setFirstDayOfWeek(Qt::Monday);
         calendar->setVerticalHeaderFormat( QCalendarWidget::ISOWeekNumbers);
     }
+}
+
+
+QWidget*  MultiDelegate::createBitSetEditor( QWidget* parent, const QModelIndex& index,
+                                             const QVariant& value)  const
+{
+    QVariant  varList = index.model()->data( index, ItemDataRole::EnumList);
+    if (varList.isNull())  return arnNullptr;  // Not a enum-list
+
+    int  maxHeight           = 100;  // Default
+    QStringList  valList     = value.toStringList();
+    QStringList  bitTextList = varList.toStringList();
+    int  bitItemCount        = bitTextList.size();
+
+    QFrame*  frame = new QFrame();
+    frame->setObjectName( "Map");
+    frame->setAutoFillBackground( true);
+    frame->setFrameStyle( QFrame::Panel | QFrame::Plain);
+    frame->setLineWidth( 1);
+    QVBoxLayout*  lay = new QVBoxLayout( frame);
+    lay->setContentsMargins( 5, 5, 5, 5);
+    lay->setSpacing( 5);
+
+    //// Setup Bit editor
+    if (bitItemCount > 0) {
+        QListWidget*  bitEditor = new QListWidget();
+        bitEditor->setObjectName( "Bits");
+        bitEditor->setFrameStyle( QFrame::NoFrame);
+        foreach (const QString& bitItemText, bitTextList) {
+            QListWidgetItem*  bitItem = new QListWidgetItem( bitItemText, bitEditor);
+            bitItem->setFlags( bitItem->flags() | Qt::ItemIsUserCheckable);
+            bitItem->setCheckState(Qt::Unchecked);
+        }
+
+        int width  = bitEditor->sizeHintForColumn(0) + 5;
+        int height = bitEditor->sizeHintForRow(0) * bitEditor->count() + 10;
+        maxHeight = bitEditor->sizeHintForRow(0) * 10 + 10;
+
+        bitEditor->setMinimumWidth( width);
+        bitEditor->setMaximumWidth( width);
+        bitEditor->setMinimumHeight( height);
+        bitEditor->setMaximumHeight( height);
+
+        lay->addWidget( bitEditor);
+
+        //// Get value snapshot into Bit editor
+        for (int i = 0; i < bitItemCount; ++i) {
+            QListWidgetItem*  bitItem = bitEditor->item( i);
+            bool  isActive = valList.contains( bitItem->text());
+            bitItem->setCheckState( isActive ? Qt::Checked : Qt::Unchecked);
+        }
+    }
+
+    //// Setup SubEnum editors
+    QStringList  subEnumNames = index.model()->data( index, ItemDataRole::SubEnumNameList).toStringList();
+    QStringList  subEnumsAll  = index.model()->data( index, ItemDataRole::SubEnumList).toStringList();
+    int  subEnumCount = subEnumNames.size();
+    for (int i = 0; i < subEnumCount; ++i) {
+        QLabel*  label = new QLabel();
+        label->setText( subEnumNames.at( i));
+
+        QStringList  subEnums = subEnumsAll.filter( QString( ":%1:").arg( i));
+        subEnums = subEnums.replaceInStrings( QString( ":%1:").arg( i), "");
+        QComboBox* subEditor = new QComboBox();
+        subEditor->setObjectName( QString( "SubEnum:%1").arg( i));
+        subEditor->setSizeAdjustPolicy( QComboBox::AdjustToContents);
+        subEditor->addItems( subEnums);
+
+        //// Get value snapshot into SubEnum editor
+        for (int j = valList.size() - 1; j >=0; --j) {
+            int idx = subEditor->findText( valList.at( j));
+            if (idx >= 0) {
+                subEditor->setCurrentIndex( idx);
+                break;
+            }
+        }
+
+        lay->addWidget( label);
+        lay->addWidget( subEditor);
+        if (bitItemCount == 0)
+            maxHeight = (label->sizeHint().height() + subEditor->sizeHint().height()) * 4;
+    }
+
+    //// Finalize the total editor
+    frame->setLayout( lay);
+    QScrollArea*  editor = new QScrollArea( parent);
+    editor->setObjectName( "EnumBits");
+    editor->setFrameStyle( QFrame::NoFrame);
+    editor->setWidget( frame);
+    editor->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff);
+    editor->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded);
+
+    int editHeight = frame->height() + 5;
+    int editWidth  = frame->width()  + 3 ;
+    if (editHeight > maxHeight) {
+        editHeight = maxHeight;
+        editWidth += QApplication::style()->pixelMetric( QStyle::PM_ScrollBarExtent);
+    }
+    editor->setMinimumWidth( editWidth);
+    editor->setMaximumWidth( editWidth);
+    editor->setMinimumHeight( editHeight);
+    editor->setMaximumHeight( editHeight);
+
+    return editor;
 }
 
 
@@ -353,8 +434,37 @@ void MultiDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
         value = QVariant( ed->isChecked());
     }
     else {
-        QItemDelegate::setModelData( editor, model, index);
-        return;
+        QString  edName = editor->objectName();
+        if (edName == "EnumBits") {
+            QStringList  valList;
+            QWidget*  edMap = editor->findChild<QWidget*>( "Map");
+            foreach( QObject* edPart, edMap->children()) {
+                // qDebug() << "EnumBits: " << edPart->objectName() << edPart->metaObject()->className();
+                QStringList  parts = edPart->objectName().split(":");
+                QString  partName = parts.at( 0);
+                if (partName == "Bits") {
+                    QListWidget*  ed = qobject_cast<QListWidget*>( edPart);
+                    Q_ASSERT( ed);
+                    int  itemCount = ed->count();
+                    for (int i = 0; i < itemCount; ++i) {
+                        QListWidgetItem*  bitItem = ed->item(i);
+                        bool  isChecked = (bitItem->checkState() == Qt::Checked);
+                        if (isChecked)
+                            valList += bitItem->text();
+                    }
+                }
+                else if (partName == "SubEnum") {
+                    QComboBox*  ed = qobject_cast<QComboBox*>( edPart);
+                    Q_ASSERT( ed);
+                    valList += ed->currentText();
+                }
+            }
+            value = QVariant( valList);
+        }
+        else {
+            QItemDelegate::setModelData( editor, model, index);
+            return;
+        }
     }
     model->setData(index, value, Qt::EditRole);
 }

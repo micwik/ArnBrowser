@@ -45,14 +45,15 @@ using Arn::XStringMap;
 void  ArnNode::init( ArnNode* parent)
 {
     _parent       = parent;
-    _valueChild   = 0;
-    _nameChild    = 0;
-    _setChild     = 0;
-    _propChild    = 0;
-    _infoChild    = 0;
-    _arnMon       = 0;
-    _setMap       = 0;
-    _propMap      = 0;
+    _valueChild   = arnNullptr;
+    _nameChild    = arnNullptr;
+    _setChild     = arnNullptr;
+    _propChild    = arnNullptr;
+    _infoChild    = arnNullptr;
+    _arnMon       = arnNullptr;
+    _setMap       = arnNullptr;
+    _propMap      = arnNullptr;
+    _enumTxt      = arnNullptr;
     _folderChildN = 0;
     _leafChildN   = 0;
     _isExpanded   = false;
@@ -72,6 +73,7 @@ void  ArnNode::dealloc()
 
     if (_setMap)      delete _setMap;
     if (_propMap)     delete _propMap;
+    if (_enumTxt)     delete _enumTxt;
 }
 
 
@@ -297,14 +299,45 @@ QVariant  ArnModel::data(const QModelIndex &index, int role) const
         if (index.column() < 1)  return QVariant();
 
         if (node->isFolder() && node->_setMap && node->_valueChild) {
-            // qDebug() << "EnumList: " << node->_setMap->values();
             QStringList retVal;
-            const XStringMap& xsm = *node->_setMap;
-            int xsmSize = xsm.size();
-            for (int i = 0; i < xsmSize; ++i) {
-                const QByteArray& key = xsm.keyRef( i);
-                if (node->_isBitSet && !key.startsWith( "B"))  continue;
-                retVal += xsm.valueString( i);
+            if (node->_isBitSet) {
+                retVal = node->_enumTxt->getBasicTextList( 0, true);
+            }
+            else {
+                retVal = node->_setMap->values();
+            }
+            // qDebug() << "EnumList: " << retVal;
+            return retVal;
+        }
+        break;
+    }
+    case ItemDataRole::SubEnumNameList: {
+        if (index.column() < 1)  return QVariant();
+
+        if (node->isFolder() && node->_enumTxt && node->_valueChild) {
+            QStringList retVal;
+            int  subEnumCount = node->_enumTxt->subEnumCount();
+            for (int i = 0; i < subEnumCount; ++i) {
+                QString  subEnumName = node->_enumTxt->subEnumNameAt( i);
+                retVal += subEnumName;
+            }
+            return retVal;
+        }
+        break;
+    }
+    case ItemDataRole::SubEnumList: {
+        if (index.column() < 1)  return QVariant();
+
+        if (node->isFolder() && node->_enumTxt && node->_valueChild) {
+            QStringList retVal;
+            int subEnumCount = node->_enumTxt->subEnumCount();
+            for (int i = 0; i < subEnumCount; ++i) {
+                const Arn::EnumTxt*  subEnumText = node->_enumTxt->subEnumAt( i);
+                Q_ASSERT( subEnumText);
+                QStringList  enumTextList = subEnumText->getBasicTextList( 0, true);
+                foreach( const QString& enumText, enumTextList ) {
+                    retVal += QString(":%1:").arg( i) + enumText;
+                }
             }
             return retVal;
         }
@@ -334,19 +367,8 @@ QVariant  ArnModel::adjustedNodeData( const ArnNode *node, int role) const
         valueNode = node->_valueChild;
 
         if (node->_isBitSet) {
-            QStringList  valList;
-            const XStringMap*  setMap = node->_setMap;
             int  itemVal = valueNode->toInt();
-            int  setSize = setMap->size();
-            for (int i = 0; i < setSize; ++i) {
-                QByteArray  key = setMap->key(i);
-                if (key.startsWith('B')) {
-                    int  bit = key.mid(1).toInt();
-                    if (itemVal & (1 << bit)) {
-                        valList += setMap->valueString(i);
-                    }
-                }
-            }
+            QStringList  valList = node->_enumTxt->flagsToStringList( itemVal);
             if (role == Qt::DisplayRole)
                 return "[ " + valList.join(" | ") + " ]";
             else
@@ -517,24 +539,13 @@ bool  ArnModel::setData( const QModelIndex& index, const QVariant& value, int ro
         if (node->isFolder()) {
             if (node->_valueChild) {
                 if (node->_isBitSet) {
-                    int  itemVal = 0;
                     QStringList  listVal = value.toStringList();
-                    const XStringMap*  setMap = node->_setMap;
-                    int  setSize = node->_setMap->size();
-                    for (int i = 0; i < setSize; ++i) {
-                        QByteArray  key = setMap->key(i);
-                        if (key.startsWith('B')) {
-                            QString  val = setMap->valueString(i);
-                            if (listVal.contains( val)) {
-                                int  bit = key.mid(1).toInt();
-                                itemVal |= (1 << bit);
-                            }
-                        }
-                    }
+                    int  itemVal = node->_enumTxt->flagsFromStringList( listVal);
                     node->_valueChild->setValue( itemVal);
                 }
                 else if (node->_setMap) {
-                    node->_valueChild->setValue( node->_setMap->keyString( value.toString()));
+                    QString  itemVal = node->_setMap->keyString( value.toString());
+                    node->_valueChild->setValue( itemVal);
                 }
                 else {
                     setAdjustedNodeData( node->_valueChild, value);
@@ -623,6 +634,7 @@ void  ArnModel::netChildFound(QString path, ArnNode* node)
         //// Peek at child item "bitSet"
         node->_isBitSet = true;
         node->_setMap   = new ArnNode::SetMap;
+        node->_enumTxt  = new ArnNode::EnumTxt( true);
         node->_setChild = new ArnNode( path, node);
         connect( node->_setChild, SIGNAL(changed()), this, SLOT(updateBitSetMap()));
         connect( node->_setChild, SIGNAL(arnLinkDestroyed()), this, SLOT(destroyNode()));
@@ -747,6 +759,14 @@ void  ArnModel::updateSetMap( ArnNode* node)
     if (node_ != parent->_setChild)  return;
 
     parent->_setMap->fromXString( node_->toByteArray());
+    XStringMap&  setMap = *parent->_setMap;
+    for (int i = 0; i < setMap.size(); ++i) {
+        bool  isOk = true;
+        int  enumVal = Arn::EnumTxt::strToNum( setMap.keyRef( i), &isOk);
+        if (isOk) {  // The key is a number dec/hex
+            setMap.setKey( i, QByteArray::number( enumVal));  // Change the key to dec num
+        }
+    }
     parent->_setMap->setEmptyKeysToValue();
 
     QModelIndex  valueIndex = indexFromNode( parent, 1);
@@ -763,10 +783,12 @@ void  ArnModel::updateBitSetMap( ArnNode* node)
     ArnNode*  parent = qobject_cast<ArnNode*>( node_->parent());
     Q_ASSERT( parent);
     Q_ASSERT( parent->_setMap);
+    Q_ASSERT( parent->_enumTxt);
 
     if (node_ != parent->_setChild)  return;
 
     parent->_setMap->fromXString( node_->toByteArray());
+    parent->_enumTxt->loadBitSet( *parent->_setMap);
 
     QModelIndex  valueIndex = indexFromNode( parent, 1);
     emit dataChanged( valueIndex, valueIndex);
@@ -816,9 +838,12 @@ void  ArnModel::destroyNode()
     }
     if (node == parent->_setChild) { // Remove Set-child
         delete parent->_setMap;
+        if (parent->_enumTxt)
+            delete parent->_enumTxt;
         parent->_isBitSet = false;
-        parent->_setMap = 0;
-        parent->_setChild = 0;
+        parent->_setMap   = arnNullptr;
+        parent->_enumTxt  = arnNullptr;
+        parent->_setChild = arnNullptr;
         QModelIndex  valueIndex = indexFromNode( parent, 1);
         emit dataChanged( valueIndex, valueIndex);
         node->deleteLater();
