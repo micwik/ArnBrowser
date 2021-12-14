@@ -85,6 +85,7 @@ private slots:
     void  on_hideBidir_clicked();
     void  on_loadBinfile();
     void  on_saveBinfile();
+    void  on_setBits();
     void  onContextMenuRequested( const QPoint& pos);
     void  errorLog( QString errText);
     void  readSettings();

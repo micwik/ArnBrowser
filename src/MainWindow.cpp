@@ -43,6 +43,7 @@
 #include <QLineEdit>
 #include <QMenu>
 #include <QFileDialog>
+#include <QDialogButtonBox>
 #include <QAction>
 #include <QSettings>
 #include <QCloseEvent>
@@ -382,7 +383,32 @@ void MainWindow::on_saveBinfile()
     QString  fileName = QFileDialog::getSaveFileName( this);
     if (!fileName.isEmpty())
         ArnM::saveToFile( _curItemPath, fileName, Arn::Coding::Binary);
-        //saveBinFile( fileName);
+    //saveBinFile( fileName);
+}
+
+
+void MainWindow::on_setBits()
+{
+    QDialog dialog( this);
+    QHBoxLayout*  lay = new QHBoxLayout;
+    QLineEdit*  maskEd = new QLineEdit;
+    QLineEdit*  valEd  = new QLineEdit;
+    QDialogButtonBox*  buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
+                                         | QDialogButtonBox::Cancel);
+    lay->addWidget( new QLabel( "Mask"));
+    lay->addWidget( maskEd);
+    lay->addWidget( new QLabel( "Value"));
+    lay->addWidget( valEd);
+    lay->addWidget( buttonBox);
+    connect( buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
+    connect( buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
+    dialog.setLayout( lay);
+    int res = dialog.exec();
+    if (res == QDialog::Accepted) {
+        ArnItem  item( _curItemPath);
+        item.setBits( maskEd->text().toInt(), valEd->text().toInt());
+        // item.addValue( valEd->text().toInt());
+    }
 }
 
 
@@ -427,6 +453,10 @@ void  MainWindow::onContextMenuRequested( const QPoint& pos)
         action = new QAction( QIcon(), "Save binfile", this);
         menu->addAction( action);
         connect( action, SIGNAL(triggered()), this, SLOT(on_saveBinfile()));
+
+        action = new QAction( QIcon(), "Set Bits", this);
+        menu->addAction( action);
+        connect( action, SIGNAL(triggered()), this, SLOT(on_setBits()));
     }
     if ( _ui->runButton->isEnabled()) {
         QAction*  action = new QAction( QIcon(":/pic/Play.png"), "Run", this);
