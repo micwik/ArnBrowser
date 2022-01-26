@@ -64,6 +64,8 @@ TermWindow::TermWindow( QSettings* appSettings, const ConnectorPath& conPath, QW
     QString  curPort  = conPath.curPort();
     this->setWindowTitle( QString("Terminal ") + normPath + " @ " + curHost + ":" + curPort );
 
+    _nrRows      = 0;
+    _maxRows     = 0;
     _appSettings = appSettings;
     _settings    = new SettingsHandler( _appSettings);
     readSettings();
@@ -174,7 +176,7 @@ void  TermWindow::keyPressEvent( QKeyEvent* ev)
         }
         break;
     }
-    case Qt::ControlModifier | Qt::Key_F:
+    case int( Qt::ControlModifier) | Qt::Key_F:
     {   //// Find
         // qDebug() << "KeyPressEvent: key=Ctrl-F";
         ev->accept();
@@ -192,7 +194,7 @@ void  TermWindow::keyPressEvent( QKeyEvent* ev)
         }
         break;
     }
-    case Qt::ControlModifier | Qt::Key_G:
+    case int( Qt::ControlModifier) | Qt::Key_G:
         // Fall through
     case Qt::Key_F3:
     {   //// Find next
@@ -205,9 +207,9 @@ void  TermWindow::keyPressEvent( QKeyEvent* ev)
         }
         break;
     }
-    case Qt::ShiftModifier | Qt::ControlModifier | Qt::Key_G:
+    case int( Qt::ShiftModifier) | Qt::ControlModifier | Qt::Key_G:
         // Fall through
-    case Qt::ShiftModifier | Qt::Key_F3:
+    case int( Qt::ShiftModifier) | Qt::Key_F3:
     {   //// Find previous
         // qDebug() << "KeyPressEvent: key=Shift-F3";
         ev->accept();
@@ -238,7 +240,7 @@ void  TermWindow::readSettings()
     _settings->readSettings();
     QPoint  pos = _appSettings->value("term/pos", QPoint(200, 200)).toPoint();
     QSize  size = _appSettings->value("term/size", QSize(400, 400)).toSize();
-    _maxRows = _settings->d.maxRows;
+    _maxRows    = _settings->d.maxRows;
     resize( size);
     move( pos);
 }

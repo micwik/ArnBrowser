@@ -36,8 +36,8 @@ public:
         QString  userName;
         QString  contact;
         QString  location;
-        QString font;
-        uint32_t  maxRows;
+        QString  font;
+        int  maxRows;
     };
 
     SettingsHandler( QSettings* appSettings);

@@ -42,7 +42,7 @@ void  SettingsHandler::readSettings()
     d.userName = _appSettings->value("set/userName", QString()).toString();
     d.contact  = _appSettings->value("set/contact",  QString()).toString();
     d.location = _appSettings->value("set/location", QString()).toString();
-    d.font = _appSettings->value("set/font", QString()).toString();
+    d.font     = _appSettings->value("set/font",     QString()).toString();
     d.maxRows  = _appSettings->value("set/maxRows",  10000).toInt();
 }
 
@@ -52,7 +52,7 @@ void  SettingsHandler::writeSettings()
     _appSettings->setValue("set/userName", d.userName);
     _appSettings->setValue("set/contact",  d.contact);
     _appSettings->setValue("set/location", d.location);
-    _appSettings->setValue("set/font",  d.font);
+    _appSettings->setValue("set/font",     d.font);
     _appSettings->setValue("set/maxRows",  d.maxRows);
 }
 

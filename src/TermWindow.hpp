@@ -81,8 +81,8 @@ private:
     History  _historyPv;
     QString  _lastFind;
     QSettings*  _appSettings;
-    int _nrRows { 0 };
-    int _maxRows { 0 };
+    int  _nrRows;
+    int  _maxRows;
 };
 
 #endif // TERMWINDOW_HPP
