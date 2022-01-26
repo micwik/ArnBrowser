@@ -16,6 +16,8 @@ win32 {
     CONFIG += ArnLibCompile
 }
 
+# CONFIG += c++11
+QMAKE_CXXFLAGS += -std=c++11
 QMAKE_CXXFLAGS_WARN_ON = -Wall -Wno-deprecated-declarations
 
 QT += core gui
