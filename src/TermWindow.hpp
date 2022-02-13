@@ -24,11 +24,11 @@
 #ifndef TERMWINDOW_HPP
 #define TERMWINDOW_HPP
 
+#include "SettingsHandler.hpp"
 #include "Connector.hpp"
 #include <ArnInc/ArnItem.hpp>
 #include <QDialog>
 #include <QStringList>
-#include <SettingsHandler.hpp>
 
 class QSettings;
 class QCloseEvent;

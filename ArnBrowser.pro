@@ -1,12 +1,25 @@
-# -------------------------------------------------
-# Project created by QtCreator 2010-08-12T21:08:40
-# -------------------------------------------------
-
-# CONFIG += mDnsIntern    # Usage of internal mDNS code (no external dependency)
-CONFIG += ArnLibCompile
-
-# Usage of running qml script in Arn
-CONFIG += QmlRun
+# ARN += core       # Level 1: Basic Arn functionality without any tcp and syncing
+ARN += client     # Level 2: Client TCP functionality with sync etc
+# ARN += server     # Level 3: Server TCP functionality with persistence etc
+# ARN += scriptjs   # Java script support QT >= 5 (new QJSEngine)
+# ARN += script     # Java script support QT <= 5 (legacy QtScriptEngine)
+# ARN += scriptauto # Java script support depend on Qt version & ArnLib: scriptjs (prefered) or script
+ARN += qml        # QML support
+# ARN += zeroconf   # Using part of Bonjour (R), Apple's (R) implementation of zero-configuration networking.
+ARN += discover   # High level service discovery using <zeroconf> and optionally <server> for remote config.
+#
+# CONFIG += ArnLibCompile  # Compile ArnLib source into application. Be ware, breaks LGPL.
+# CONFIG += ArnRealFloat   # Use float as real type, default is double. Must be same in application & lib pro-file.
+# CONFIG += mDnsIntern     # Use internal mDNS code for zero-config (no external dependency)
+#
+QMFEATURES=$$[QMAKEFEATURES]
+isEmpty(QMFEATURES) {
+    win32: QMAKEFEATURES *= $$PWD/../qtfeatures   # '*=' because of 3 passes under Windows
+    else:  QMAKEFEATURES *= /usr/include/qtfeatures
+    cache(QMAKEFEATURES, set transient super)
+}
+# load(arnlib)      # Alt. 1) Load arnlib.prf here
+CONFIG += arnlib  # Alt. 2) Load arnlib.prf after parsing project file
 
 # Usage of js aware code editor
 # CONFIG += qscintilla
@@ -20,10 +33,8 @@ win32 {
 QMAKE_CXXFLAGS += -std=c++11
 QMAKE_CXXFLAGS_WARN_ON = -Wall -Wno-deprecated-declarations
 
-QT += core gui
-QT += network
+QT += gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-greaterThan(QT_MAJOR_VERSION, 5): QT += core5compat
 
 TARGET = ArnBrowser
 TEMPLATE = app
@@ -90,48 +101,16 @@ OTHER_FILES += \
     doc/Todo.md
 
 
-QmlRun {
-    ARN += qml
+contains(ARN, qml) {
     DEFINES += QMLRUN
-    greaterThan(QT_MAJOR_VERSION, 4) {
-        QT += qml quick
-    } else {
-        QT += declarative
-    }
     SOURCES += src/QmlRunWindow.cpp
     HEADERS += src/QmlRunWindow.hpp
 }
 
-INCLUDEPATH += src $$PWD/.. $$PWD/../include
 
-greaterThan(QT_MAJOR_VERSION, 5) {
-    ARNLIB = Arn6
-} else {
-    greaterThan(QT_MAJOR_VERSION, 4) {
-        ARNLIB = Arn5
-    } else {
-        ARNLIB = Arn4
-    }
-}
+INCLUDEPATH += src
+#INCLUDEPATH += src $$PWD/.. $$PWD/../include
 
-ArnLibCompile {
-    ARN += client
-    ARN += discover
-    include(../ArnLib/src/ArnLib.pri)
-    INCLUDEPATH += $$PWD/../ArnLib/src
-} else {
-    win32: INCLUDEPATH += $$PWD/../ArnLib/src
-
-    win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../ArnLib/release/ -l$${ARNLIB}
-    else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ArnLib/debug/ -l$${ARNLIB}
-    else:unix: LIBS += -L$$OUT_PWD/../ArnLib/ -l$${ARNLIB}
-}
-
-!mDnsIntern {
-    win32:CONFIG(release, debug|release): LIBS +=  -ldns_sd
-    else:win32:CONFIG(debug, debug|release): LIBS +=  -ldns_sd
-    else:unix: LIBS += -ldns_sd
-}
 
 qscintilla {
     DEFINES += QSCINTILLA
