@@ -12,6 +12,7 @@
 *.exe
 *.dll
 tmp
+build
 ArnBrowser
 
 
