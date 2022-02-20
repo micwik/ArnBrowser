@@ -12,22 +12,26 @@ ARN += discover   # High level service discovery using <zeroconf> and optionally
 # CONFIG += ArnRealFloat   # Use float as real type, default is double. Must be same in application & lib pro-file.
 # CONFIG += mDnsIntern     # Use internal mDNS code for zero-config (no external dependency)
 #
-QMFEATURES=$$[QMAKEFEATURES]
-isEmpty(QMFEATURES) {
-    win32: QMAKEFEATURES *= $$PWD/../qtfeatures   # '*=' because of 3 passes under Windows
-    else:  QMAKEFEATURES *= /usr/include/qtfeatures
-    cache(QMAKEFEATURES, set transient super)
-}
-# load(arnlib)      # Alt. 1) Load arnlib.prf here
-CONFIG += arnlib  # Alt. 2) Load arnlib.prf after parsing project file
-
-# Usage of js aware code editor
-# CONFIG += qscintilla
-
 win32 {
     CONFIG += mDnsIntern
     CONFIG += ArnLibCompile
 }
+greaterThan(QT_MAJOR_VERSION, 4) {
+    QMFEATURES=$$[QMAKEFEATURES]
+    isEmpty(QMFEATURES) {
+        win32: QMAKEFEATURES *= $$PWD/../qtfeatures   # '*=' because of 3 passes under Windows
+        # win32: QMAKEFEATURES *= $$PWD/../ArnLib   # '*=' because of 3 passes under Windows
+        else:  QMAKEFEATURES *= /usr/include/qtfeatures
+        cache(QMAKEFEATURES, set transient super)
+    }
+    # load(arnlib)      # Alt. 1) Load arnlib.prf here
+    CONFIG += arnlib  # Alt. 2) Load arnlib.prf after parsing project file
+} else {
+    include($$PWD/../ArnLib/arnlib.prf)
+}
+
+# Usage of js aware code editor
+# CONFIG += qscintilla
 
 # CONFIG += c++11
 QMAKE_CXXFLAGS += -std=c++11
@@ -109,8 +113,6 @@ contains(ARN, qml) {
 
 
 INCLUDEPATH += src
-#INCLUDEPATH += src $$PWD/.. $$PWD/../include
-
 
 qscintilla {
     DEFINES += QSCINTILLA
