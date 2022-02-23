@@ -12,7 +12,19 @@ build a certain project. A project file ends with the suffix "*.pro".
 Files that end with the suffix "*.pri" are included by the project 
 files and contain definitions, that are common for several project files.
 
-The first step is to edit the *.pri / *.pro files to adjust 
+In ArnLib the arnlib.prf -file contains template lines that can be used 
+in the *.pro file of the application.
+
+To use a more automated config of ArnLib and related applications,
+the Qt Feature mechanism is used as default when available.
+To set the feature directory following can be executed once (in Linux):
+> qmake -set QMAKEFEATURES /usr/include/qtfeatures
+Applications using ArnLib can now at best e.g. use:
+> ARN += client
+> CONFIG += arnlib
+And all needed config for ArnLib is automatically loaded.
+
+If needed edit the *.pro file to adjust 
 them to your needs. Take care to select your deployment directories.
 <Br><Br>
 

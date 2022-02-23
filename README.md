@@ -1,4 +1,4 @@
-    Copyright (C) 2010-2016 Michael Wiklund.
+    Copyright (C) 2010-2022 Michael Wiklund.
     All rights reserved.
     Contact: arnlib@wiklunden.se
 
@@ -12,13 +12,13 @@ All data objects are real time presented in a tree view.
 ## Installation and usage
 
 Read [Install.md](Install.md) how to build, install and use.
-This ArnBrowser depends on ArnLib 3.0 or later.
+This ArnBrowser depends on ArnLib 4.0 or later.
 <Br><Br>
 
 
 ## Main features
 
-* Based on Qt (4 & 5), multiple plattform and OS support.
+* Based on Qt (4 & 5 & 6), multiple plattform and OS support.
 
 * Tree view presentation of "hot" changing data objects.
 
@@ -51,4 +51,8 @@ This ArnBrowser depends on ArnLib 3.0 or later.
   Contains genertor for password hash (to login system).
 
 * Log dialog for saving a stream (pipe) to a file.
+
+* Content menu has new items for loading and saving binary file to/from ArnObject.
+
+* Support for Sub Enums
 
