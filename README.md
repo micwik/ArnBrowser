@@ -12,7 +12,7 @@ All data objects are real time presented in a tree view.
 ## Installation and usage
 
 Read [Install.md](Install.md) how to build, install and use.
-This ArnBrowser depends on ArnLib 4.0 or later.
+This ArnBrowser depends on ArnLib 4.1 or later.
 <Br><Br>
 
 

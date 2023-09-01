@@ -26,7 +26,7 @@
 #include <QIcon>
 
 const QString QtVerTxt = "(Qt" QT_VERSION_STR ")";
-extern const QString ver = "4.0  " + QtVerTxt;  // Don't forget to change in setup.iss -file
+extern const QString ver = "4.1  " + QtVerTxt;  // Don't forget to change in setup.iss -file
 
 
 int main(int argc, char *argv[])

@@ -57,6 +57,8 @@ LoginDialog::LoginDialog( int contextCode, QWidget* parent) :
         setGuiNoLogin();
         break;
     default:
+        _ui->messageLabel->setText("Unknown Arn protocol problem");
+        setGuiNoLogin();
         break;
     }
 }

@@ -110,6 +110,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _arnClient = new ArnClient( this);
     _arnClient->setSyncMode( ArnClient::SyncMode::ExplicitMaster);
     _arnClient->setDemandLogin( false);
+    _arnClient->setEncryptPolicy( Arn::EncryptPolicy::PreferNo);
     // _arnClient->setReceiveTimeout(5);  // Base time for receiver timeout
     connect( _arnClient, SIGNAL(connectionStatusChanged(int,int)), this, SLOT(doClientStateChanged(int)));
     connect( _arnClient, SIGNAL(loginRequired(int)), this, SLOT(doStartLogin(int)));
@@ -139,6 +140,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _ui->hostEdit->setText( host);    // Default host
     _ui->portEdit->setValue( port);
     _ui->connectStat->hide();
+    _ui->encryptStat->hide();
 
     _chatServWin = new ChatServWindow( _appSettings, this);
     connect( _chatServWin, SIGNAL(txtOutput(QString)), this, SLOT(doChatAdd(QString)));
@@ -234,6 +236,7 @@ void MainWindow::setConnectOffGui()
     setFuncButtonOffGui();
 
     _ui->connectStat->setVisible( false);
+    _ui->encryptStat->setVisible( false);
     _ui->connectButton->setEnabled( true);
     _ui->discoverButton->setVisible( true);
     _ui->chatButton->setVisible( false);
@@ -812,6 +815,8 @@ void MainWindow::doClientStateChanged( int status)
                               || ((status == ArnClient::ConnectStat::Negotiating) && _isLoginCancel));
     _ui->connectStat->setVisible( _wasContact);
 
+    _ui->encryptStat->setVisible( _arnClient->isEncrypted() && _wasConnect);
+
     _ui->chatButton->setVisible( _wasConnect);
 }
 
@@ -820,6 +825,12 @@ void  MainWindow::doStartLogin( int contextCode)
 {
     if (_isLoginDialog)  return;  // Login dialog already in use
     if (_isLoginCancel)  return;  // User has canceled login earlier
+
+    if (contextCode == 5) {
+        connection( false);
+        clientError("Encryption policy mismatch for Arn client/server");
+        return;
+    }
 
     _loginContextCode = contextCode;
     _isLoginDialog    = true;

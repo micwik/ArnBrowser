@@ -23,5 +23,6 @@
         <file>pic/Play.png</file>
         <file>pic/chat.png</file>
         <file>pic/log.png</file>
+        <file>pic/lock.png</file>
     </qresource>
 </RCC>
