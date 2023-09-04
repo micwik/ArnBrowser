@@ -25,6 +25,7 @@
 #include "ui_SettingsWindow.h"
 #include "SettingsHandler.hpp"
 #include <ArnInc/ArnClient.hpp>
+#include <ArnInc/Arn.hpp>
 #include <QDialogButtonBox>
 #include <QCloseEvent>
 #include <QSettings>
@@ -38,6 +39,7 @@ SettingsWindow::SettingsWindow( SettingsHandler* settings, QWidget* parent) :
 {
     _ui->setupUi( this);
     this->setWindowTitle( QString("Settings - ArnBrowser"));
+    _ui->encryptEdit->addItems( Arn::EncryptPolicy::txt().getBasicTextList());
     setModal( true);
     show();
 
@@ -104,6 +106,7 @@ void  SettingsWindow::readSettings()
     _ui->contactEdit->setText(  _settings->d.contact);
     _ui->locationEdit->setText( _settings->d.location);
     _ui->rowsEdit->setText( QString::number( _settings->d.maxRows));
+    _ui->encryptEdit->setCurrentIndex( _settings->d.encryptPol);
 }
 
 
@@ -113,9 +116,10 @@ void  SettingsWindow::writeSettings()
     _appSettings->setValue("set/pos", pos());
     _appSettings->setValue("set/size", size());
 
-    _settings->d.userName = _ui->userNameEdit->text();
-    _settings->d.contact  = _ui->contactEdit->text();
-    _settings->d.location = _ui->locationEdit->text();
-    _settings->d.maxRows  = _ui->rowsEdit->text().toInt();
+    _settings->d.userName   = _ui->userNameEdit->text();
+    _settings->d.contact    = _ui->contactEdit->text();
+    _settings->d.location   = _ui->locationEdit->text();
+    _settings->d.maxRows    = _ui->rowsEdit->text().toInt();
+    _settings->d.encryptPol = _ui->encryptEdit->currentIndex();
     _settings->writeSettings();
 }

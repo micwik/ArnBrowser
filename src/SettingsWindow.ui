@@ -173,6 +173,42 @@
                <item row="0" column="1">
                 <widget class="QLineEdit" name="userNameEdit"/>
                </item>
+               <item row="4" column="0">
+                <widget class="QLabel" name="rowsTxt">
+                 <property name="text">
+                  <string>Max &amp;rows</string>
+                 </property>
+                 <property name="buddy">
+                  <cstring>rowsEdit</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="locationTxt">
+                 <property name="text">
+                  <string>&amp;Location</string>
+                 </property>
+                 <property name="buddy">
+                  <cstring>locationEdit</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0">
+                <spacer name="verticalSpacer_5">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>10</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
                <item row="0" column="0">
                 <widget class="QLabel" name="userNameTxt">
                  <property name="text">
@@ -186,18 +222,8 @@
                <item row="2" column="1">
                 <widget class="QLineEdit" name="locationEdit"/>
                </item>
-               <item row="1" column="1">
-                <widget class="QLineEdit" name="contactEdit"/>
-               </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="locationTxt">
-                 <property name="text">
-                  <string>&amp;Location</string>
-                 </property>
-                 <property name="buddy">
-                  <cstring>locationEdit</cstring>
-                 </property>
-                </widget>
+               <item row="6" column="1">
+                <widget class="QComboBox" name="encryptEdit"/>
                </item>
                <item row="1" column="0">
                 <widget class="QLabel" name="contactTxt">
@@ -209,7 +235,36 @@
                  </property>
                 </widget>
                </item>
-               <item row="3" column="1">
+               <item row="6" column="0">
+                <widget class="QLabel" name="encryptTxt">
+                 <property name="text">
+                  <string>&amp;Encrypt policy</string>
+                 </property>
+                 <property name="buddy">
+                  <cstring>encryptEdit</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="0">
+                <spacer name="verticalSpacer_6">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>10</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLineEdit" name="contactEdit"/>
+               </item>
+               <item row="4" column="1">
                 <widget class="QLineEdit" name="rowsEdit">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -225,13 +280,6 @@
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0">
-                <widget class="QLabel" name="rowsTxt">
-                 <property name="text">
-                  <string>Max rows</string>
                  </property>
                 </widget>
                </item>
@@ -256,11 +304,47 @@
             </layout>
            </item>
            <item>
-            <widget class="QPushButton" name="fontButton">
-             <property name="text">
-              <string>Font select (requires restart)</string>
+            <spacer name="verticalSpacer_7">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
              </property>
-            </widget>
+             <property name="sizeType">
+              <enum>QSizePolicy::Preferred</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>15</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <layout class="QGridLayout" name="gridLayout_4" columnminimumwidth="0,0">
+             <item row="0" column="0">
+              <widget class="QPushButton" name="fontButton">
+               <property name="text">
+                <string>Font select (requires restart)</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <spacer name="horizontalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>250</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
            </item>
            <item>
             <spacer name="verticalSpacer_4">

@@ -38,6 +38,7 @@ public:
         QString  location;
         QString  font;
         int  maxRows;
+        int  encryptPol;
     };
 
     SettingsHandler( QSettings* appSettings);

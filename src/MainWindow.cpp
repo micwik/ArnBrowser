@@ -110,7 +110,6 @@ MainWindow::MainWindow(QWidget *parent) :
     _arnClient = new ArnClient( this);
     _arnClient->setSyncMode( ArnClient::SyncMode::ExplicitMaster);
     _arnClient->setDemandLogin( false);
-    _arnClient->setEncryptPolicy( Arn::EncryptPolicy::PreferNo);
     // _arnClient->setReceiveTimeout(5);  // Base time for receiver timeout
     connect( _arnClient, SIGNAL(connectionStatusChanged(int,int)), this, SLOT(doClientStateChanged(int)));
     connect( _arnClient, SIGNAL(loginRequired(int)), this, SLOT(doStartLogin(int)));
@@ -195,6 +194,7 @@ void  MainWindow::connection( bool isConnect)
         wimXsm.add("Contact",  _settings->d.contact);
         wimXsm.add("Location", _settings->d.location);
         _arnClient->setWhoIAm( wimXsm);
+        _arnClient->setEncryptPolicy( Arn::EncryptPolicy::fromInt( _settings->d.encryptPol));
 
         _arnClient->connectToArn( _ui->hostEdit->text(), _ui->portEdit->value());
         _connector->setCurHost( _ui->hostEdit->text());
